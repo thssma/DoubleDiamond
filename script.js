@@ -1,42 +1,41 @@
 const clients = [];
 
+window.onload = () => {
+    renderDashboard();
+};
+
 function changePage(page, event){
 
-    const title = document.getElementById("pageTitle");
-    const content = document.getElementById("pageContent");
-
-    document.querySelectorAll(".menu-btn")
+    document
+        .querySelectorAll(".menu-btn")
         .forEach(btn => btn.classList.remove("active"));
 
     if(event){
         event.target.classList.add("active");
     }
 
-    if(page === "dashboard"){
-        renderDashboard(title, content);
-    }
+    switch(page){
 
-    if(page === "clientes"){
-        renderClientes(title, content);
-    }
+        case "dashboard":
+            renderDashboard();
+            break;
 
-    if(page !== "dashboard" && page !== "clientes"){
-        title.innerText = page.charAt(0).toUpperCase() + page.slice(1);
+        case "clientes":
+            renderClientes();
+            break;
 
-        content.innerHTML = `
-            <div class="card">
-                <h2>${title.innerText}</h2>
-                <p>Módulo em desenvolvimento.</p>
-            </div>
-        `;
+        default:
+            renderPlaceholder(page);
     }
 }
 
-function renderDashboard(title, content){
-    title.innerText = "Dashboard";
+function renderDashboard(){
 
-    content.innerHTML = `
+    document.getElementById("pageTitle").innerText = "Dashboard";
+
+    document.getElementById("pageContent").innerHTML = `
         <div class="cards">
+
             <div class="card">
                 <h3>Clientes</h3>
                 <p>${clients.length}</p>
@@ -56,111 +55,142 @@ function renderDashboard(title, content){
                 <h3>Receita</h3>
                 <p>R$ 0,00</p>
             </div>
+
         </div>
     `;
 }
 
-function renderClientes(title, content){
-    title.innerText = "Clientes";
+function renderClientes(){
 
-    content.innerHTML = `
+    document.getElementById("pageTitle").innerText = "Clientes";
+
+    document.getElementById("pageContent").innerHTML = `
         <div class="card">
+
             <h2>Novo Cliente</h2>
 
             <div class="form-grid">
-                <input id="clientName" placeholder="Nome do cliente">
-                <input id="clientPhone" placeholder="Telefone">
-                <input id="clientEmail" placeholder="Email">
-                <input id="clientAddress" placeholder="Endereço">
 
-                <select id="clientPropertyType">
-                    <option value="">Tipo de propriedade</option>
-                    <option value="Residential">Residential</option>
-                    <option value="Commercial">Commercial</option>
-                    <option value="HOA Community">HOA Community</option>
-                    <option value="Office Building">Office Building</option>
-                </select>
+                <input id="name" placeholder="Nome">
 
-                <select id="clientStatus">
-                    <option value="Ativo">Ativo</option>
-                    <option value="Lead">Lead</option>
-                    <option value="Inativo">Inativo</option>
-                </select>
+                <input id="phone" placeholder="Telefone">
+
+                <input id="email" placeholder="Email">
+
+                <input id="address" placeholder="Endereço">
+
             </div>
 
-            <textarea id="clientNotes" placeholder="Observações"></textarea>
+            <textarea
+                id="notes"
+                placeholder="Observações">
+            </textarea>
 
-            <button class="primary-btn" onclick="addClient()">
+            <button
+                class="primary-btn"
+                onclick="addClient()">
+
                 Adicionar Cliente
+
             </button>
+
         </div>
 
+        <br>
+
         <div class="card">
-            <h2>Lista de Clientes</h2>
+
+            <h2>Clientes Cadastrados</h2>
+
             <div id="clientList"></div>
+
         </div>
     `;
 
-    renderClientList();
+    updateClientList();
 }
 
 function addClient(){
-    const name = document.getElementById("clientName").value.trim();
-    const phone = document.getElementById("clientPhone").value.trim();
-    const email = document.getElementById("clientEmail").value.trim();
-    const address = document.getElementById("clientAddress").value.trim();
-    const propertyType = document.getElementById("clientPropertyType").value;
-    const status = document.getElementById("clientStatus").value;
-    const notes = document.getElementById("clientNotes").value.trim();
+
+    const name =
+        document.getElementById("name").value.trim();
 
     if(!name){
-        alert("Digite o nome do cliente.");
+
+        alert("Digite o nome do cliente");
+
         return;
     }
 
     clients.push({
         name,
-        phone,
-        email,
-        address,
-        propertyType,
-        status,
-        notes
+        phone: document.getElementById("phone").value,
+        email: document.getElementById("email").value,
+        address: document.getElementById("address").value,
+        notes: document.getElementById("notes").value
     });
 
-    renderClientes(
-        document.getElementById("pageTitle"),
-        document.getElementById("pageContent")
-    );
+    updateClientList();
 }
 
 function removeClient(index){
-    clients.splice(index, 1);
-    renderClientList();
+
+    clients.splice(index,1);
+
+    updateClientList();
 }
 
-function renderClientList(){
-    const list = document.getElementById("clientList");
+function updateClientList(){
 
-    if(!list) return;
+    const container =
+        document.getElementById("clientList");
+
+    if(!container) return;
 
     if(clients.length === 0){
-        list.innerHTML = "<p>Nenhum cliente cadastrado.</p>";
+
+        container.innerHTML =
+            "<p>Nenhum cliente cadastrado.</p>";
+
         return;
     }
 
-    list.innerHTML = clients.map((client, index) => `
-        <div class="client-item">
-            <div>
-                <strong>${client.name}</strong>
-                <p>${client.phone || "Sem telefone"} | ${client.email || "Sem email"}</p>
-                <p>${client.address || "Sem endereço"}</p>
-                <small>${client.propertyType || "Sem tipo"} • ${client.status}</small>
+    container.innerHTML =
+        clients.map((client,index)=>`
+
+            <div class="client-item">
+
+                <div>
+
+                    <strong>${client.name}</strong>
+
+                    <br>
+
+                    ${client.phone}
+
+                </div>
+
+                <button
+                    class="danger-btn"
+                    onclick="removeClient(${index})">
+
+                    Remover
+
+                </button>
+
             </div>
 
-            <button class="danger-btn" onclick="removeClient(${index})">
-                Remover
-            </button>
+        `).join("");
+}
+
+function renderPlaceholder(page){
+
+    document.getElementById("pageTitle").innerText =
+        page;
+
+    document.getElementById("pageContent").innerHTML = `
+        <div class="card">
+            <h2>Módulo em desenvolvimento</h2>
         </div>
-    `).join("");
+    `;
 }
