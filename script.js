@@ -3,6 +3,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 let clients = [];
 let quotes = [];
+let services = [];
 
 const headers = {
     "apikey": SUPABASE_ANON_KEY,
@@ -18,27 +19,26 @@ window.onload = async () => {
 async function loadData(){
     await loadClients();
     await loadQuotes();
+    await loadServices();
 }
 
 async function loadClients(){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/clients?select=*&order=created_at.desc`, {
-        headers
-    });
-
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/clients?select=*&order=created_at.desc`, { headers });
     clients = await response.json();
 }
 
 async function loadQuotes(){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/quotes?select=*&order=created_at.desc`, {
-        headers
-    });
-
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/quotes?select=*&order=created_at.desc`, { headers });
     quotes = await response.json();
 }
 
+async function loadServices(){
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/services?select=*&order=created_at.desc`, { headers });
+    services = await response.json();
+}
+
 function changePage(page, event){
-    document.querySelectorAll(".menu-btn")
-        .forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".menu-btn").forEach(btn => btn.classList.remove("active"));
 
     if(event){
         event.target.classList.add("active");
@@ -48,15 +48,15 @@ function changePage(page, event){
         case "dashboard":
             renderDashboard();
             break;
-
         case "clientes":
             renderClientes();
             break;
-
         case "orcamentos":
             renderOrcamentos();
             break;
-
+        case "servicos":
+            renderServicos();
+            break;
         default:
             renderPlaceholder(page);
     }
@@ -78,8 +78,8 @@ function renderDashboard(){
             </div>
 
             <div class="card">
-                <h3>Projetos</h3>
-                <p>0</p>
+                <h3>Serviços</h3>
+                <p>${services.length}</p>
             </div>
 
             <div class="card">
@@ -120,9 +120,7 @@ function renderClientes(){
 
             <textarea id="notes" placeholder="Observações"></textarea>
 
-            <button class="primary-btn" onclick="addClient()">
-                Adicionar Cliente
-            </button>
+            <button class="primary-btn" onclick="addClient()">Adicionar Cliente</button>
         </div>
 
         <div class="card">
@@ -154,15 +152,12 @@ async function addClient(){
 
     const response = await fetch(`${SUPABASE_URL}/rest/v1/clients`, {
         method: "POST",
-        headers: {
-            ...headers,
-            "Prefer": "return=representation"
-        },
+        headers: { ...headers, "Prefer": "return=representation" },
         body: JSON.stringify(newClient)
     });
 
     if(!response.ok){
-        alert("Erro ao salvar cliente no Supabase.");
+        alert("Erro ao salvar cliente.");
         return;
     }
 
@@ -204,9 +199,7 @@ function updateClientList(){
                 <small>${client.property_type || "Sem tipo"} • ${client.status}</small>
             </div>
 
-            <button class="danger-btn" onclick="removeClient('${client.id}')">
-                Remover
-            </button>
+            <button class="danger-btn" onclick="removeClient('${client.id}')">Remover</button>
         </div>
     `).join("");
 }
@@ -221,20 +214,23 @@ function renderOrcamentos(){
             <div class="form-grid">
                 <select id="quoteClient">
                     <option value="">Selecione o cliente</option>
-                    ${clients.map(client => `
-                        <option value="${client.id}">${client.name}</option>
-                    `).join("")}
+                    ${clients.map(client => `<option value="${client.id}">${client.name}</option>`).join("")}
                 </select>
 
                 <select id="quoteService">
                     <option value="">Serviço</option>
-                    <option value="Lawn Care">Lawn Care</option>
-                    <option value="Landscaping">Landscaping</option>
-                    <option value="Irrigation">Irrigation</option>
-                    <option value="Pressure Washing">Pressure Washing</option>
-                    <option value="Gutter Cleaning">Gutter Cleaning</option>
-                    <option value="Tree Care">Tree Care</option>
-                    <option value="Seasonal Cleanup">Seasonal Cleanup</option>
+                    ${services.length > 0
+                        ? services.map(service => `<option value="${service.name}">${service.name}</option>`).join("")
+                        : `
+                            <option value="Lawn Care">Lawn Care</option>
+                            <option value="Landscaping">Landscaping</option>
+                            <option value="Irrigation">Irrigation</option>
+                            <option value="Pressure Washing">Pressure Washing</option>
+                            <option value="Gutter Cleaning">Gutter Cleaning</option>
+                            <option value="Tree Care">Tree Care</option>
+                            <option value="Seasonal Cleanup">Seasonal Cleanup</option>
+                        `
+                    }
                 </select>
 
                 <input id="quoteValue" type="number" placeholder="Valor estimado">
@@ -249,9 +245,7 @@ function renderOrcamentos(){
 
             <textarea id="quoteDescription" placeholder="Descrição do orçamento"></textarea>
 
-            <button class="primary-btn" onclick="addQuote()">
-                Adicionar Orçamento
-            </button>
+            <button class="primary-btn" onclick="addQuote()">Adicionar Orçamento</button>
         </div>
 
         <div class="card">
@@ -290,15 +284,12 @@ async function addQuote(){
 
     const response = await fetch(`${SUPABASE_URL}/rest/v1/quotes`, {
         method: "POST",
-        headers: {
-            ...headers,
-            "Prefer": "return=representation"
-        },
+        headers: { ...headers, "Prefer": "return=representation" },
         body: JSON.stringify(newQuote)
     });
 
     if(!response.ok){
-        alert("Erro ao salvar orçamento no Supabase.");
+        alert("Erro ao salvar orçamento.");
         return;
     }
 
@@ -338,14 +329,130 @@ function updateQuoteList(){
                 <small>${quote.service}</small><br>
                 <small>${quote.description || "Sem descrição"}</small><br>
                 <strong>R$ ${formatMoney(quote.value)}</strong><br>
-                <span class="status ${getStatusClass(quote.status)}">
-                    ${quote.status}
+                <span class="status ${getStatusClass(quote.status)}">${quote.status}</span>
+            </div>
+
+            <button class="danger-btn" onclick="removeQuote('${quote.id}')">Remover</button>
+        </div>
+    `).join("");
+}
+
+function renderServicos(){
+    document.getElementById("pageTitle").innerText = "Serviços";
+
+    document.getElementById("pageContent").innerHTML = `
+        <div class="card">
+            <h2>Novo Serviço</h2>
+
+            <div class="form-grid">
+                <input id="serviceName" placeholder="Nome do serviço">
+
+                <select id="serviceCategory">
+                    <option value="">Categoria</option>
+                    <option value="Lawn Care">Lawn Care</option>
+                    <option value="Landscaping">Landscaping</option>
+                    <option value="Irrigation">Irrigation</option>
+                    <option value="Pressure Washing">Pressure Washing</option>
+                    <option value="Gutter Cleaning">Gutter Cleaning</option>
+                    <option value="Tree Care">Tree Care</option>
+                    <option value="Seasonal Cleanup">Seasonal Cleanup</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <input id="serviceBasePrice" type="number" placeholder="Preço base">
+
+                <input id="serviceDuration" placeholder="Duração estimada">
+
+                <select id="serviceStatus">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+
+            <textarea id="serviceDescription" placeholder="Descrição do serviço"></textarea>
+
+            <button class="primary-btn" onclick="addService()">Adicionar Serviço</button>
+        </div>
+
+        <div class="card">
+            <h2>Serviços Cadastrados</h2>
+            <div id="serviceList"></div>
+        </div>
+    `;
+
+    updateServiceList();
+}
+
+async function addService(){
+    const name = document.getElementById("serviceName").value.trim();
+
+    if(!name){
+        alert("Digite o nome do serviço.");
+        return;
+    }
+
+    const newService = {
+        name,
+        category: document.getElementById("serviceCategory").value,
+        base_price: Number(document.getElementById("serviceBasePrice").value || 0),
+        estimated_duration: document.getElementById("serviceDuration").value,
+        status: document.getElementById("serviceStatus").value,
+        description: document.getElementById("serviceDescription").value
+    };
+
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/services`, {
+        method: "POST",
+        headers: { ...headers, "Prefer": "return=representation" },
+        body: JSON.stringify(newService)
+    });
+
+    if(!response.ok){
+        alert("Erro ao salvar serviço.");
+        return;
+    }
+
+    await loadServices();
+    renderServicos();
+}
+
+async function removeService(id){
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/services?id=eq.${id}`, {
+        method: "DELETE",
+        headers
+    });
+
+    if(!response.ok){
+        alert("Erro ao remover serviço.");
+        return;
+    }
+
+    await loadServices();
+    renderServicos();
+}
+
+function updateServiceList(){
+    const container = document.getElementById("serviceList");
+
+    if(!container) return;
+
+    if(services.length === 0){
+        container.innerHTML = "<p>Nenhum serviço cadastrado.</p>";
+        return;
+    }
+
+    container.innerHTML = services.map(service => `
+        <div class="service-item">
+            <div>
+                <strong>${service.name}</strong><br>
+                <small>${service.category || "Sem categoria"} • ${service.estimated_duration || "Sem duração"}</small><br>
+                <strong>R$ ${formatMoney(service.base_price)}</strong><br>
+                <small>${service.description || "Sem descrição"}</small><br>
+                <span class="status ${service.status === "Active" ? "status-active" : "status-inactive"}">
+                    ${service.status}
                 </span>
             </div>
 
-            <button class="danger-btn" onclick="removeQuote('${quote.id}')">
-                Remover
-            </button>
+            <button class="danger-btn" onclick="removeService('${service.id}')">Remover</button>
         </div>
     `).join("");
 }
