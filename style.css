@@ -125,7 +125,8 @@ textarea{
 }
 
 .client-item,
-.quote-item{
+.quote-item,
+.service-item{
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -135,7 +136,8 @@ textarea{
 }
 
 .client-item small,
-.quote-item small{
+.quote-item small,
+.service-item small{
     color:#6b7280;
 }
 
@@ -161,13 +163,16 @@ textarea{
 .status-sent{ background:#dbeafe; color:#1d4ed8; }
 .status-approved{ background:#dcfce7; color:#166534; }
 .status-rejected{ background:#fee2e2; color:#991b1b; }
+.status-active{ background:#dcfce7; color:#166534; }
+.status-inactive{ background:#fee2e2; color:#991b1b; }
 
 @media(max-width:768px){
     .container{ flex-direction:column; }
     .sidebar{ width:100%; }
 
     .client-item,
-    .quote-item{
+    .quote-item,
+    .service-item{
         flex-direction:column;
         align-items:flex-start;
     }
