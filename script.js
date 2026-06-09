@@ -1,90 +1,54 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
-}
+function changePage(page){
 
-body{
-    background:#f4f6f9;
-}
+    const title = document.getElementById("pageTitle");
+    const content = document.getElementById("pageContent");
 
-.container{
-    display:flex;
-    min-height:100vh;
-}
+    document.querySelectorAll(".menu-btn")
+        .forEach(btn => btn.classList.remove("active"));
 
-.sidebar{
-    width:250px;
-    background:#1f2937;
-    color:white;
-    padding:20px;
-}
+    event.target.classList.add("active");
 
-.logo{
-    margin-bottom:30px;
-}
+    switch(page){
 
-.menu-btn{
-    width:100%;
-    border:none;
-    background:transparent;
-    color:white;
-    text-align:left;
-    padding:15px;
-    cursor:pointer;
-    border-radius:8px;
-    margin-bottom:5px;
-}
+        case "dashboard":
 
-.menu-btn:hover{
-    background:#374151;
-}
+            title.innerText = "Dashboard";
 
-.menu-btn.active{
-    background:#2563eb;
-}
+            content.innerHTML = `
+                <div class="cards">
+                    <div class="card">
+                        <h3>Clientes</h3>
+                        <p>0</p>
+                    </div>
 
-.content{
-    flex:1;
-    padding:30px;
-}
+                    <div class="card">
+                        <h3>Orçamentos</h3>
+                        <p>0</p>
+                    </div>
 
-header{
-    margin-bottom:30px;
-}
+                    <div class="card">
+                        <h3>Projetos</h3>
+                        <p>0</p>
+                    </div>
 
-.cards{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
-}
+                    <div class="card">
+                        <h3>Receita</h3>
+                        <p>R$ 0,00</p>
+                    </div>
+                </div>
+            `;
+        break;
 
-.card{
-    background:white;
-    border-radius:12px;
-    padding:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-}
+        default:
 
-.card h3{
-    margin-bottom:10px;
-}
+            title.innerText =
+                page.charAt(0).toUpperCase() + page.slice(1);
 
-.card p{
-    font-size:28px;
-    font-weight:bold;
-    color:#2563eb;
-}
-
-@media(max-width:768px){
-
-    .container{
-        flex-direction:column;
+            content.innerHTML = `
+                <div class="card">
+                    <h2>${title.innerText}</h2>
+                    <p>Módulo em desenvolvimento.</p>
+                </div>
+            `;
     }
-
-    .sidebar{
-        width:100%;
-    }
-
 }
