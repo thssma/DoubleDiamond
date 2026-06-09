@@ -1,1 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DoubleDiamond</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                <h2>💎 DoubleDiamond</h2>
+            </div>
+
+            <nav>
+
+                <button class="menu-btn active" onclick="changePage('dashboard')">
+                    Dashboard
+                </button>
+
+                <button class="menu-btn" onclick="changePage('clientes')">
+                    Clientes
+                </button>
+
+                <button class="menu-btn" onclick="changePage('orcamentos')">
+                    Orçamentos
+                </button>
+
+                <button class="menu-btn" onclick="changePage('projetos')">
+                    Projetos
+                </button>
+
+                <button class="menu-btn" onclick="changePage('agenda')">
+                    Agenda
+                </button>
+
+                <button class="menu-btn" onclick="changePage('financeiro')">
+                    Financeiro
+                </button>
+
+                <button class="menu-btn" onclick="changePage('configuracoes')">
+                    Configurações
+                </button>
+
+            </nav>
+
+        </aside>
+
+        <main class="content">
+
+            <header>
+                <h1 id="pageTitle">Dashboard</h1>
+            </header>
+
+            <section id="pageContent">
+
+                <div class="cards">
+
+                    <div class="card">
+                        <h3>Clientes</h3>
+                        <p>0</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Orçamentos</h3>
+                        <p>0</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Projetos</h3>
+                        <p>0</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Receita</h3>
+                        <p>R$ 0,00</p>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
