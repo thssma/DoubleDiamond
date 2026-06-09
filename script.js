@@ -1,14 +1,43 @@
-const clients = [];
-const quotes = [];
+const SUPABASE_URL = "https://phpphqcxzwpuiglkqkls.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBocHBocWN4endwdWlnbGtxa2xzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNDE0NTAsImV4cCI6MjA5NjYxNzQ1MH0.z0F0KAHCWKdRTyg5JeNDzAWEbIdFEknT_kmx4QyMz3I";
 
-window.onload = () => {
+let clients = [];
+let quotes = [];
+
+const headers = {
+    "apikey": SUPABASE_ANON_KEY,
+    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+    "Content-Type": "application/json"
+};
+
+window.onload = async () => {
+    await loadData();
     renderDashboard();
 };
 
-function changePage(page, event){
+async function loadData(){
+    await loadClients();
+    await loadQuotes();
+}
 
-    document
-        .querySelectorAll(".menu-btn")
+async function loadClients(){
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/clients?select=*&order=created_at.desc`, {
+        headers
+    });
+
+    clients = await response.json();
+}
+
+async function loadQuotes(){
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/quotes?select=*&order=created_at.desc`, {
+        headers
+    });
+
+    quotes = await response.json();
+}
+
+function changePage(page, event){
+    document.querySelectorAll(".menu-btn")
         .forEach(btn => btn.classList.remove("active"));
 
     if(event){
@@ -16,7 +45,6 @@ function changePage(page, event){
     }
 
     switch(page){
-
         case "dashboard":
             renderDashboard();
             break;
@@ -35,12 +63,10 @@ function changePage(page, event){
 }
 
 function renderDashboard(){
-
     document.getElementById("pageTitle").innerText = "Dashboard";
 
     document.getElementById("pageContent").innerHTML = `
         <div class="cards">
-
             <div class="card">
                 <h3>Clientes</h3>
                 <p>${clients.length}</p>
@@ -60,18 +86,15 @@ function renderDashboard(){
                 <h3>Receita Estimada</h3>
                 <p>R$ ${getApprovedRevenue()}</p>
             </div>
-
         </div>
     `;
 }
 
 function renderClientes(){
-
     document.getElementById("pageTitle").innerText = "Clientes";
 
     document.getElementById("pageContent").innerHTML = `
         <div class="card">
-
             <h2>Novo Cliente</h2>
 
             <div class="form-grid">
@@ -100,98 +123,106 @@ function renderClientes(){
             <button class="primary-btn" onclick="addClient()">
                 Adicionar Cliente
             </button>
-
         </div>
 
         <div class="card">
-
             <h2>Clientes Cadastrados</h2>
-
             <div id="clientList"></div>
-
         </div>
     `;
 
     updateClientList();
 }
 
-function addClient(){
-
+async function addClient(){
     const name = document.getElementById("name").value.trim();
 
     if(!name){
-        alert("Digite o nome do cliente");
+        alert("Digite o nome do cliente.");
         return;
     }
 
-    clients.push({
+    const newClient = {
         name,
         phone: document.getElementById("phone").value,
         email: document.getElementById("email").value,
         address: document.getElementById("address").value,
-        propertyType: document.getElementById("propertyType").value,
+        property_type: document.getElementById("propertyType").value,
         status: document.getElementById("clientStatus").value,
         notes: document.getElementById("notes").value
+    };
+
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/clients`, {
+        method: "POST",
+        headers: {
+            ...headers,
+            "Prefer": "return=representation"
+        },
+        body: JSON.stringify(newClient)
     });
 
+    if(!response.ok){
+        alert("Erro ao salvar cliente no Supabase.");
+        return;
+    }
+
+    await loadClients();
     renderClientes();
 }
 
-function removeClient(index){
+async function removeClient(id){
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/clients?id=eq.${id}`, {
+        method: "DELETE",
+        headers
+    });
 
-    clients.splice(index,1);
+    if(!response.ok){
+        alert("Erro ao remover cliente.");
+        return;
+    }
 
+    await loadData();
     renderClientes();
 }
 
 function updateClientList(){
-
     const container = document.getElementById("clientList");
 
     if(!container) return;
 
     if(clients.length === 0){
-
         container.innerHTML = "<p>Nenhum cliente cadastrado.</p>";
-
         return;
     }
 
-    container.innerHTML = clients.map((client,index)=>`
-
+    container.innerHTML = clients.map(client => `
         <div class="client-item">
-
             <div>
                 <strong>${client.name}</strong><br>
                 <small>${client.phone || "Sem telefone"} | ${client.email || "Sem email"}</small><br>
                 <small>${client.address || "Sem endereço"}</small><br>
-                <small>${client.propertyType || "Sem tipo"} • ${client.status}</small>
+                <small>${client.property_type || "Sem tipo"} • ${client.status}</small>
             </div>
 
-            <button class="danger-btn" onclick="removeClient(${index})">
+            <button class="danger-btn" onclick="removeClient('${client.id}')">
                 Remover
             </button>
-
         </div>
-
     `).join("");
 }
 
 function renderOrcamentos(){
-
     document.getElementById("pageTitle").innerText = "Orçamentos";
 
     document.getElementById("pageContent").innerHTML = `
         <div class="card">
-
             <h2>Novo Orçamento</h2>
 
             <div class="form-grid">
-
                 <select id="quoteClient">
                     <option value="">Selecione o cliente</option>
-                    ${clients.map((client, index) => `
-                        <option value="${index}">${client.name}</option>
+                    ${clients.map(client => `
+                        <option value="${client.id}">${client.name}</option>
                     `).join("")}
                 </select>
 
@@ -214,7 +245,6 @@ function renderOrcamentos(){
                     <option value="Approved">Approved</option>
                     <option value="Rejected">Rejected</option>
                 </select>
-
             </div>
 
             <textarea id="quoteDescription" placeholder="Descrição do orçamento"></textarea>
@@ -222,30 +252,22 @@ function renderOrcamentos(){
             <button class="primary-btn" onclick="addQuote()">
                 Adicionar Orçamento
             </button>
-
         </div>
 
         <div class="card">
-
             <h2>Orçamentos Cadastrados</h2>
-
             <div id="quoteList"></div>
-
         </div>
     `;
 
     updateQuoteList();
 }
 
-function addQuote(){
-
-    const clientIndex = document.getElementById("quoteClient").value;
+async function addQuote(){
+    const clientId = document.getElementById("quoteClient").value;
     const service = document.getElementById("quoteService").value;
-    const value = document.getElementById("quoteValue").value;
-    const status = document.getElementById("quoteStatus").value;
-    const description = document.getElementById("quoteDescription").value;
 
-    if(clientIndex === ""){
+    if(!clientId){
         alert("Selecione um cliente.");
         return;
     }
@@ -255,43 +277,64 @@ function addQuote(){
         return;
     }
 
-    quotes.push({
-        clientName: clients[clientIndex].name,
+    const selectedClient = clients.find(client => client.id === clientId);
+
+    const newQuote = {
+        client_id: clientId,
+        client_name: selectedClient.name,
         service,
-        value,
-        status,
-        description
+        value: Number(document.getElementById("quoteValue").value || 0),
+        status: document.getElementById("quoteStatus").value,
+        description: document.getElementById("quoteDescription").value
+    };
+
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/quotes`, {
+        method: "POST",
+        headers: {
+            ...headers,
+            "Prefer": "return=representation"
+        },
+        body: JSON.stringify(newQuote)
     });
 
+    if(!response.ok){
+        alert("Erro ao salvar orçamento no Supabase.");
+        return;
+    }
+
+    await loadQuotes();
     renderOrcamentos();
 }
 
-function removeQuote(index){
+async function removeQuote(id){
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/quotes?id=eq.${id}`, {
+        method: "DELETE",
+        headers
+    });
 
-    quotes.splice(index,1);
+    if(!response.ok){
+        alert("Erro ao remover orçamento.");
+        return;
+    }
 
+    await loadQuotes();
     renderOrcamentos();
 }
 
 function updateQuoteList(){
-
     const container = document.getElementById("quoteList");
 
     if(!container) return;
 
     if(quotes.length === 0){
-
         container.innerHTML = "<p>Nenhum orçamento cadastrado.</p>";
-
         return;
     }
 
-    container.innerHTML = quotes.map((quote,index)=>`
-
+    container.innerHTML = quotes.map(quote => `
         <div class="quote-item">
-
             <div>
-                <strong>${quote.clientName}</strong><br>
+                <strong>${quote.client_name}</strong><br>
                 <small>${quote.service}</small><br>
                 <small>${quote.description || "Sem descrição"}</small><br>
                 <strong>R$ ${formatMoney(quote.value)}</strong><br>
@@ -300,38 +343,24 @@ function updateQuoteList(){
                 </span>
             </div>
 
-            <button class="danger-btn" onclick="removeQuote(${index})">
+            <button class="danger-btn" onclick="removeQuote('${quote.id}')">
                 Remover
             </button>
-
         </div>
-
     `).join("");
 }
 
 function getStatusClass(status){
-
     switch(status){
-
-        case "Draft":
-            return "status-draft";
-
-        case "Sent":
-            return "status-sent";
-
-        case "Approved":
-            return "status-approved";
-
-        case "Rejected":
-            return "status-rejected";
-
-        default:
-            return "status-draft";
+        case "Draft": return "status-draft";
+        case "Sent": return "status-sent";
+        case "Approved": return "status-approved";
+        case "Rejected": return "status-rejected";
+        default: return "status-draft";
     }
 }
 
 function getApprovedRevenue(){
-
     const total = quotes
         .filter(quote => quote.status === "Approved")
         .reduce((sum, quote) => sum + Number(quote.value || 0), 0);
@@ -340,7 +369,6 @@ function getApprovedRevenue(){
 }
 
 function formatMoney(value){
-
     return Number(value || 0).toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
@@ -348,7 +376,6 @@ function formatMoney(value){
 }
 
 function renderPlaceholder(page){
-
     document.getElementById("pageTitle").innerText =
         page.charAt(0).toUpperCase() + page.slice(1);
 
