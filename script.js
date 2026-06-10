@@ -15,6 +15,8 @@ let appUsers = [];
 let signatures = [];
 let leads = [];
 let leadTimeline = [];
+let notifications = [];
+let teamCheckins = [];
 let projectChecklists = [];
 let projectTasks = [];
 let projectTimeline = [];
@@ -76,6 +78,8 @@ async function loadData(){
   signatures = await apiGet("signatures");
   leads = await apiGet("leads");
   leadTimeline = await apiGet("lead_timeline");
+  notifications = await apiGet("notifications");
+  teamCheckins = await apiGet("team_checkins");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -108,7 +112,10 @@ function changePage(page, event){
     usuarios: renderUsuarios,
     backup: renderBackup,
     crm: renderCRM,
-    dashboardCEO: renderDashboardCEO
+    dashboardCEO: renderDashboardCEO,
+    smartCore: renderSmartCore,
+    notificacoes: renderNotificacoes,
+    mobile: renderMobile
   };
 
   (routes[page] || (() => renderPlaceholder(page)))();
@@ -119,7 +126,7 @@ function setContent(html){ document.getElementById("pageContent").innerHTML = ht
 
 /* DASHBOARD EXECUTIVO */
 function renderDashboard(){
-  setTitle("Dashboard Executivo V8.1");
+  setTitle("Dashboard Executivo V10");
 
   const approvedRevenue = quotes.filter(q => q.status === "Approved").reduce((s,q) => s + Number(q.value || 0), 0);
   const incomePaid = financeItems.filter(i => i.type === "Income" && i.status === "Paid").reduce((s,i) => s + Number(i.amount || 0), 0);
@@ -133,7 +140,7 @@ function renderDashboard(){
 
   setContent(`
     <div class="notice">
-      V8.1 ativa: CRM Comercial + Pipeline + Dashboard CEO + Métricas Comerciais.
+      V10 ativa: Smart Core + Notificações + Recomendações + Mobile Ready + Check-in.
     </div>
 
     <div class="cards">
@@ -150,6 +157,8 @@ function renderDashboard(){
       ${metric("Clientes", clients.length, "")}
       ${metric("Leads", leads.length, "purple")}
       ${metric("Conversão", getConversionRate() + "%", "good")}
+      ${metric("Alertas", notifications.filter(n => n.status !== "Read").length, "warn")}
+      ${metric("Recomendações", getRecommendations().length, "purple")}
       ${metric("Equipe", employees.length, "")}
     </div>
 
@@ -1065,6 +1074,8 @@ async function addEmployee(){
   signatures = await apiGet("signatures");
   leads = await apiGet("leads");
   leadTimeline = await apiGet("lead_timeline");
+  notifications = await apiGet("notifications");
+  teamCheckins = await apiGet("team_checkins");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -1079,6 +1090,8 @@ async function removeEmployee(id){
   signatures = await apiGet("signatures");
   leads = await apiGet("leads");
   leadTimeline = await apiGet("lead_timeline");
+  notifications = await apiGet("notifications");
+  teamCheckins = await apiGet("team_checkins");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -1659,6 +1672,8 @@ async function signQuote(){
   signatures = await apiGet("signatures");
   leads = await apiGet("leads");
   leadTimeline = await apiGet("lead_timeline");
+  notifications = await apiGet("notifications");
+  teamCheckins = await apiGet("team_checkins");
   quotes = await apiGet("quotes");
 
   alert("Orçamento assinado e aprovado.");
@@ -1882,6 +1897,8 @@ function renderCRM(){
         ${metric("Pipeline", "R$ " + formatMoney(getPipelineValue()), "purple")}
         ${metric("Fechados", leads.filter(l => l.status === "Fechado").length, "good")}
         ${metric("Conversão", getConversionRate() + "%", "good")}
+      ${metric("Alertas", notifications.filter(n => n.status !== "Read").length, "warn")}
+      ${metric("Recomendações", getRecommendations().length, "purple")}
       </div>
     </div>
 
@@ -1951,6 +1968,8 @@ async function addLead(){
   }
 
   leadTimeline = await apiGet("lead_timeline");
+  notifications = await apiGet("notifications");
+  teamCheckins = await apiGet("team_checkins");
   renderCRM();
 }
 
@@ -1969,6 +1988,8 @@ async function updateLeadStatus(leadId, status){
 
   leads = await apiGet("leads");
   leadTimeline = await apiGet("lead_timeline");
+  notifications = await apiGet("notifications");
+  teamCheckins = await apiGet("team_checkins");
   renderCRM();
 }
 
@@ -1979,6 +2000,8 @@ async function removeLead(id){
 
   leads = await apiGet("leads");
   leadTimeline = await apiGet("lead_timeline");
+  notifications = await apiGet("notifications");
+  teamCheckins = await apiGet("team_checkins");
   renderCRM();
 }
 
@@ -2019,6 +2042,8 @@ async function convertLeadToClient(leadId){
   clients = await apiGet("clients");
   leads = await apiGet("leads");
   leadTimeline = await apiGet("lead_timeline");
+  notifications = await apiGet("notifications");
+  teamCheckins = await apiGet("team_checkins");
 
   alert("Lead convertido em cliente.");
   renderCRM();
@@ -2108,13 +2133,428 @@ function renderDashboardCEO(){
 }
 
 
+
+/* SMART CORE V10 */
+function renderSmartCore(){
+  setTitle("Smart Core");
+
+  const recommendations = getRecommendations();
+  const projectHealth = projects.map(project => ({
+    project,
+    score: getProjectHealthScore(project.id)
+  }));
+
+  setContent(`
+    <div class="notice">
+      Smart Core analisa CRM, projetos, financeiro, tarefas, agenda e fotos para sugerir ações.
+    </div>
+
+    <div class="cards">
+      ${metric("Recomendações", recommendations.length, "purple")}
+      ${metric("Alertas Não Lidos", notifications.filter(n => n.status !== "Read").length, "warn")}
+      ${metric("Projetos Críticos", projectHealth.filter(p => p.score < 50).length, "bad")}
+      ${metric("Leads Quentes", leads.filter(l => getLeadScore(l) === "Hot").length, "good")}
+      ${metric("Check-ins", teamCheckins.length, "")}
+    </div>
+
+    <div class="smart-grid">
+      <div class="card">
+        <h2>Recomendações</h2>
+        ${recommendations.length ? recommendations.map(r => `
+          <div class="recommendation">
+            <strong>${r.title}</strong>
+            <p>${r.message}</p>
+            <small>${r.module}</small>
+          </div>
+        `).join("") : "<p>Nenhuma recomendação crítica agora.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Saúde dos Projetos</h2>
+        ${projectHealth.length ? projectHealth.map(item => `
+          <div class="soft-box">
+            <strong>${item.project.project_name}</strong><br>
+            <small>${item.project.client_name || "Sem cliente"} • ${item.project.status}</small>
+            <div class="score-circle ${getHealthClass(item.score)}">${item.score}</div>
+            <small>${getHealthLabel(item.score)}</small>
+          </div>
+        `).join("") : "<p>Nenhum projeto cadastrado.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Score Comercial</h2>
+        ${leads.length ? leads.map(lead => `
+          <div class="soft-box">
+            <strong>${lead.name}</strong><br>
+            <small>${lead.status} • R$ ${formatMoney(lead.potential_value)}</small><br>
+            <span class="status ${getLeadScore(lead) === "Hot" ? "status-approved" : getLeadScore(lead) === "Warm" ? "status-scheduled" : "status-draft"}">
+              ${getLeadScore(lead)}
+            </span>
+          </div>
+        `).join("") : "<p>Nenhum lead cadastrado.</p>"}
+      </div>
+    </div>
+  `);
+}
+
+function getRecommendations(){
+  const items = [];
+
+  financeItems
+    .filter(f => f.status === "Overdue")
+    .forEach(f => items.push({
+      title: "Pagamento vencido",
+      message: `Cobrar ${f.related_client || "cliente"} sobre ${f.title} no valor de R$ ${formatMoney(f.amount)}.`,
+      module: "Financeiro"
+    }));
+
+  projects
+    .filter(p => ["Planning","Scheduled","In Progress"].includes(p.status))
+    .forEach(project => {
+      const health = getProjectHealthScore(project.id);
+
+      if(health < 50){
+        items.push({
+          title: "Projeto em risco",
+          message: `${project.project_name} está com saúde ${health}/100. Revise tarefas, checklist, fotos e financeiro.`,
+          module: "Projetos"
+        });
+      }
+
+      const team = projectTeam.filter(t => t.project_id === project.id);
+
+      if(!team.length){
+        items.push({
+          title: "Projeto sem equipe",
+          message: `${project.project_name} ainda não tem equipe vinculada.`,
+          module: "Operações"
+        });
+      }
+    });
+
+  leads
+    .filter(l => ["Lead","Contato","Visita","Negociação"].includes(l.status))
+    .forEach(lead => {
+      if(getLeadScore(lead) === "Hot"){
+        items.push({
+          title: "Lead quente",
+          message: `${lead.name} tem alta prioridade comercial. Próximo passo: contato ou proposta.`,
+          module: "CRM"
+        });
+      }
+    });
+
+  appointments
+    .filter(a => isTomorrow(a.appointment_date))
+    .forEach(a => items.push({
+      title: "Visita amanhã",
+      message: `${a.title} agendada para amanhã com ${a.client_name || "cliente"}.`,
+      module: "Agenda"
+    }));
+
+  return items;
+}
+
+function getProjectHealthScore(projectId){
+  let score = 100;
+
+  const checks = projectChecklists.filter(c => c.project_id === projectId);
+  const tasks = projectTasks.filter(t => t.project_id === projectId);
+  const photos = projectPhotos.filter(p => p.project_id === projectId);
+  const team = projectTeam.filter(t => t.project_id === projectId);
+  const relatedProject = projects.find(p => p.id === projectId);
+  const finance = financeItems.filter(f => f.related_project === relatedProject?.project_name);
+
+  if(checks.length){
+    const completed = checks.filter(c => c.completed).length;
+    const percent = completed / checks.length;
+    if(percent < .5) score -= 25;
+    else if(percent < .8) score -= 10;
+  }else{
+    score -= 15;
+  }
+
+  if(tasks.filter(t => t.status !== "Completed").length > 3) score -= 15;
+  if(!photos.length) score -= 10;
+  if(!team.length) score -= 15;
+  if(finance.some(f => f.status === "Overdue")) score -= 20;
+
+  return Math.max(0, Math.min(100, score));
+}
+
+function getHealthClass(score){
+  if(score >= 75) return "health-good";
+  if(score >= 50) return "health-warn";
+  return "health-bad";
+}
+
+function getHealthLabel(score){
+  if(score >= 75) return "Saudável";
+  if(score >= 50) return "Atenção";
+  return "Crítico";
+}
+
+function getLeadScore(lead){
+  const value = Number(lead.potential_value || 0);
+
+  if(lead.status === "Negociação" || lead.status === "Orçamento" || value >= 10000) return "Hot";
+  if(lead.status === "Visita" || lead.status === "Contato" || value >= 3000) return "Warm";
+  return "Cold";
+}
+
+/* NOTIFICAÇÕES V10 */
+function renderNotificacoes(){
+  setTitle("Central de Notificações");
+
+  const autoItems = generateAutoNotificationsPreview();
+
+  setContent(`
+    <div class="card">
+      <h2>Gerar Alertas Inteligentes</h2>
+      <p>O sistema analisa os dados atuais e cria alertas para o que precisa de atenção.</p>
+      <button class="primary-btn" onclick="generateSmartNotifications()">Gerar Notificações</button>
+    </div>
+
+    <div class="card">
+      <h2>Prévia Inteligente</h2>
+      ${autoItems.length ? autoItems.map(n => `
+        <div class="notification-card ${n.type} card">
+          <strong>${n.title}</strong>
+          <p>${n.message}</p>
+          <small>${n.type} • ${n.related_module}</small>
+        </div>
+      `).join("") : "<p>Nenhum alerta automático no momento.</p>"}
+    </div>
+
+    <div class="card">
+      <h2>Notificações Salvas</h2>
+      <div id="notificationList"></div>
+    </div>
+  `);
+
+  updateNotificationList();
+}
+
+function generateAutoNotificationsPreview(){
+  const list = [];
+
+  financeItems.filter(f => f.status === "Overdue").forEach(f => {
+    list.push({
+      title: "Pagamento vencido",
+      message: `${f.title} está vencido. Valor: R$ ${formatMoney(f.amount)}.`,
+      type: "CRITICAL",
+      related_module: "Financeiro",
+      related_id: f.id
+    });
+  });
+
+  projectTasks.filter(t => t.status !== "Completed").forEach(t => {
+    list.push({
+      title: "Tarefa pendente",
+      message: `${t.title} ainda está ${t.status}.`,
+      type: "WARNING",
+      related_module: "Operações",
+      related_id: t.id
+    });
+  });
+
+  projects.forEach(project => {
+    const health = getProjectHealthScore(project.id);
+
+    if(health < 50){
+      list.push({
+        title: "Projeto crítico",
+        message: `${project.project_name} está com saúde ${health}/100.`,
+        type: "CRITICAL",
+        related_module: "Projeto",
+        related_id: project.id
+      });
+    }
+  });
+
+  leads.filter(l => getLeadScore(l) === "Hot" && l.status !== "Fechado").forEach(lead => {
+    list.push({
+      title: "Lead quente",
+      message: `${lead.name} tem alta chance comercial.`,
+      type: "SUCCESS",
+      related_module: "CRM",
+      related_id: lead.id
+    });
+  });
+
+  appointments.filter(a => isTomorrow(a.appointment_date)).forEach(a => {
+    list.push({
+      title: "Agendamento amanhã",
+      message: `${a.title} está agendado para amanhã.`,
+      type: "INFO",
+      related_module: "Agenda",
+      related_id: a.id
+    });
+  });
+
+  return list;
+}
+
+async function generateSmartNotifications(){
+  const items = generateAutoNotificationsPreview();
+
+  if(!items.length) return alert("Nenhuma notificação necessária agora.");
+
+  for(const item of items){
+    await apiInsert("notifications", {
+      ...item,
+      status: "Unread"
+    });
+  }
+
+  notifications = await apiGet("notifications");
+  renderNotificacoes();
+}
+
+async function markNotificationRead(id){
+  const res = await apiPatch("notifications", id, { status: "Read" });
+
+  if(!res.ok) return alert("Erro ao atualizar notificação.");
+
+  notifications = await apiGet("notifications");
+  renderNotificacoes();
+}
+
+async function removeNotification(id){
+  const res = await apiDelete("notifications", id);
+
+  if(!res.ok) return alert("Erro ao remover notificação.");
+
+  notifications = await apiGet("notifications");
+  renderNotificacoes();
+}
+
+function updateNotificationList(){
+  const el = document.getElementById("notificationList");
+
+  if(!notifications.length){
+    el.innerHTML = "<p>Nenhuma notificação salva.</p>";
+    return;
+  }
+
+  el.innerHTML = notifications.map(n => `
+    <div class="notification-card ${n.type} card">
+      <strong>${n.title}</strong>
+      <p>${n.message || ""}</p>
+      <small>${n.type} • ${n.status} • ${n.related_module || ""}</small>
+      <div class="action-row">
+        <button class="secondary-btn" onclick="markNotificationRead('${n.id}')">Marcar lida</button>
+        <button class="danger-btn" onclick="removeNotification('${n.id}')">Remover</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* MOBILE READY + CHECK-IN V10 */
+function renderMobile(){
+  setTitle("Mobile Field Mode");
+
+  setContent(`
+    <div class="mobile-panel">
+      <div class="mobile-screen">
+        <h2>Campo</h2>
+        <p>Modo rápido para equipe em obra.</p>
+
+        <select id="mobileEmployee">
+          <option value="">Funcionário</option>
+          ${employees.map(e => `<option value="${e.id}">${e.name}</option>`).join("")}
+        </select>
+
+        <select id="mobileProject">
+          <option value="">Projeto</option>
+          ${projects.map(p => `<option value="${p.id}">${p.project_name} - ${p.client_name}</option>`).join("")}
+        </select>
+
+        <textarea id="mobileNotes" placeholder="Observações rápidas"></textarea>
+
+        <button class="mobile-action in" onclick="teamCheckIn('IN')">Entrar na Obra</button>
+        <button class="mobile-action out" onclick="teamCheckIn('OUT')">Sair da Obra</button>
+        <button class="mobile-action photo" onclick="changePage('fotosProjetos')">Enviar Foto</button>
+        <button class="mobile-action photo" onclick="changePage('operacoes')">Abrir Operações</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Histórico de Check-ins</h2>
+      <div id="checkinList"></div>
+    </div>
+  `);
+
+  updateCheckinList();
+}
+
+async function teamCheckIn(type){
+  const employeeId = val("mobileEmployee");
+  const projectId = val("mobileProject");
+
+  if(!employeeId) return alert("Selecione um funcionário.");
+  if(!projectId) return alert("Selecione um projeto.");
+
+  const employee = employees.find(e => e.id === employeeId);
+  const project = projects.find(p => p.id === projectId);
+
+  const res = await apiInsert("team_checkins", {
+    employee_id: employeeId,
+    employee_name: employee?.name || "",
+    project_id: projectId,
+    project_name: project?.project_name || "",
+    check_type: type,
+    notes: val("mobileNotes")
+  });
+
+  if(!res.ok) return alert("Erro ao registrar check-in.");
+
+  await createTimeline(projectId, `${employee?.name || "Funcionário"} realizou check-${type === "IN" ? "in" : "out"} na obra.`);
+
+  teamCheckins = await apiGet("team_checkins");
+  projectTimeline = await apiGet("project_timeline");
+
+  renderMobile();
+}
+
+function updateCheckinList(){
+  const el = document.getElementById("checkinList");
+
+  if(!teamCheckins.length){
+    el.innerHTML = "<p>Nenhum check-in registrado.</p>";
+    return;
+  }
+
+  el.innerHTML = teamCheckins.map(c => `
+    <div class="list-item">
+      <div>
+        <strong>${c.employee_name}</strong><br>
+        <small>${c.project_name} • ${c.check_type}</small><br>
+        <small>${c.check_time ? new Date(c.check_time).toLocaleString("pt-BR") : ""}</small><br>
+        <small>${c.notes || ""}</small>
+      </div>
+    </div>
+  `).join("");
+}
+
+function isTomorrow(dateString){
+  if(!dateString) return false;
+
+  const date = new Date(dateString + "T00:00:00");
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  return date.toDateString() === tomorrow.toDateString();
+}
+
+
 function renderConfiguracoes(){
   setTitle("Configurações");
   setContent(`
     <div class="card">
       <h2>Configurações</h2>
       <p>Projeto conectado ao Supabase.</p>
-      <div class="report-box">Versão: V8.1 CRM + CEO Dashboard
+      <div class="report-box">Versão: V10 Smart Core
 URL: ${SUPABASE_URL}
 
 Automações ativas:
@@ -2140,7 +2580,12 @@ Automações ativas:
 - CRM Comercial V8.1
 - Pipeline de Leads V8.1
 - Dashboard CEO V8.1
-- Timeline Comercial V8.1</div>
+- Timeline Comercial V8.1
+- Smart Core V10
+- Central de Notificações V10
+- Check-in Mobile V10
+- Motor de Recomendações V10
+- Saúde do Projeto V10</div>
     </div>
   `);
 }
