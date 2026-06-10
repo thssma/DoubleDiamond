@@ -978,6 +978,7 @@ async function removeChecklistItem(id){
   if(record) await createTimeline(record.project_id, `Checklist removido: ${record.item}`);
   projectChecklists = await apiGet("project_checklists");
   renderOperacoes();
+
 }
 
 async function addProjectTask(){
@@ -994,10 +995,17 @@ async function addProjectTask(){
     status: val("taskStatus")
   });
 
-  if(!res.ok) return alert("Erro ao criar tarefa.");
+  console.log("TASK RESULT:", res);
+
+  if(!res.ok){
+    console.error(res);
+    return alert("Erro ao criar tarefa.");
+  }
 
   await createTimeline(projectId, `Tarefa criada: ${title}`);
+
   projectTasks = await apiGet("project_tasks");
+
   renderOperacoes();
 }
 
