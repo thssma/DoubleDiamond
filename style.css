@@ -66,7 +66,7 @@ header{
 
 .cards{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:20px;
 }
 
@@ -126,7 +126,8 @@ textarea{
 
 .client-item,
 .quote-item,
-.service-item{
+.service-item,
+.project-item{
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -137,7 +138,8 @@ textarea{
 
 .client-item small,
 .quote-item small,
-.service-item small{
+.service-item small,
+.project-item small{
     color:#6b7280;
 }
 
@@ -165,6 +167,12 @@ textarea{
 .status-rejected{ background:#fee2e2; color:#991b1b; }
 .status-active{ background:#dcfce7; color:#166534; }
 .status-inactive{ background:#fee2e2; color:#991b1b; }
+.status-planning{ background:#e5e7eb; color:#374151; }
+.status-quoted{ background:#dbeafe; color:#1d4ed8; }
+.status-scheduled{ background:#fef3c7; color:#92400e; }
+.status-progress{ background:#ede9fe; color:#5b21b6; }
+.status-completed{ background:#dcfce7; color:#166534; }
+.status-cancelled{ background:#fee2e2; color:#991b1b; }
 
 @media(max-width:768px){
     .container{ flex-direction:column; }
@@ -172,7 +180,8 @@ textarea{
 
     .client-item,
     .quote-item,
-    .service-item{
+    .service-item,
+    .project-item{
         flex-direction:column;
         align-items:flex-start;
     }
