@@ -1,1 +1,71 @@
-<!-- V41-V45 BI menus -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DoubleDiamond Business Intelligence Platform</title>
+  <link rel="icon" href="data:,">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">💎</div>
+        <div>
+          <h2>DoubleDiamond</h2>
+          <span>Business Intelligence Platform</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="menu-btn active" onclick="changePage('dashboard', event)">📊 Dashboard</button>
+        <button class="menu-btn" onclick="changePage('empresas', event)">🏢 Empresas</button>
+        <button class="menu-btn" onclick="changePage('integrationHub', event)">🔌 Integrações</button>
+        <button class="menu-btn" onclick="changePage('aiFoundation', event)">🤖 AI Foundation</button>
+        <button class="menu-btn" onclick="changePage('executiveDashboard', event)">📈 Executivo</button>
+        <button class="menu-btn" onclick="changePage('kpiCenter', event)">🎯 KPIs</button>
+        <button class="menu-btn" onclick="changePage('automationCenter', event)">⚙️ Automações</button>
+        <button class="menu-btn" onclick="changePage('reportCenter', event)">📑 Relatórios</button>
+        <button class="menu-btn" onclick="changePage('mobileReady', event)">📱 Mobile Ready</button>
+        <button class="menu-btn" onclick="changePage('fieldDashboard', event)">🌱 Campo</button>
+        <button class="menu-btn" onclick="changePage('pwaCenter', event)">📲 PWA</button>
+        <button class="menu-btn" onclick="changePage('routePlanning', event)">🗺️ Rotas</button>
+        <button class="menu-btn" onclick="changePage('weatherCenter', event)">🌦️ Clima</button>
+        <button class="menu-btn" onclick="changePage('mobileWorkforce', event)">👷 Mobile Workforce</button>
+        <button class="menu-btn" onclick="changePage('workOrders', event)">🧾 Ordens Serviço</button>
+        <button class="menu-btn" onclick="changePage('biDashboard', event)">📊 BI Dashboard</button>
+        <button class="menu-btn" onclick="changePage('analyticsCenter', event)">📈 Analytics</button>
+        <button class="menu-btn" onclick="changePage('forecastEngine', event)">🔮 Forecast</button>
+        <button class="menu-btn" onclick="changePage('profitabilityEngine', event)">💰 Profitability</button>
+        <button class="menu-btn" onclick="changePage('executiveIntelligence', event)">🧠 Executive IQ</button>
+        <button class="menu-btn" onclick="changePage('configuracoes', event)">⚙️ Configurações</button>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">DoubleDiamond Platform</p>
+          <h1 id="pageTitle">Business Intelligence Platform</h1>
+          <p class="subtitle">BI, analytics, forecast, lucratividade e inteligência executiva.</p>
+        </div>
+        <div class="top-actions">
+          <span class="badge">V41/V42/V43/V44/V45</span>
+          <span class="badge success">Foundation</span>
+        </div>
+      </header>
+
+      <section id="pageContent"></section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+}
+</script>
+</body>
+</html>
