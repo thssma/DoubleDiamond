@@ -454,3 +454,62 @@ textarea{
   padding:14px;
   margin-top:12px;
 }
+
+
+.project-hub-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:18px;
+}
+
+.chart-bar{
+  background:#e2e8f0;
+  border-radius:999px;
+  height:14px;
+  overflow:hidden;
+  margin-top:8px;
+}
+
+.chart-fill{
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(135deg,#2563eb,#7c3aed);
+}
+
+.whatsapp-btn{
+  background:#22c55e;
+  color:white;
+  border:none;
+  border-radius:12px;
+  padding:10px 14px;
+  cursor:pointer;
+  font-weight:900;
+  margin-top:10px;
+  display:inline-block;
+  text-decoration:none;
+}
+
+.signature-box{
+  border:2px dashed #94a3b8;
+  border-radius:18px;
+  padding:20px;
+  background:#f8fafc;
+  margin-top:14px;
+}
+
+.backup-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:14px;
+}
+
+.big-number{
+  font-size:38px;
+  font-weight:900;
+  color:var(--blue);
+}
+
+.project-selector{
+  margin-bottom:18px;
+}

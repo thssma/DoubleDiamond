@@ -11,6 +11,8 @@ let financeItems = [];
 let appointments = [];
 let reports = [];
 let employees = [];
+let appUsers = [];
+let signatures = [];
 let projectChecklists = [];
 let projectTasks = [];
 let projectTimeline = [];
@@ -68,6 +70,8 @@ async function loadData(){
   appointments = await apiGet("appointments");
   reports = await apiGet("reports");
   employees = await apiGet("employees");
+  appUsers = await apiGet("app_users");
+  signatures = await apiGet("signatures");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -92,7 +96,13 @@ function changePage(page, event){
     equipe: renderEquipe,
     configuracoes: renderConfiguracoes,
     operacoes: renderOperacoes,
-    kanban: renderKanban
+    kanban: renderKanban,
+    centroProjeto: renderCentroProjeto,
+    dashboardFinanceiro: renderDashboardFinanceiro,
+    whatsapp: renderWhatsApp,
+    assinaturas: renderAssinaturas,
+    usuarios: renderUsuarios,
+    backup: renderBackup
   };
 
   (routes[page] || (() => renderPlaceholder(page)))();
@@ -103,7 +113,7 @@ function setContent(html){ document.getElementById("pageContent").innerHTML = ht
 
 /* DASHBOARD EXECUTIVO */
 function renderDashboard(){
-  setTitle("Dashboard Executivo V6");
+  setTitle("Dashboard Executivo V7");
 
   const approvedRevenue = quotes.filter(q => q.status === "Approved").reduce((s,q) => s + Number(q.value || 0), 0);
   const incomePaid = financeItems.filter(i => i.type === "Income" && i.status === "Paid").reduce((s,i) => s + Number(i.amount || 0), 0);
@@ -117,7 +127,7 @@ function renderDashboard(){
 
   setContent(`
     <div class="notice">
-      V6.0 ativa: Agenda Inteligente + Financeiro por Projeto + Relatórios Operacionais + Dashboard Executivo + Kanban de Obras.
+      V7.0 ativa: Centro de Projeto + Dashboard Financeiro + WhatsApp + Backup + Usuários + Assinatura Digital.
     </div>
 
     <div class="cards">
@@ -1043,6 +1053,8 @@ async function addEmployee(){
   });
   if(!res.ok) return alert("Erro ao salvar funcionário.");
   employees = await apiGet("employees");
+  appUsers = await apiGet("app_users");
+  signatures = await apiGet("signatures");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -1053,6 +1065,8 @@ async function removeEmployee(id){
   const res = await apiDelete("employees", id);
   if(!res.ok) return alert("Erro ao remover funcionário.");
   employees = await apiGet("employees");
+  appUsers = await apiGet("app_users");
+  signatures = await apiGet("signatures");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -1402,13 +1416,424 @@ function getChecklistCompletion(){
 }
 
 
+
+/* CENTRO DO PROJETO V7 */
+function renderCentroProjeto(){
+  setTitle("Centro do Projeto");
+
+  setContent(`
+    <div class="card">
+      <h2>Selecionar Projeto</h2>
+      <select id="hubProject" class="project-selector" onchange="renderProjectHubDetails()">
+        <option value="">Selecione um projeto</option>
+        ${projects.map(p => `<option value="${p.id}">${p.project_name} - ${p.client_name}</option>`).join("")}
+      </select>
+      <div id="projectHubDetails"></div>
+    </div>
+  `);
+}
+
+function renderProjectHubDetails(){
+  const projectId = val("hubProject");
+  const container = document.getElementById("projectHubDetails");
+
+  if(!projectId){
+    container.innerHTML = "<p>Selecione um projeto para ver o centro operacional.</p>";
+    return;
+  }
+
+  const project = projects.find(p => p.id === projectId);
+  const checks = projectChecklists.filter(c => c.project_id === projectId);
+  const tasks = projectTasks.filter(t => t.project_id === projectId);
+  const team = projectTeam.filter(t => t.project_id === projectId);
+  const timeline = projectTimeline.filter(t => t.project_id === projectId).slice(0, 10);
+  const photos = projectPhotos.filter(p => p.project_id === projectId);
+  const finances = financeItems.filter(f => f.related_project === project.project_name);
+  const appointmentsList = appointments.filter(a => a.project_id === projectId);
+  const done = checks.filter(c => c.completed).length;
+  const percent = checks.length ? Math.round((done / checks.length) * 100) : 0;
+  const income = finances.filter(f => f.type === "Income").reduce((s,f) => s + Number(f.amount || 0), 0);
+  const expense = finances.filter(f => f.type === "Expense").reduce((s,f) => s + Number(f.amount || 0), 0);
+
+  container.innerHTML = `
+    <div class="notice">
+      ${project.project_name} • ${project.client_name || "Sem cliente"} • Status: ${project.status}
+    </div>
+
+    <div class="cards">
+      ${metric("Checklist", percent + "%", "good")}
+      ${metric("Tarefas", tasks.length, "warn")}
+      ${metric("Fotos", photos.length, "")}
+      ${metric("Lucro Previsto", "R$ " + formatMoney(income - expense), "purple")}
+    </div>
+
+    <div class="project-hub-grid">
+      <div class="card">
+        <h2>Checklist</h2>
+        ${checks.length ? checks.map(c => `<p>${c.completed ? "✅" : "⬜"} ${c.item}</p>`).join("") : "<p>Nenhum checklist.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Tarefas</h2>
+        ${tasks.length ? tasks.map(t => `<p><strong>${t.title}</strong><br><small>${t.assigned_to || "Sem responsável"} • ${t.status}</small></p>`).join("") : "<p>Nenhuma tarefa.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Equipe</h2>
+        ${team.length ? team.map(m => {
+          const emp = employees.find(e => e.id === m.employee_id);
+          return `<p><strong>${emp?.name || "Funcionário"}</strong><br><small>${emp?.role || "Sem função"}</small></p>`;
+        }).join("") : "<p>Nenhuma equipe vinculada.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Agenda</h2>
+        ${appointmentsList.length ? appointmentsList.map(a => `<p><strong>${a.title}</strong><br><small>${a.appointment_date || "Sem data"} ${a.appointment_time || ""}</small></p>`).join("") : "<p>Nenhum agendamento.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Financeiro</h2>
+        <p>Receita: <strong>R$ ${formatMoney(income)}</strong></p>
+        <p>Custo: <strong>R$ ${formatMoney(expense)}</strong></p>
+        <p>Lucro: <strong>R$ ${formatMoney(income - expense)}</strong></p>
+      </div>
+
+      <div class="card">
+        <h2>Timeline</h2>
+        ${timeline.length ? timeline.map(t => `<p><strong>${t.event}</strong><br><small>${new Date(t.created_at).toLocaleString("pt-BR")}</small></p>`).join("") : "<p>Nenhum evento.</p>"}
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Fotos do Projeto</h2>
+      ${photos.length ? `<div class="photo-grid">${photos.map(p => `
+        <div class="photo-card">
+          <img src="${p.photo_url}" alt="Foto">
+          <div class="photo-card-content">
+            <strong>${p.photo_type || "Foto"}</strong>
+            <small>${p.created_at ? new Date(p.created_at).toLocaleDateString("pt-BR") : ""}</small>
+          </div>
+        </div>
+      `).join("")}</div>` : "<p>Nenhuma foto.</p>"}
+    </div>
+  `;
+}
+
+/* DASHBOARD FINANCEIRO V7 */
+function renderDashboardFinanceiro(){
+  setTitle("Dashboard Financeiro");
+
+  const income = financeItems.filter(f => f.type === "Income").reduce((s,f) => s + Number(f.amount || 0), 0);
+  const expense = financeItems.filter(f => f.type === "Expense").reduce((s,f) => s + Number(f.amount || 0), 0);
+  const paidIncome = financeItems.filter(f => f.type === "Income" && f.status === "Paid").reduce((s,f) => s + Number(f.amount || 0), 0);
+  const paidExpense = financeItems.filter(f => f.type === "Expense" && f.status === "Paid").reduce((s,f) => s + Number(f.amount || 0), 0);
+
+  setContent(`
+    <div class="cards">
+      ${metric("Receita Prevista", "R$ " + formatMoney(income), "purple")}
+      ${metric("Receita Recebida", "R$ " + formatMoney(paidIncome), "good")}
+      ${metric("Custo Previsto", "R$ " + formatMoney(expense), "bad")}
+      ${metric("Custo Pago", "R$ " + formatMoney(paidExpense), "bad")}
+      ${metric("Lucro Previsto", "R$ " + formatMoney(income - expense), "purple")}
+      ${metric("Lucro Real", "R$ " + formatMoney(paidIncome - paidExpense), "good")}
+    </div>
+
+    <div class="card">
+      <h2>Lucro por Projeto</h2>
+      ${projects.map(project => {
+        const related = financeItems.filter(f => f.related_project === project.project_name);
+        const projectIncome = related.filter(f => f.type === "Income").reduce((s,f) => s + Number(f.amount || 0), 0);
+        const projectExpense = related.filter(f => f.type === "Expense").reduce((s,f) => s + Number(f.amount || 0), 0);
+        const profit = projectIncome - projectExpense;
+        const max = Math.max(income, expense, 1);
+        const width = Math.min(100, Math.abs(profit) / max * 100);
+        return `
+          <div class="soft-box">
+            <strong>${project.project_name}</strong><br>
+            <small>${project.client_name || "Sem cliente"}</small>
+            <p>Lucro previsto: <strong>R$ ${formatMoney(profit)}</strong></p>
+            <div class="chart-bar"><div class="chart-fill" style="width:${width}%"></div></div>
+          </div>
+        `;
+      }).join("") || "<p>Nenhum projeto.</p>"}
+    </div>
+  `);
+}
+
+/* WHATSAPP V7 */
+function renderWhatsApp(){
+  setTitle("WhatsApp");
+
+  setContent(`
+    <div class="card">
+      <h2>Mensagens Rápidas</h2>
+      <p>Use os botões para abrir o WhatsApp com uma mensagem pronta.</p>
+    </div>
+
+    <div class="card">
+      <h2>Clientes</h2>
+      ${clients.length ? clients.map(client => {
+        const phone = normalizePhone(client.phone || "");
+        const msg = encodeURIComponent(`Olá ${client.name}, aqui é da DoubleDiamond. Estou entrando em contato sobre seu atendimento/projeto.`);
+        return `
+          <div class="list-item">
+            <div>
+              <strong>${client.name}</strong><br>
+              <small>${client.phone || "Sem telefone"}</small>
+            </div>
+            ${phone ? `<a class="whatsapp-btn" target="_blank" href="https://wa.me/${phone}?text=${msg}">Enviar WhatsApp</a>` : "<small>Telefone inválido</small>"}
+          </div>
+        `;
+      }).join("") : "<p>Nenhum cliente cadastrado.</p>"}
+    </div>
+  `);
+}
+
+/* ASSINATURA DIGITAL V7 */
+function renderAssinaturas(){
+  setTitle("Assinatura Digital");
+
+  setContent(`
+    <div class="card">
+      <h2>Nova Assinatura</h2>
+      <div class="form-grid">
+        <select id="signatureQuote">
+          <option value="">Selecione o orçamento</option>
+          ${quotes.map(q => `<option value="${q.id}">${q.client_name} - ${q.service} - R$ ${formatMoney(q.value)}</option>`).join("")}
+        </select>
+        <input id="signerName" placeholder="Nome de quem está assinando">
+      </div>
+
+      <div class="signature-box">
+        <p>Ao assinar, o cliente declara que aprova o orçamento selecionado.</p>
+        <input id="signatureText" placeholder="Digite: EU APROVO">
+      </div>
+
+      <button class="success-btn" onclick="signQuote()">Assinar e Aprovar Orçamento</button>
+    </div>
+
+    <div class="card">
+      <h2>Assinaturas Registradas</h2>
+      <div id="signatureList"></div>
+    </div>
+  `);
+
+  updateSignatureList();
+}
+
+async function signQuote(){
+  const quoteId = val("signatureQuote");
+  const signerName = val("signerName").trim();
+  const signatureText = val("signatureText").trim();
+
+  if(!quoteId) return alert("Selecione um orçamento.");
+  if(!signerName) return alert("Digite o nome do assinante.");
+  if(signatureText.toUpperCase() !== "EU APROVO") return alert("Digite exatamente: EU APROVO");
+
+  const quote = quotes.find(q => q.id === quoteId);
+
+  const res = await apiInsert("signatures", {
+    quote_id: quoteId,
+    client_name: quote.client_name,
+    signer_name: signerName,
+    signature_text: signatureText,
+    status: "Signed"
+  });
+
+  if(!res.ok) return alert("Erro ao salvar assinatura.");
+
+  await apiPatch("quotes", quoteId, { status: "Approved" });
+
+  signatures = await apiGet("signatures");
+  quotes = await apiGet("quotes");
+
+  alert("Orçamento assinado e aprovado.");
+  renderAssinaturas();
+}
+
+function updateSignatureList(){
+  const el = document.getElementById("signatureList");
+
+  if(!signatures.length){
+    el.innerHTML = "<p>Nenhuma assinatura registrada.</p>";
+    return;
+  }
+
+  el.innerHTML = signatures.map(s => `
+    <div class="list-item">
+      <div>
+        <strong>${s.client_name}</strong><br>
+        <small>Assinado por: ${s.signer_name}</small><br>
+        <small>${s.signed_at ? new Date(s.signed_at).toLocaleString("pt-BR") : ""}</small><br>
+        <span class="status status-approved">${s.status}</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* USUÁRIOS V7 */
+function renderUsuarios(){
+  setTitle("Usuários");
+
+  setContent(`
+    <div class="card">
+      <h2>Novo Usuário</h2>
+      <div class="form-grid">
+        <input id="userName" placeholder="Nome">
+        <input id="userEmail" placeholder="Email">
+        <select id="userRole">
+          <option>Admin</option>
+          <option>Supervisor</option>
+          <option>Employee</option>
+          <option>Client</option>
+        </select>
+        <select id="userStatus">
+          <option>Active</option>
+          <option>Inactive</option>
+        </select>
+      </div>
+      <textarea id="userNotes" placeholder="Observações"></textarea>
+      <button class="primary-btn" onclick="addUser()">Adicionar Usuário</button>
+    </div>
+
+    <div class="card">
+      <h2>Usuários Cadastrados</h2>
+      <div id="userList"></div>
+    </div>
+  `);
+
+  updateUserList();
+}
+
+async function addUser(){
+  const name = val("userName").trim();
+
+  if(!name) return alert("Digite o nome.");
+
+  const res = await apiInsert("app_users", {
+    name,
+    email: val("userEmail"),
+    role: val("userRole"),
+    status: val("userStatus"),
+    notes: val("userNotes")
+  });
+
+  if(!res.ok) return alert("Erro ao salvar usuário.");
+
+  appUsers = await apiGet("app_users");
+  renderUsuarios();
+}
+
+async function removeUser(id){
+  const res = await apiDelete("app_users", id);
+
+  if(!res.ok) return alert("Erro ao remover usuário.");
+
+  appUsers = await apiGet("app_users");
+  renderUsuarios();
+}
+
+function updateUserList(){
+  const el = document.getElementById("userList");
+
+  if(!appUsers.length){
+    el.innerHTML = "<p>Nenhum usuário cadastrado.</p>";
+    return;
+  }
+
+  el.innerHTML = appUsers.map(user => item(`
+    <strong>${user.name}</strong><br>
+    <small>${user.email || "Sem email"} • ${user.role}</small><br>
+    <span class="status ${user.status === "Active" ? "status-active" : "status-inactive"}">${user.status}</span>
+  `, `removeUser('${user.id}')`)).join("");
+}
+
+/* BACKUP V7 */
+function renderBackup(){
+  setTitle("Backup do Sistema");
+
+  setContent(`
+    <div class="card">
+      <h2>Exportar Dados</h2>
+      <p>Gere um arquivo JSON com os dados principais da DoubleDiamond.</p>
+
+      <div class="backup-actions">
+        <button class="primary-btn" onclick="exportBackup()">Exportar Backup Completo</button>
+        <button class="secondary-btn" onclick="previewBackup()">Visualizar Resumo</button>
+      </div>
+
+      <div id="backupPreview"></div>
+    </div>
+  `);
+}
+
+function getBackupData(){
+  return {
+    exported_at: new Date().toISOString(),
+    version: "DoubleDiamond V7.0",
+    clients,
+    quotes,
+    services,
+    projects,
+    quotePhotos,
+    projectPhotos,
+    financeItems,
+    appointments,
+    reports,
+    employees,
+    projectChecklists,
+    projectTasks,
+    projectTimeline,
+    projectTeam,
+    appUsers,
+    signatures
+  };
+}
+
+function exportBackup(){
+  const data = getBackupData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = `doublediamond-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function previewBackup(){
+  const data = getBackupData();
+
+  document.getElementById("backupPreview").innerHTML = `
+    <div class="report-box">
+Backup pronto:
+Clientes: ${data.clients.length}
+Orçamentos: ${data.quotes.length}
+Serviços: ${data.services.length}
+Projetos: ${data.projects.length}
+Financeiro: ${data.financeItems.length}
+Agenda: ${data.appointments.length}
+Equipe: ${data.employees.length}
+Usuários: ${data.appUsers.length}
+Assinaturas: ${data.signatures.length}
+    </div>
+  `;
+}
+
+function normalizePhone(phone){
+  return String(phone || "").replace(/\D/g, "");
+}
+
+
 function renderConfiguracoes(){
   setTitle("Configurações");
   setContent(`
     <div class="card">
       <h2>Configurações</h2>
       <p>Projeto conectado ao Supabase.</p>
-      <div class="report-box">Versão: V6.0 Full Suite
+      <div class="report-box">Versão: V7.0 Business Suite
 URL: ${SUPABASE_URL}
 
 Automações ativas:
@@ -1424,7 +1849,13 @@ Automações ativas:
 - Agenda Inteligente V6
 - Financeiro por Projeto V6
 - Kanban de Obras V6
-- Relatório Executivo V6</div>
+- Relatório Executivo V6
+- Centro de Projeto V7
+- Dashboard Financeiro V7
+- Backup JSON V7
+- WhatsApp V7
+- Usuários V7
+- Assinatura Digital V7</div>
     </div>
   `);
 }
