@@ -17,6 +17,10 @@ let leads = [];
 let leadTimeline = [];
 let notifications = [];
 let teamCheckins = [];
+let clientPortalUsers = [];
+let clientPortalSessions = [];
+let clientNotifications = [];
+let currentPortalClient = null;
 let projectChecklists = [];
 let projectTasks = [];
 let projectTimeline = [];
@@ -80,6 +84,9 @@ async function loadData(){
   leadTimeline = await apiGet("lead_timeline");
   notifications = await apiGet("notifications");
   teamCheckins = await apiGet("team_checkins");
+  clientPortalUsers = await apiGet("client_portal_users");
+  clientPortalSessions = await apiGet("client_portal_sessions");
+  clientNotifications = await apiGet("client_notifications");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -115,7 +122,8 @@ function changePage(page, event){
     dashboardCEO: renderDashboardCEO,
     smartCore: renderSmartCore,
     notificacoes: renderNotificacoes,
-    mobile: renderMobile
+    mobile: renderMobile,
+    portalCliente: renderPortalCliente
   };
 
   (routes[page] || (() => renderPlaceholder(page)))();
@@ -126,7 +134,7 @@ function setContent(html){ document.getElementById("pageContent").innerHTML = ht
 
 /* DASHBOARD EXECUTIVO */
 function renderDashboard(){
-  setTitle("Dashboard Executivo V10");
+  setTitle("Dashboard Executivo V12");
 
   const approvedRevenue = quotes.filter(q => q.status === "Approved").reduce((s,q) => s + Number(q.value || 0), 0);
   const incomePaid = financeItems.filter(i => i.type === "Income" && i.status === "Paid").reduce((s,i) => s + Number(i.amount || 0), 0);
@@ -140,7 +148,7 @@ function renderDashboard(){
 
   setContent(`
     <div class="notice">
-      V10 ativa: Smart Core + Notificações + Recomendações + Mobile Ready + Check-in.
+      V12 ativa: Portal do Cliente + Login por código + Dashboard do cliente + histórico de projeto.
     </div>
 
     <div class="cards">
@@ -159,6 +167,7 @@ function renderDashboard(){
       ${metric("Conversão", getConversionRate() + "%", "good")}
       ${metric("Alertas", notifications.filter(n => n.status !== "Read").length, "warn")}
       ${metric("Recomendações", getRecommendations().length, "purple")}
+      ${metric("Usuários Portal", clientPortalUsers.length, "good")}
       ${metric("Equipe", employees.length, "")}
     </div>
 
@@ -1076,6 +1085,9 @@ async function addEmployee(){
   leadTimeline = await apiGet("lead_timeline");
   notifications = await apiGet("notifications");
   teamCheckins = await apiGet("team_checkins");
+  clientPortalUsers = await apiGet("client_portal_users");
+  clientPortalSessions = await apiGet("client_portal_sessions");
+  clientNotifications = await apiGet("client_notifications");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -1092,6 +1104,9 @@ async function removeEmployee(id){
   leadTimeline = await apiGet("lead_timeline");
   notifications = await apiGet("notifications");
   teamCheckins = await apiGet("team_checkins");
+  clientPortalUsers = await apiGet("client_portal_users");
+  clientPortalSessions = await apiGet("client_portal_sessions");
+  clientNotifications = await apiGet("client_notifications");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -1674,6 +1689,9 @@ async function signQuote(){
   leadTimeline = await apiGet("lead_timeline");
   notifications = await apiGet("notifications");
   teamCheckins = await apiGet("team_checkins");
+  clientPortalUsers = await apiGet("client_portal_users");
+  clientPortalSessions = await apiGet("client_portal_sessions");
+  clientNotifications = await apiGet("client_notifications");
   quotes = await apiGet("quotes");
 
   alert("Orçamento assinado e aprovado.");
@@ -1899,6 +1917,7 @@ function renderCRM(){
         ${metric("Conversão", getConversionRate() + "%", "good")}
       ${metric("Alertas", notifications.filter(n => n.status !== "Read").length, "warn")}
       ${metric("Recomendações", getRecommendations().length, "purple")}
+      ${metric("Usuários Portal", clientPortalUsers.length, "good")}
       </div>
     </div>
 
@@ -1970,6 +1989,9 @@ async function addLead(){
   leadTimeline = await apiGet("lead_timeline");
   notifications = await apiGet("notifications");
   teamCheckins = await apiGet("team_checkins");
+  clientPortalUsers = await apiGet("client_portal_users");
+  clientPortalSessions = await apiGet("client_portal_sessions");
+  clientNotifications = await apiGet("client_notifications");
   renderCRM();
 }
 
@@ -1990,6 +2012,9 @@ async function updateLeadStatus(leadId, status){
   leadTimeline = await apiGet("lead_timeline");
   notifications = await apiGet("notifications");
   teamCheckins = await apiGet("team_checkins");
+  clientPortalUsers = await apiGet("client_portal_users");
+  clientPortalSessions = await apiGet("client_portal_sessions");
+  clientNotifications = await apiGet("client_notifications");
   renderCRM();
 }
 
@@ -2002,6 +2027,9 @@ async function removeLead(id){
   leadTimeline = await apiGet("lead_timeline");
   notifications = await apiGet("notifications");
   teamCheckins = await apiGet("team_checkins");
+  clientPortalUsers = await apiGet("client_portal_users");
+  clientPortalSessions = await apiGet("client_portal_sessions");
+  clientNotifications = await apiGet("client_notifications");
   renderCRM();
 }
 
@@ -2044,6 +2072,9 @@ async function convertLeadToClient(leadId){
   leadTimeline = await apiGet("lead_timeline");
   notifications = await apiGet("notifications");
   teamCheckins = await apiGet("team_checkins");
+  clientPortalUsers = await apiGet("client_portal_users");
+  clientPortalSessions = await apiGet("client_portal_sessions");
+  clientNotifications = await apiGet("client_notifications");
 
   alert("Lead convertido em cliente.");
   renderCRM();
@@ -2512,6 +2543,9 @@ async function teamCheckIn(type){
   await createTimeline(projectId, `${employee?.name || "Funcionário"} realizou check-${type === "IN" ? "in" : "out"} na obra.`);
 
   teamCheckins = await apiGet("team_checkins");
+  clientPortalUsers = await apiGet("client_portal_users");
+  clientPortalSessions = await apiGet("client_portal_sessions");
+  clientNotifications = await apiGet("client_notifications");
   projectTimeline = await apiGet("project_timeline");
 
   renderMobile();
@@ -2548,13 +2582,287 @@ function isTomorrow(dateString){
 }
 
 
+
+/* PORTAL DO CLIENTE V12 */
+function renderPortalCliente(){
+  setTitle("Portal do Cliente");
+
+  setContent(`
+    <div class="portal-hero">
+      <h2>Portal do Cliente</h2>
+      <p>Área para cliente acompanhar projeto, fotos, agenda, financeiro, timeline e relatórios sem precisar ligar ou mandar mensagem.</p>
+      <span class="client-view-badge">Foundation V12</span>
+    </div>
+
+    <div class="portal-shell">
+      <div class="card portal-login">
+        <h2>Criar Acesso do Cliente</h2>
+        <div class="form-grid">
+          <select id="portalClientCreate">
+            <option value="">Selecione o cliente</option>
+            ${clients.map(client => `<option value="${client.id}">${client.name} - ${client.email || "sem email"}</option>`).join("")}
+          </select>
+          <input id="portalAccessCode" placeholder="Código de acesso ex: 123456">
+        </div>
+        <button class="primary-btn" onclick="createPortalUser()">Criar Acesso</button>
+      </div>
+
+      <div class="card portal-login">
+        <h2>Entrar como Cliente</h2>
+        <div class="form-grid">
+          <input id="portalEmailLogin" placeholder="Email do cliente">
+          <input id="portalCodeLogin" placeholder="Código de acesso">
+        </div>
+        <button class="success-btn" onclick="portalLogin()">Entrar no Portal</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Acessos Criados</h2>
+      <div id="portalUsersList"></div>
+    </div>
+
+    <div id="portalClientArea"></div>
+  `);
+
+  updatePortalUsersList();
+}
+
+async function createPortalUser(){
+  const clientId = val("portalClientCreate");
+  const code = val("portalAccessCode").trim();
+
+  if(!clientId) return alert("Selecione um cliente.");
+  if(!code) return alert("Digite um código de acesso.");
+
+  const client = clients.find(c => c.id === clientId);
+
+  const exists = clientPortalUsers.some(user => user.client_id === clientId);
+
+  if(exists) return alert("Este cliente já possui acesso ao portal.");
+
+  const res = await apiInsert("client_portal_users", {
+    client_id: clientId,
+    client_name: client.name,
+    email: client.email || "",
+    access_code: code,
+    status: "Active"
+  });
+
+  if(!res.ok) return alert("Erro ao criar acesso.");
+
+  await apiInsert("client_notifications", {
+    client_id: clientId,
+    title: "Acesso ao portal criado",
+    message: "Seu acesso ao portal DoubleDiamond foi criado.",
+    status: "Unread"
+  });
+
+  clientPortalUsers = await apiGet("client_portal_users");
+  clientNotifications = await apiGet("client_notifications");
+
+  renderPortalCliente();
+}
+
+async function portalLogin(){
+  const email = val("portalEmailLogin").trim().toLowerCase();
+  const code = val("portalCodeLogin").trim();
+
+  if(!email) return alert("Digite o email.");
+  if(!code) return alert("Digite o código.");
+
+  const user = clientPortalUsers.find(u =>
+    String(u.email || "").toLowerCase() === email &&
+    String(u.access_code || "") === code &&
+    u.status === "Active"
+  );
+
+  if(!user) return alert("Acesso não encontrado ou código inválido.");
+
+  currentPortalClient = clients.find(c => c.id === user.client_id);
+
+  await apiInsert("client_portal_sessions", {
+    portal_user_id: user.id,
+    client_id: user.client_id,
+    status: "Active"
+  });
+
+  clientPortalSessions = await apiGet("client_portal_sessions");
+
+  renderPortalClientArea(user.client_id);
+}
+
+async function removePortalUser(id){
+  const res = await apiDelete("client_portal_users", id);
+
+  if(!res.ok) return alert("Erro ao remover acesso.");
+
+  clientPortalUsers = await apiGet("client_portal_users");
+  renderPortalCliente();
+}
+
+function updatePortalUsersList(){
+  const el = document.getElementById("portalUsersList");
+
+  if(!clientPortalUsers.length){
+    el.innerHTML = "<p>Nenhum acesso criado.</p>";
+    return;
+  }
+
+  el.innerHTML = clientPortalUsers.map(user => item(`
+    <strong>${user.client_name}</strong><br>
+    <small>${user.email || "Sem email"} • Código: ${user.access_code}</small><br>
+    <span class="status ${user.status === "Active" ? "status-active" : "status-inactive"}">${user.status}</span>
+  `, `removePortalUser('${user.id}')`)).join("");
+}
+
+function renderPortalClientArea(clientId){
+  const client = clients.find(c => c.id === clientId);
+  const clientProjects = projects.filter(p => p.client_id === clientId || p.client_name === client?.name);
+  const clientQuotes = quotes.filter(q => q.client_id === clientId || q.client_name === client?.name);
+  const clientAppointments = appointments.filter(a => a.client_id === clientId || a.client_name === client?.name);
+  const clientFinance = financeItems.filter(f => f.related_client === client?.name);
+  const clientReports = reports.filter(r => r.related_client === client?.name);
+  const clientNotes = clientNotifications.filter(n => n.client_id === clientId);
+
+  const relatedProjectIds = clientProjects.map(p => p.id);
+  const relatedProjectNames = clientProjects.map(p => p.project_name);
+
+  const photos = projectPhotos.filter(p => relatedProjectIds.includes(p.project_id));
+  const timeline = projectTimeline.filter(t => relatedProjectIds.includes(t.project_id));
+  const checklist = projectChecklists.filter(c => relatedProjectIds.includes(c.project_id));
+  const tasks = projectTasks.filter(t => relatedProjectIds.includes(t.project_id));
+  const financeByProject = financeItems.filter(f => relatedProjectNames.includes(f.related_project));
+
+  document.getElementById("portalClientArea").innerHTML = `
+    <div class="portal-hero">
+      <h2>Bem-vindo, ${client?.name || "Cliente"}</h2>
+      <p>Resumo dos seus projetos e atendimentos com a DoubleDiamond.</p>
+      <span class="client-view-badge">Cliente conectado</span>
+    </div>
+
+    <div class="cards">
+      ${metric("Projetos", clientProjects.length, "purple")}
+      ${metric("Orçamentos", clientQuotes.length, "")}
+      ${metric("Agenda", clientAppointments.length, "warn")}
+      ${metric("Fotos", photos.length, "")}
+      ${metric("Pendências", clientFinance.filter(f => f.status !== "Paid").length, "bad")}
+      ${metric("Checklist", getClientChecklistCompletion(checklist) + "%", "good")}
+    </div>
+
+    <div class="portal-shell">
+      <div class="card">
+        <div class="portal-section-title">
+          <h2>Projetos</h2>
+        </div>
+        ${clientProjects.length ? clientProjects.map(project => `
+          <div class="soft-box">
+            <strong>${project.project_name}</strong><br>
+            <small>${project.service_name || "Sem serviço"} • ${project.status}</small><br>
+            <small>Início: ${project.start_date || "sem data"} • Fim: ${project.end_date || "sem data"}</small>
+          </div>
+        `).join("") : "<p>Nenhum projeto encontrado.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Agenda</h2>
+        ${clientAppointments.length ? clientAppointments.map(a => `
+          <div class="soft-box">
+            <strong>${a.title}</strong><br>
+            <small>${a.appointment_date || "Sem data"} ${a.appointment_time || ""}</small><br>
+            <small>${a.status}</small>
+          </div>
+        `).join("") : "<p>Nenhum agendamento.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Financeiro</h2>
+        ${[...clientFinance, ...financeByProject].length ? [...clientFinance, ...financeByProject].map(f => `
+          <div class="soft-box">
+            <strong>${f.title}</strong><br>
+            <small>${f.type} • ${f.status}</small><br>
+            <strong>R$ ${formatMoney(f.amount)}</strong>
+          </div>
+        `).join("") : "<p>Nenhum lançamento financeiro.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Checklist e Tarefas</h2>
+        <p>Checklist concluído: <strong>${getClientChecklistCompletion(checklist)}%</strong></p>
+        ${tasks.length ? tasks.map(t => `
+          <div class="soft-box">
+            <strong>${t.title}</strong><br>
+            <small>${t.status} • ${t.assigned_to || "Sem responsável"}</small>
+          </div>
+        `).join("") : "<p>Nenhuma tarefa visível.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Notificações</h2>
+        ${clientNotes.length ? clientNotes.map(n => `
+          <div class="soft-box">
+            <strong>${n.title}</strong><br>
+            <small>${n.message || ""}</small><br>
+            <small>${n.status}</small>
+          </div>
+        `).join("") : "<p>Nenhuma notificação.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Relatórios</h2>
+        ${clientReports.length ? clientReports.map(r => `
+          <div class="soft-box">
+            <strong>${r.title}</strong><br>
+            <small>${r.report_type}</small>
+            <div class="report-box">${r.notes || "Sem conteúdo"}</div>
+          </div>
+        `).join("") : "<p>Nenhum relatório publicado.</p>"}
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Fotos</h2>
+      ${photos.length ? `<div class="photo-grid">${photos.map(photo => `
+        <div class="photo-card">
+          <img src="${photo.photo_url}" alt="Foto do projeto">
+          <div class="photo-card-content">
+            <strong>${photo.photo_type || "Foto"}</strong>
+            <small>${photo.project_label || ""}</small>
+          </div>
+        </div>
+      `).join("")}</div>` : "<p>Nenhuma foto disponível.</p>"}
+    </div>
+
+    <div class="card">
+      <h2>Timeline</h2>
+      <div class="portal-timeline">
+        ${timeline.length ? timeline.map(t => `
+          <div class="portal-timeline-item">
+            <strong>${t.event}</strong><br>
+            <small>${t.created_at ? new Date(t.created_at).toLocaleString("pt-BR") : ""}</small>
+          </div>
+        `).join("") : "<p>Nenhum evento registrado.</p>"}
+      </div>
+    </div>
+  `;
+}
+
+function getClientChecklistCompletion(items){
+  if(!items.length) return 0;
+
+  const completed = items.filter(i => i.completed).length;
+
+  return Math.round((completed / items.length) * 100);
+}
+
+
 function renderConfiguracoes(){
   setTitle("Configurações");
   setContent(`
     <div class="card">
       <h2>Configurações</h2>
       <p>Projeto conectado ao Supabase.</p>
-      <div class="report-box">Versão: V10 Smart Core
+      <div class="report-box">Versão: V12 Client Portal Foundation
 URL: ${SUPABASE_URL}
 
 Automações ativas:
@@ -2585,7 +2893,11 @@ Automações ativas:
 - Central de Notificações V10
 - Check-in Mobile V10
 - Motor de Recomendações V10
-- Saúde do Projeto V10</div>
+- Saúde do Projeto V10
+- Portal do Cliente V12
+- Login por Código V12
+- Dashboard Cliente V12
+- Notificações Cliente V12</div>
     </div>
   `);
 }

@@ -653,3 +653,62 @@ textarea{
   input,select,textarea{font-size:16px;padding:15px}
   .primary-btn,.secondary-btn,.success-btn,.danger-btn{padding:14px 16px;font-size:15px}
 }
+
+
+.portal-shell{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:18px;
+}
+
+.portal-login{
+  max-width:520px;
+}
+
+.portal-hero{
+  background:linear-gradient(135deg,#eff6ff,#f5f3ff);
+  border:1px solid #bfdbfe;
+  border-radius:22px;
+  padding:22px;
+  margin-bottom:18px;
+}
+
+.portal-timeline{
+  border-left:3px solid #2563eb;
+  padding-left:16px;
+}
+
+.portal-timeline-item{
+  margin-bottom:14px;
+  position:relative;
+}
+
+.portal-timeline-item:before{
+  content:"";
+  width:12px;
+  height:12px;
+  background:#2563eb;
+  border-radius:50%;
+  position:absolute;
+  left:-23px;
+  top:4px;
+}
+
+.client-view-badge{
+  display:inline-block;
+  padding:7px 11px;
+  border-radius:999px;
+  background:#dcfce7;
+  color:#166534;
+  font-weight:900;
+  font-size:12px;
+  margin-top:8px;
+}
+
+.portal-section-title{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  margin-bottom:12px;
+}
