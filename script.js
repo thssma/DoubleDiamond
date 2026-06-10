@@ -13,6 +13,8 @@ let reports = [];
 let employees = [];
 let appUsers = [];
 let signatures = [];
+let leads = [];
+let leadTimeline = [];
 let projectChecklists = [];
 let projectTasks = [];
 let projectTimeline = [];
@@ -72,6 +74,8 @@ async function loadData(){
   employees = await apiGet("employees");
   appUsers = await apiGet("app_users");
   signatures = await apiGet("signatures");
+  leads = await apiGet("leads");
+  leadTimeline = await apiGet("lead_timeline");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -102,7 +106,9 @@ function changePage(page, event){
     whatsapp: renderWhatsApp,
     assinaturas: renderAssinaturas,
     usuarios: renderUsuarios,
-    backup: renderBackup
+    backup: renderBackup,
+    crm: renderCRM,
+    dashboardCEO: renderDashboardCEO
   };
 
   (routes[page] || (() => renderPlaceholder(page)))();
@@ -113,7 +119,7 @@ function setContent(html){ document.getElementById("pageContent").innerHTML = ht
 
 /* DASHBOARD EXECUTIVO */
 function renderDashboard(){
-  setTitle("Dashboard Executivo V7");
+  setTitle("Dashboard Executivo V8.1");
 
   const approvedRevenue = quotes.filter(q => q.status === "Approved").reduce((s,q) => s + Number(q.value || 0), 0);
   const incomePaid = financeItems.filter(i => i.type === "Income" && i.status === "Paid").reduce((s,i) => s + Number(i.amount || 0), 0);
@@ -127,7 +133,7 @@ function renderDashboard(){
 
   setContent(`
     <div class="notice">
-      V7.0 ativa: Centro de Projeto + Dashboard Financeiro + WhatsApp + Backup + Usuários + Assinatura Digital.
+      V8.1 ativa: CRM Comercial + Pipeline + Dashboard CEO + Métricas Comerciais.
     </div>
 
     <div class="cards">
@@ -142,6 +148,8 @@ function renderDashboard(){
       ${metric("Agenda da Semana", weekAppointments, "")}
       ${metric("Fotos", totalPhotos, "")}
       ${metric("Clientes", clients.length, "")}
+      ${metric("Leads", leads.length, "purple")}
+      ${metric("Conversão", getConversionRate() + "%", "good")}
       ${metric("Equipe", employees.length, "")}
     </div>
 
@@ -1055,6 +1063,8 @@ async function addEmployee(){
   employees = await apiGet("employees");
   appUsers = await apiGet("app_users");
   signatures = await apiGet("signatures");
+  leads = await apiGet("leads");
+  leadTimeline = await apiGet("lead_timeline");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -1067,6 +1077,8 @@ async function removeEmployee(id){
   employees = await apiGet("employees");
   appUsers = await apiGet("app_users");
   signatures = await apiGet("signatures");
+  leads = await apiGet("leads");
+  leadTimeline = await apiGet("lead_timeline");
   projectChecklists = await apiGet("project_checklists");
   projectTasks = await apiGet("project_tasks");
   projectTimeline = await apiGet("project_timeline");
@@ -1645,6 +1657,8 @@ async function signQuote(){
   await apiPatch("quotes", quoteId, { status: "Approved" });
 
   signatures = await apiGet("signatures");
+  leads = await apiGet("leads");
+  leadTimeline = await apiGet("lead_timeline");
   quotes = await apiGet("quotes");
 
   alert("Orçamento assinado e aprovado.");
@@ -1827,13 +1841,280 @@ function normalizePhone(phone){
 }
 
 
+
+/* CRM COMERCIAL V8.1 */
+function renderCRM(){
+  setTitle("CRM Comercial");
+
+  const stages = getLeadStages();
+
+  setContent(`
+    <div class="card">
+      <h2>Novo Lead</h2>
+      <div class="form-grid">
+        <input id="leadName" placeholder="Nome do lead">
+        <input id="leadPhone" placeholder="Telefone">
+        <input id="leadEmail" placeholder="Email">
+        <select id="leadSource">
+          <option value="">Origem</option>
+          <option>Referral</option>
+          <option>Website</option>
+          <option>Google</option>
+          <option>Facebook</option>
+          <option>Instagram</option>
+          <option>Door Hanger</option>
+          <option>HOA</option>
+          <option>Other</option>
+        </select>
+        <input id="leadValue" type="number" placeholder="Valor potencial">
+        <select id="leadStatus">
+          ${stages.map(stage => `<option>${stage}</option>`).join("")}
+        </select>
+      </div>
+      <textarea id="leadNotes" placeholder="Observações"></textarea>
+      <button class="primary-btn" onclick="addLead()">Adicionar Lead</button>
+    </div>
+
+    <div class="conversion-box">
+      <h2>Resumo Comercial</h2>
+      <div class="cards">
+        ${metric("Leads Totais", leads.length, "purple")}
+        ${metric("Pipeline", "R$ " + formatMoney(getPipelineValue()), "purple")}
+        ${metric("Fechados", leads.filter(l => l.status === "Fechado").length, "good")}
+        ${metric("Conversão", getConversionRate() + "%", "good")}
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Pipeline Comercial</h2>
+      <div class="pipeline-board">
+        ${stages.map(stage => `
+          <div class="pipeline-column">
+            <h3>${stage} (${leads.filter(l => l.status === stage).length})</h3>
+            ${leads.filter(l => l.status === stage).map(lead => renderLeadCard(lead, stages)).join("") || "<p>Nenhum lead.</p>"}
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `);
+}
+
+function getLeadStages(){
+  return ["Lead", "Contato", "Visita", "Orçamento", "Negociação", "Fechado", "Perdido"];
+}
+
+function renderLeadCard(lead, stages){
+  const timeline = leadTimeline.filter(t => t.lead_id === lead.id).slice(0, 3);
+
+  return `
+    <div class="pipeline-card">
+      <strong>${lead.name}</strong>
+      <small>${lead.phone || "Sem telefone"} • ${lead.email || "Sem email"}</small><br>
+      <small>Origem: ${lead.source || "Não informada"}</small>
+      <div class="pipeline-value">R$ ${formatMoney(lead.potential_value)}</div>
+
+      <select onchange="updateLeadStatus('${lead.id}', this.value)">
+        ${stages.map(stage => `<option value="${stage}" ${stage === lead.status ? "selected" : ""}>${stage}</option>`).join("")}
+      </select>
+
+      <div class="action-row">
+        <button class="secondary-btn" onclick="convertLeadToClient('${lead.id}')">Virar Cliente</button>
+        <button class="danger-btn" onclick="removeLead('${lead.id}')">Remover</button>
+      </div>
+
+      ${timeline.length ? `<div class="timeline-mini">${timeline.map(t => `<small>• ${t.event}</small><br>`).join("")}</div>` : ""}
+    </div>
+  `;
+}
+
+async function addLead(){
+  const name = val("leadName").trim();
+
+  if(!name) return alert("Digite o nome do lead.");
+
+  const res = await apiInsert("leads", {
+    name,
+    phone: val("leadPhone"),
+    email: val("leadEmail"),
+    source: val("leadSource"),
+    potential_value: Number(val("leadValue") || 0),
+    status: val("leadStatus"),
+    notes: val("leadNotes")
+  });
+
+  if(!res.ok) return alert("Erro ao salvar lead.");
+
+  leads = await apiGet("leads");
+  const createdLead = leads.find(l => l.name === name);
+  if(createdLead){
+    await createLeadTimeline(createdLead.id, "Lead criado");
+  }
+
+  leadTimeline = await apiGet("lead_timeline");
+  renderCRM();
+}
+
+async function updateLeadStatus(leadId, status){
+  const lead = leads.find(l => l.id === leadId);
+
+  const res = await apiPatch("leads", leadId, { status });
+
+  if(!res.ok) return alert("Erro ao atualizar lead.");
+
+  await createLeadTimeline(leadId, `Status alterado para ${status}`);
+
+  if(status === "Fechado"){
+    await createLeadTimeline(leadId, "Lead marcado como fechado");
+  }
+
+  leads = await apiGet("leads");
+  leadTimeline = await apiGet("lead_timeline");
+  renderCRM();
+}
+
+async function removeLead(id){
+  const res = await apiDelete("leads", id);
+
+  if(!res.ok) return alert("Erro ao remover lead.");
+
+  leads = await apiGet("leads");
+  leadTimeline = await apiGet("lead_timeline");
+  renderCRM();
+}
+
+async function createLeadTimeline(leadId, event){
+  if(!leadId || !event) return;
+
+  await apiInsert("lead_timeline", {
+    lead_id: leadId,
+    event
+  });
+}
+
+async function convertLeadToClient(leadId){
+  const lead = leads.find(l => l.id === leadId);
+
+  if(!lead) return alert("Lead não encontrado.");
+
+  const exists = clients.some(c =>
+    String(c.email || "").toLowerCase() === String(lead.email || "").toLowerCase() && lead.email
+  );
+
+  if(exists) return alert("Já existe um cliente com esse email.");
+
+  const res = await apiInsert("clients", {
+    name: lead.name,
+    phone: lead.phone || "",
+    email: lead.email || "",
+    address: "",
+    property_type: "",
+    status: "Lead",
+    notes: `Criado a partir do CRM. Origem: ${lead.source || "Não informada"}. Valor potencial: R$ ${formatMoney(lead.potential_value)}`
+  });
+
+  if(!res.ok) return alert("Erro ao converter lead em cliente.");
+
+  await updateLeadStatus(leadId, "Fechado");
+
+  clients = await apiGet("clients");
+  leads = await apiGet("leads");
+  leadTimeline = await apiGet("lead_timeline");
+
+  alert("Lead convertido em cliente.");
+  renderCRM();
+}
+
+function getPipelineValue(){
+  return leads
+    .filter(l => l.status !== "Perdido")
+    .reduce((sum, lead) => sum + Number(lead.potential_value || 0), 0);
+}
+
+function getConversionRate(){
+  if(!leads.length) return 0;
+
+  const closed = leads.filter(l => l.status === "Fechado").length;
+
+  return Math.round((closed / leads.length) * 100);
+}
+
+/* DASHBOARD CEO V8.1 */
+function renderDashboardCEO(){
+  setTitle("Dashboard CEO");
+
+  const month = new Date().getMonth();
+  const year = new Date().getFullYear();
+
+  const monthFinance = financeItems.filter(item => {
+    if(!item.created_at) return false;
+    const date = new Date(item.created_at);
+    return date.getMonth() === month && date.getFullYear() === year;
+  });
+
+  const monthIncome = monthFinance.filter(i => i.type === "Income").reduce((s,i) => s + Number(i.amount || 0), 0);
+  const monthExpense = monthFinance.filter(i => i.type === "Expense").reduce((s,i) => s + Number(i.amount || 0), 0);
+  const activeProjects = projects.filter(p => ["Planning","Quoted","Scheduled","In Progress"].includes(p.status));
+  const overdueFinance = financeItems.filter(f => f.status === "Overdue");
+  const pendingTasks = projectTasks.filter(t => t.status !== "Completed");
+  const busyEmployees = new Set(projectTeam.map(t => t.employee_id)).size;
+
+  setContent(`
+    <div class="notice">
+      Dashboard CEO: visão rápida de vendas, operação, financeiro e equipe.
+    </div>
+
+    <div class="cards">
+      ${metric("Receita do Mês", "R$ " + formatMoney(monthIncome), "good")}
+      ${metric("Despesa do Mês", "R$ " + formatMoney(monthExpense), "bad")}
+      ${metric("Lucro do Mês", "R$ " + formatMoney(monthIncome - monthExpense), "purple")}
+      ${metric("Pipeline Comercial", "R$ " + formatMoney(getPipelineValue()), "purple")}
+      ${metric("Taxa Conversão", getConversionRate() + "%", "good")}
+      ${metric("Projetos Ativos", activeProjects.length, "purple")}
+      ${metric("Pagamentos Vencidos", overdueFinance.length, "bad")}
+      ${metric("Tarefas Pendentes", pendingTasks.length, "warn")}
+      ${metric("Equipe Ocupada", busyEmployees, "")}
+    </div>
+
+    <div class="ceo-grid">
+      <div class="card">
+        <h2>Comercial</h2>
+        ${getLeadStages().map(stage => `
+          <div class="soft-box">
+            <strong>${stage}</strong>
+            <p class="big">${leads.filter(l => l.status === stage).length}</p>
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="card">
+        <h2>Projetos em Andamento</h2>
+        ${activeProjects.length ? activeProjects.slice(0, 8).map(project => `
+          <div class="soft-box">
+            <strong>${project.project_name}</strong><br>
+            <small>${project.client_name || "Sem cliente"} • ${project.status}</small>
+          </div>
+        `).join("") : "<p>Nenhum projeto ativo.</p>"}
+      </div>
+
+      <div class="card">
+        <h2>Atenção Necessária</h2>
+        <p>Pagamentos vencidos: <strong>${overdueFinance.length}</strong></p>
+        <p>Tarefas pendentes: <strong>${pendingTasks.length}</strong></p>
+        <p>Checklists incompletos: <strong>${projectChecklists.filter(c => !c.completed).length}</strong></p>
+        <p>Leads em negociação: <strong>${leads.filter(l => l.status === "Negociação").length}</strong></p>
+      </div>
+    </div>
+  `);
+}
+
+
 function renderConfiguracoes(){
   setTitle("Configurações");
   setContent(`
     <div class="card">
       <h2>Configurações</h2>
       <p>Projeto conectado ao Supabase.</p>
-      <div class="report-box">Versão: V7.0 Business Suite
+      <div class="report-box">Versão: V8.1 CRM + CEO Dashboard
 URL: ${SUPABASE_URL}
 
 Automações ativas:
@@ -1855,7 +2136,11 @@ Automações ativas:
 - Backup JSON V7
 - WhatsApp V7
 - Usuários V7
-- Assinatura Digital V7</div>
+- Assinatura Digital V7
+- CRM Comercial V8.1
+- Pipeline de Leads V8.1
+- Dashboard CEO V8.1
+- Timeline Comercial V8.1</div>
     </div>
   `);
 }
