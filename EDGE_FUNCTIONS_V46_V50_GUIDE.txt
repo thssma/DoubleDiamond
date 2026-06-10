@@ -1,0 +1,13 @@
+DOUBLEDIAMOND V46-V50 REAL INTEGRATIONS GUIDE
+
+Não coloque tokens/secrets no frontend.
+
+Edge Functions recomendadas:
+1. dd-google-maps-route
+2. dd-whatsapp-send
+3. dd-gmail-send
+4. dd-push-send
+5. dd-automation-flow-runner
+
+Fluxo:
+Frontend cria fila -> Backend lê fila -> Provider externo executa -> Backend atualiza status.
