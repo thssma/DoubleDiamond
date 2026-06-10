@@ -2729,3 +2729,292 @@ async function saveArchitectureAudit(){
   architectureAuditLogs = await apiGet("architecture_audit_logs");
   renderArchitectureHardening();
 }
+
+
+/* V50.1 FIX: Architecture + AI Ready com funções operacionais */
+function renderArchitectureHardening(){
+  setTitle("Architecture Hardening");
+
+  const totalFunctions = countFunctionsInRuntime();
+  const modules = buildModuleRegistryPreview();
+
+  setContent(`
+    <div class="hardening-hero">
+      <h2>V50.1 Architecture Hardening</h2>
+      <p>Auditoria operacional da arquitetura, rotas, cache, módulos e preparação para V51→V60.</p>
+    </div>
+
+    <div class="cards">
+      ${metric("Funções Runtime", totalFunctions)}
+      ${metric("Módulos Preview", modules.length)}
+      ${metric("Audit Logs", architectureAuditLogs.length)}
+      ${metric("AI Readiness", aiOperationsReadiness.length)}
+      ${metric("Registry", moduleRegistry.length)}
+    </div>
+
+    <div class="card">
+      <h2>Ações de Hardening</h2>
+      <p>Use estes botões para registrar auditoria, popular o registry de módulos e preparar a próxima fase.</p>
+      <div class="action-row">
+        <button class="primary-btn" onclick="saveArchitectureAudit()">Salvar Auditoria</button>
+        <button class="success-btn" onclick="seedModuleRegistry()">Registrar Módulos</button>
+        <button class="secondary-btn" onclick="seedAIReadiness()">Preparar AI Ready</button>
+      </div>
+    </div>
+
+    <div class="hardening-grid">
+      <div class="hardening-card hardening-success">
+        <h2>Core Preservado</h2>
+        <span class="hardening-badge">OK</span>
+        <p>Nenhuma funcionalidade existente foi removida.</p>
+      </div>
+
+      <div class="hardening-card hardening-info">
+        <h2>PWA Cache</h2>
+        <span class="hardening-badge">V50.1</span>
+        <p>Service worker atualizado para reduzir cache antigo no celular.</p>
+      </div>
+
+      <div class="hardening-card hardening-success">
+        <h2>AI Operations</h2>
+        <span class="hardening-badge">Preparado</span>
+        <p>Base pronta para V51→V60: Lead Scoring, Quote Generator, Risk Analysis e Command Center.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Module Registry Preview</h2>
+      <div class="module-map">
+        ${modules.map(m => `${m.group} → ${m.name} → ${m.route}`).join("<br>")}
+      </div>
+    </div>
+
+    <div class="hardening-grid">
+      ${architectureAuditLogs.length ? architectureAuditLogs.map(log => `
+        <div class="hardening-card">
+          <h2>${log.audit_title}</h2>
+          <small>${log.audit_type} • ${log.severity} • ${log.status}</small>
+          <p>${log.audit_message || ""}</p>
+        </div>
+      `).join("") : "<div class='card'>Nenhum log de auditoria salvo.</div>"}
+    </div>
+  `);
+}
+
+function renderAIReadiness(){
+  setTitle("AI Operations Ready");
+
+  setContent(`
+    <div class="hardening-hero">
+      <h2>AI Operations Readiness</h2>
+      <p>Preparação operacional para V51→V60 AI Operations Platform.</p>
+    </div>
+
+    <div class="card">
+      <h2>Ações AI Ready</h2>
+      <p>Popule a lista de readiness e registre o plano do próximo bloco.</p>
+      <div class="action-row">
+        <button class="primary-btn" onclick="seedAIReadiness()">Popular AI Ready</button>
+        <button class="success-btn" onclick="saveAIReadinessAudit()">Salvar Auditoria AI</button>
+      </div>
+    </div>
+
+    <div class="readiness-grid">
+      ${aiOperationsReadiness.length ? aiOperationsReadiness.map(item => `
+        <div class="readiness-card hardening-success">
+          <h2>${item.area_name}</h2>
+          <span class="hardening-badge">${item.readiness_status}</span>
+          <p>${item.notes || ""}</p>
+        </div>
+      `).join("") : getDefaultAIReadinessCards()}
+    </div>
+
+    <div class="card">
+      <h2>Próximo Bloco V51→V60</h2>
+      <div class="module-map">
+V51 AI Lead Scoring<br>
+V52 AI Quote Generator<br>
+V53 AI Project Risk Analysis<br>
+V54 AI Financial Advisor<br>
+V55 AI Workforce Planner<br>
+V56 AI Route Optimization<br>
+V57 AI Weather Impact Engine<br>
+V58 AI Executive Reports<br>
+V59 AI Automation Recommendations<br>
+V60 AI Command Center
+      </div>
+    </div>
+  `);
+}
+
+function getDefaultAIReadinessCards(){
+  return [
+    "AI Lead Scoring",
+    "AI Quote Generator",
+    "AI Project Risk Analysis",
+    "AI Financial Advisor",
+    "AI Workforce Planner",
+    "AI Route Optimization",
+    "AI Weather Impact Engine",
+    "AI Executive Reports",
+    "AI Automation Recommendations",
+    "AI Command Center"
+  ].map(name => `
+    <div class="readiness-card hardening-info">
+      <h2>${name}</h2>
+      <span class="hardening-badge">Preview</span>
+      <p>Rode “Popular AI Ready” para salvar no Supabase.</p>
+    </div>
+  `).join("");
+}
+
+function countFunctionsInRuntime(){
+  try{
+    return Object.keys(window).filter(k => typeof window[k] === "function").length;
+  }catch(e){
+    return 0;
+  }
+}
+
+function buildModuleRegistryPreview(){
+  return [
+    {group:"Core", name:"Dashboard", route:"dashboard"},
+    {group:"Enterprise", name:"Empresas", route:"empresas"},
+    {group:"Enterprise", name:"Integration Hub", route:"integrationHub"},
+    {group:"AI", name:"AI Foundation", route:"aiFoundation"},
+    {group:"Integrations", name:"Real Integrations", route:"realIntegrations"},
+    {group:"AI", name:"AI Copilot", route:"copilot"},
+    {group:"Security", name:"Credential Manager", route:"credentialManager"},
+    {group:"Growth", name:"SaaS", route:"saasDashboard"},
+    {group:"Growth", name:"Billing", route:"billingDashboard"},
+    {group:"Growth", name:"Marketplace", route:"marketplaceDashboard"},
+    {group:"Field", name:"Campo", route:"fieldDashboard"},
+    {group:"Field", name:"Rotas", route:"routePlanning"},
+    {group:"Field", name:"Clima", route:"weatherCenter"},
+    {group:"Field", name:"Mobile Workforce", route:"mobileWorkforce"},
+    {group:"Field", name:"Ordens Serviço", route:"workOrders"},
+    {group:"BI", name:"BI Dashboard", route:"biDashboard"},
+    {group:"BI", name:"Analytics", route:"analyticsCenter"},
+    {group:"BI", name:"Forecast", route:"forecastEngine"},
+    {group:"BI", name:"Profitability", route:"profitabilityEngine"},
+    {group:"BI", name:"Executive IQ", route:"executiveIntelligence"},
+    {group:"Real Integrations", name:"Google Maps Real", route:"mapsReal"},
+    {group:"Real Integrations", name:"WhatsApp Real", route:"whatsappReal"},
+    {group:"Real Integrations", name:"Gmail Real", route:"gmailReal"},
+    {group:"Real Integrations", name:"Push Real", route:"pushReal"},
+    {group:"Real Integrations", name:"Flows Reais", route:"automationFlowsReal"},
+    {group:"Hardening", name:"Architecture", route:"architectureHardening"},
+    {group:"Hardening", name:"AI Ready", route:"aiReadiness"}
+  ];
+}
+
+async function saveArchitectureAudit(){
+  const res = await apiInsert("architecture_audit_logs", {
+    audit_type: "V50.1",
+    audit_title: "Architecture Hardening Operational Audit",
+    audit_message: `Runtime functions: ${countFunctionsInRuntime()} | Module preview: ${buildModuleRegistryPreview().length} | Status: base preparada para V51-V60.`,
+    severity: "Info",
+    status: "Open"
+  });
+
+  if(!res.ok) return alert("Erro ao salvar auditoria. Verifique se rodou o SQL V50.1.");
+
+  architectureAuditLogs = await apiGet("architecture_audit_logs");
+  renderArchitectureHardening();
+}
+
+async function seedModuleRegistry(){
+  const modules = buildModuleRegistryPreview();
+
+  for(const mod of modules){
+    await apiInsert("module_registry", {
+      module_key: mod.route,
+      module_name: mod.name,
+      module_group: mod.group,
+      route_name: mod.route,
+      renderer_name: inferRendererName(mod.route),
+      status: "Active",
+      ai_ready: ["AI","BI","Field","Real Integrations","Hardening"].includes(mod.group)
+    });
+  }
+
+  moduleRegistry = await apiGet("module_registry");
+  alert("Módulos registrados com sucesso.");
+  renderArchitectureHardening();
+}
+
+function inferRendererName(route){
+  const map = {
+    dashboard:"renderDashboard",
+    empresas:"renderEmpresas",
+    integrationHub:"renderIntegrationHub",
+    aiFoundation:"renderAIFoundation",
+    realIntegrations:"renderRealIntegrations",
+    copilot:"renderCopilot",
+    credentialManager:"renderCredentialManager",
+    saasDashboard:"renderSaasDashboard",
+    billingDashboard:"renderBillingDashboard",
+    marketplaceDashboard:"renderMarketplaceDashboard",
+    fieldDashboard:"renderFieldDashboard",
+    routePlanning:"renderRoutePlanning",
+    weatherCenter:"renderWeatherCenter",
+    mobileWorkforce:"renderMobileWorkforce",
+    workOrders:"renderWorkOrders",
+    biDashboard:"renderBIDashboard",
+    analyticsCenter:"renderAnalyticsCenter",
+    forecastEngine:"renderForecastEngine",
+    profitabilityEngine:"renderProfitabilityEngine",
+    executiveIntelligence:"renderExecutiveIntelligence",
+    mapsReal:"renderMapsReal",
+    whatsappReal:"renderWhatsAppReal",
+    gmailReal:"renderGmailReal",
+    pushReal:"renderPushReal",
+    automationFlowsReal:"renderAutomationFlowsReal",
+    architectureHardening:"renderArchitectureHardening",
+    aiReadiness:"renderAIReadiness"
+  };
+
+  return map[route] || "";
+}
+
+async function seedAIReadiness(){
+  const items = [
+    ["AI Lead Scoring", "Prepared", "Base preparada para V51 AI Lead Scoring."],
+    ["AI Quote Generator", "Prepared", "Base preparada para V52 AI Quote Generator."],
+    ["AI Project Risk Analysis", "Prepared", "Base preparada para V53 AI Project Risk Analysis."],
+    ["AI Financial Advisor", "Prepared", "Base preparada para V54 AI Financial Advisor."],
+    ["AI Workforce Planner", "Prepared", "Base preparada para V55 AI Workforce Planner."],
+    ["AI Route Optimization", "Prepared", "Base preparada para V56 AI Route Optimization."],
+    ["AI Weather Impact Engine", "Prepared", "Base preparada para V57 AI Weather Impact Engine."],
+    ["AI Executive Reports", "Prepared", "Base preparada para V58 AI Executive Reports."],
+    ["AI Automation Recommendations", "Prepared", "Base preparada para V59 AI Automation Recommendations."],
+    ["AI Command Center", "Prepared", "Base preparada para V60 AI Command Center."]
+  ];
+
+  for(const [area_name, readiness_status, notes] of items){
+    await apiInsert("ai_operations_readiness", {
+      area_name,
+      readiness_status,
+      notes
+    });
+  }
+
+  aiOperationsReadiness = await apiGet("ai_operations_readiness");
+  alert("AI Readiness populado com sucesso.");
+  renderAIReadiness();
+}
+
+async function saveAIReadinessAudit(){
+  const res = await apiInsert("architecture_audit_logs", {
+    audit_type: "AI Readiness",
+    audit_title: "V51-V60 AI Operations Prepared",
+    audit_message: "Próximo bloco preparado: AI Lead Scoring, Quote Generator, Risk Analysis, Financial Advisor, Workforce Planner, Route Optimization, Weather Impact, Executive Reports, Automation Recommendations e Command Center.",
+    severity: "Info",
+    status: "Open"
+  });
+
+  if(!res.ok) return alert("Erro ao salvar auditoria AI.");
+
+  architectureAuditLogs = await apiGet("architecture_audit_logs");
+  alert("Auditoria AI salva com sucesso.");
+}

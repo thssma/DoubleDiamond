@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-v50-1-architecture-hardening-20260610';
+const CACHE_NAME = 'doublediamond-v50-1-functional-fix-20260610';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -30,10 +30,6 @@ self.addEventListener('fetch', event => {
   }
 
   event.respondWith(
-    caches.match(req).then(cached => cached || fetch(req).then(response => {
-      const copy = response.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put(req, copy)).catch(() => {});
-      return response;
-    }))
+    caches.match(req).then(cached => cached || fetch(req))
   );
 });
