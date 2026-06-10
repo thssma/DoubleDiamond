@@ -16,6 +16,10 @@ let integrationWebhooks = [];
 let copilotConversations = [];
 let copilotMessages = [];
 let promptTemplates = [];
+let executiveKpiSnapshots = [];
+let reportCenterExports = [];
+let automationCenterItems = [];
+let mobileAppSettings = [];
 
 const headers = {
   "apikey": SUPABASE_ANON_KEY,
@@ -73,6 +77,10 @@ async function loadData(){
   copilotConversations = await apiGet("copilot_conversations");
   copilotMessages = await apiGet("copilot_messages");
   promptTemplates = await apiGet("prompt_templates");
+  executiveKpiSnapshots = await apiGet("executive_kpi_snapshots");
+  reportCenterExports = await apiGet("report_center_exports");
+  automationCenterItems = await apiGet("automation_center_items");
+  mobileAppSettings = await apiGet("mobile_app_settings");
 }
 
 function changePage(page, event){
@@ -87,6 +95,11 @@ function changePage(page, event){
     realIntegrations: renderRealIntegrations,
     copilot: renderCopilot,
     credentialManager: renderCredentialManager,
+    executiveDashboard: renderExecutiveDashboard,
+    kpiCenter: renderKpiCenter,
+    automationCenter: renderAutomationCenter,
+    reportCenter: renderReportCenter,
+    mobileReady: renderMobileReady,
     configuracoes: renderConfiguracoes
   };
 
@@ -721,4 +734,299 @@ function generateSafeCopilotResponse(message){
   }
 
   return "Copilot em modo seguro. A estrutura está pronta para conectar OpenAI no backend sem expor a API key no frontend.";
+}
+
+
+/* V26-V30 EXECUTIVE GROWTH PLATFORM */
+function getExecutiveMetrics(){
+  const invoiceTotal = typeof invoices !== "undefined" ? invoices.reduce((s,i) => s + Number(i.amount || 0), 0) : 0;
+  const paidTotal = typeof payments !== "undefined" ? payments.filter(p => p.status === "Paid").reduce((s,p) => s + Number(p.amount || 0), 0) : 0;
+  const activeSubs = typeof companySubscriptions !== "undefined" ? companySubscriptions.filter(s => s.status === "Active") : [];
+  const mrr = activeSubs.reduce((sum, sub) => {
+    const plan = typeof subscriptionPlans !== "undefined" ? subscriptionPlans.find(p => p.id === sub.plan_id) : null;
+    return sum + Number(plan?.monthly_price || 0);
+  }, 0);
+
+  return {
+    invoiceTotal,
+    paidTotal,
+    mrr,
+    activeCompanies: companies.filter(c => c.status === "Active").length,
+    providers: integrationProviders.length,
+    connections: integrationConnections.length,
+    insights: aiInsights.length,
+    queue: typeof integrationQueue !== "undefined" ? integrationQueue.length : 0,
+    reports: reportCenterExports.length,
+    automations: automationCenterItems.length
+  };
+}
+
+function renderExecutiveDashboard(){
+  setTitle("Dashboard Executivo");
+
+  const m = getExecutiveMetrics();
+
+  setContent(`
+    <div class="executive-hero">
+      <h2>Executive Growth Platform</h2>
+      <p>Visão executiva para gestão SaaS, billing, integrações, IA e crescimento.</p>
+    </div>
+
+    <div class="cards">
+      ${metric("MRR", "R$ " + formatMoneyExecutive(m.mrr))}
+      ${metric("Invoices", "R$ " + formatMoneyExecutive(m.invoiceTotal))}
+      ${metric("Recebido", "R$ " + formatMoneyExecutive(m.paidTotal))}
+      ${metric("Empresas Ativas", m.activeCompanies)}
+      ${metric("Conexões", m.connections)}
+      ${metric("AI Insights", m.insights)}
+      ${metric("Fila Integrações", m.queue)}
+      ${metric("Relatórios", m.reports)}
+    </div>
+
+    <div class="card">
+      <h2>Snapshot Executivo</h2>
+      <p>Salve o estado atual dos KPIs para comparação futura.</p>
+      <button class="primary-btn" onclick="saveExecutiveSnapshot()">Salvar Snapshot</button>
+    </div>
+
+    <div class="card">
+      <h2>Histórico de Snapshots</h2>
+      ${executiveKpiSnapshots.length ? executiveKpiSnapshots.map(s => `
+        <div class="soft-box">
+          <strong>${s.snapshot_name || "Snapshot Executivo"}</strong><br>
+          <small>${s.created_at ? new Date(s.created_at).toLocaleString("pt-BR") : ""}</small>
+          <p>MRR: R$ ${formatMoneyExecutive(s.mrr)} • Receita: R$ ${formatMoneyExecutive(s.revenue_total)}</p>
+        </div>
+      `).join("") : "<p>Nenhum snapshot salvo.</p>"}
+    </div>
+  `);
+}
+
+async function saveExecutiveSnapshot(){
+  const m = getExecutiveMetrics();
+  const companyId = companies[0]?.id || "";
+
+  const res = await apiInsert("executive_kpi_snapshots", {
+    company_id: companyId,
+    snapshot_name: "Executive Snapshot",
+    revenue_total: m.invoiceTotal,
+    mrr: m.mrr,
+    active_clients: companies.length,
+    active_projects: m.connections,
+    completed_projects: m.insights,
+    pending_invoices: typeof invoices !== "undefined" ? invoices.filter(i => i.status !== "Paid").length : 0,
+    collected_payments: m.paidTotal
+  });
+
+  if(!res.ok) return alert("Erro ao salvar snapshot.");
+
+  executiveKpiSnapshots = await apiGet("executive_kpi_snapshots");
+  renderExecutiveDashboard();
+}
+
+function renderKpiCenter(){
+  setTitle("KPIs Reais");
+
+  const m = getExecutiveMetrics();
+  const conversion = companies.length ? Math.round((m.connections / companies.length) * 100) : 0;
+  const avgRevenue = companies.length ? m.invoiceTotal / companies.length : 0;
+  const collectionRate = m.invoiceTotal ? Math.round((m.paidTotal / m.invoiceTotal) * 100) : 0;
+
+  setContent(`
+    <div class="executive-hero">
+      <h2>KPI Center</h2>
+      <p>Indicadores reais para crescimento, operação e monetização.</p>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-good"><h3>MRR</h3><p class="kpi-number">R$ ${formatMoneyExecutive(m.mrr)}</p></div>
+      <div class="kpi-card kpi-good"><h3>Receita por Empresa</h3><p class="kpi-number">R$ ${formatMoneyExecutive(avgRevenue)}</p></div>
+      <div class="kpi-card kpi-warn"><h3>Taxa de Conexão</h3><p class="kpi-number">${conversion}%</p></div>
+      <div class="kpi-card kpi-good"><h3>Recebimento</h3><p class="kpi-number">${collectionRate}%</p></div>
+      <div class="kpi-card kpi-warn"><h3>Automação</h3><p class="kpi-number">${m.automations}</p></div>
+      <div class="kpi-card kpi-warn"><h3>Relatórios</h3><p class="kpi-number">${m.reports}</p></div>
+    </div>
+  `);
+}
+
+function renderAutomationCenter(){
+  setTitle("Centro de Automações");
+
+  setContent(`
+    <div class="executive-hero">
+      <h2>Automation Center</h2>
+      <p>Controle central de automações, triggers e ações.</p>
+    </div>
+
+    <div class="card">
+      <h2>Nova Automação</h2>
+      <div class="form-grid">
+        <select id="autoCompany">
+          <option value="">Empresa</option>
+          ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
+        </select>
+        <input id="autoName" placeholder="Nome da automação">
+        <input id="autoTrigger" placeholder="Trigger. Ex: Invoice Overdue">
+        <input id="autoAction" placeholder="Ação. Ex: Send WhatsApp">
+        <select id="autoStatus"><option>Active</option><option>Paused</option><option>Error</option></select>
+      </div>
+      <button class="primary-btn" onclick="addAutomationCenterItem()">Criar Automação</button>
+    </div>
+
+    <div class="automation-grid">
+      ${automationCenterItems.length ? automationCenterItems.map(a => `
+        <div class="automation-card">
+          <h2>${a.automation_name}</h2>
+          <small>${companies.find(c => c.id === a.company_id)?.name || "Empresa"}</small>
+          <p><strong>Trigger:</strong> ${a.trigger_name}</p>
+          <p><strong>Ação:</strong> ${a.action_name}</p>
+          <span class="export-badge">${a.status}</span>
+        </div>
+      `).join("") : "<div class='card'>Nenhuma automação criada.</div>"}
+    </div>
+  `);
+}
+
+async function addAutomationCenterItem(){
+  const companyId = val("autoCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("automation_center_items", {
+    company_id: companyId,
+    automation_name: val("autoName"),
+    trigger_name: val("autoTrigger"),
+    action_name: val("autoAction"),
+    status: val("autoStatus")
+  });
+
+  if(!res.ok) return alert("Erro ao criar automação.");
+
+  automationCenterItems = await apiGet("automation_center_items");
+  renderAutomationCenter();
+}
+
+function renderReportCenter(){
+  setTitle("Centro de Relatórios");
+
+  setContent(`
+    <div class="executive-hero">
+      <h2>Report Center</h2>
+      <p>Central de relatórios preparada para PDF, CSV e Excel.</p>
+    </div>
+
+    <div class="card">
+      <h2>Novo Relatório</h2>
+      <div class="form-grid">
+        <select id="reportCompany">
+          <option value="">Empresa</option>
+          ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
+        </select>
+        <input id="reportName" placeholder="Nome do relatório">
+        <select id="reportType"><option>Financeiro</option><option>Projetos</option><option>CRM</option><option>Operações</option><option>SaaS</option><option>Marketplace</option></select>
+        <select id="reportFormat"><option>CSV</option><option>PDF</option><option>Excel</option></select>
+      </div>
+      <button class="primary-btn" onclick="createReportExport()">Preparar Relatório</button>
+    </div>
+
+    <div class="report-grid">
+      ${reportCenterExports.length ? reportCenterExports.map(r => `
+        <div class="report-card">
+          <h2>${r.report_name}</h2>
+          <small>${r.report_type}</small><br>
+          <span class="export-badge">${r.export_format}</span>
+          <p>Status: ${r.status}</p>
+        </div>
+      `).join("") : "<div class='card'>Nenhum relatório preparado.</div>"}
+    </div>
+  `);
+}
+
+async function createReportExport(){
+  const companyId = val("reportCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("report_center_exports", {
+    company_id: companyId,
+    report_name: val("reportName"),
+    report_type: val("reportType"),
+    export_format: val("reportFormat"),
+    status: "Prepared"
+  });
+
+  if(!res.ok) return alert("Erro ao preparar relatório.");
+
+  reportCenterExports = await apiGet("report_center_exports");
+  renderReportCenter();
+}
+
+function renderMobileReady(){
+  setTitle("Mobile Ready");
+
+  setContent(`
+    <div class="executive-hero">
+      <h2>Mobile Ready Foundation</h2>
+      <p>Preparação para PWA, cache offline, instalação no celular e push notifications.</p>
+    </div>
+
+    <div class="card">
+      <h2>Configuração Mobile</h2>
+      <div class="form-grid">
+        <select id="mobileCompany">
+          <option value="">Empresa</option>
+          ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
+        </select>
+        <select id="pwaEnabled"><option value="true">PWA ON</option><option value="false">PWA OFF</option></select>
+        <select id="offlineEnabled"><option value="false">Offline OFF</option><option value="true">Offline ON</option></select>
+        <select id="pushReady"><option value="false">Push Ready OFF</option><option value="true">Push Ready ON</option></select>
+      </div>
+      <button class="primary-btn" onclick="saveMobileSettings()">Salvar Configuração</button>
+    </div>
+
+    <div class="mobile-preview">
+      <div class="mobile-preview-screen">
+        <h2>DoubleDiamond</h2>
+        <p>Mobile Field Mode</p>
+        <button class="mobile-preview-button">Dashboard</button>
+        <button class="mobile-preview-button">Projetos</button>
+        <button class="mobile-preview-button">Fotos</button>
+        <button class="mobile-preview-button">Check-in</button>
+      </div>
+    </div>
+
+    <div class="mobile-grid">
+      ${mobileAppSettings.length ? mobileAppSettings.map(s => `
+        <div class="mobile-card">
+          <h2>${companies.find(c => c.id === s.company_id)?.name || "Empresa"}</h2>
+          <p>PWA: ${s.pwa_enabled ? "ON" : "OFF"}</p>
+          <p>Offline: ${s.offline_cache_enabled ? "ON" : "OFF"}</p>
+          <p>Push Ready: ${s.push_ready ? "ON" : "OFF"}</p>
+        </div>
+      `).join("") : "<div class='card'>Nenhuma configuração mobile.</div>"}
+    </div>
+  `);
+}
+
+async function saveMobileSettings(){
+  const companyId = val("mobileCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("mobile_app_settings", {
+    company_id: companyId,
+    pwa_enabled: val("pwaEnabled") === "true",
+    offline_cache_enabled: val("offlineEnabled") === "true",
+    push_ready: val("pushReady") === "true",
+    install_prompt_enabled: true
+  });
+
+  if(!res.ok) return alert("Erro ao salvar configuração mobile.");
+
+  mobileAppSettings = await apiGet("mobile_app_settings");
+  renderMobileReady();
+}
+
+function formatMoneyExecutive(value){
+  return Number(value || 0).toLocaleString("pt-BR", {
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
 }
