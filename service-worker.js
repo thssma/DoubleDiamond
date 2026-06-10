@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-v50-render-flowsteps-fix-20260610';
+const CACHE_NAME = 'doublediamond-v50-1-architecture-hardening-20260610';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -15,16 +15,25 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
-    event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+  const req = event.request;
+
+  if (req.mode === 'navigate' || req.destination === 'document') {
+    event.respondWith(fetch(req).catch(() => caches.match(req)));
     return;
   }
 
-  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
+  event.respondWith(
+    caches.match(req).then(cached => cached || fetch(req).then(response => {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put(req, copy)).catch(() => {});
+      return response;
+    }))
+  );
 });
