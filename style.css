@@ -294,3 +294,72 @@ textarea{
   background:#dbeafe;
   color:#1d4ed8;
 }
+
+.field-hero{
+  background:linear-gradient(135deg,#064e3b,#16a34a);
+  color:white;
+  border-radius:24px;
+  padding:24px;
+  margin-bottom:22px;
+  box-shadow:0 18px 45px rgba(6,78,59,.22);
+}
+.field-hero h2{
+  font-size:30px;
+  margin-bottom:8px;
+}
+.field-grid,.route-grid,.weather-grid,.work-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+  gap:18px;
+}
+.field-card,.route-card,.weather-card,.work-card{
+  background:#ffffff;
+  border:1px solid #e2e8f0;
+  border-radius:20px;
+  padding:18px;
+  box-shadow:0 14px 35px rgba(15,23,42,.08);
+  margin-bottom:14px;
+}
+.field-badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#dcfce7;
+  color:#166534;
+  font-size:12px;
+  font-weight:900;
+  margin-top:8px;
+}
+.field-phone{
+  max-width:390px;
+  margin:auto;
+  background:#0f172a;
+  border-radius:34px;
+  padding:16px;
+  box-shadow:0 20px 55px rgba(15,23,42,.28);
+}
+.field-phone-screen{
+  background:#f8fafc;
+  border-radius:24px;
+  padding:18px;
+}
+.field-phone-button{
+  width:100%;
+  border:none;
+  border-radius:16px;
+  padding:15px;
+  margin:8px 0;
+  font-weight:900;
+  background:#dcfce7;
+  color:#166534;
+}
+.weather-critical{border-left:6px solid #dc2626}
+.weather-medium{border-left:6px solid #f59e0b}
+.weather-low{border-left:6px solid #16a34a}
+.signature-box{
+  border:2px dashed #94a3b8;
+  border-radius:18px;
+  padding:18px;
+  background:#f8fafc;
+  margin-top:14px;
+}

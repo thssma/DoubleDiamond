@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DoubleDiamond Executive Growth Platform</title>
+  <title>DoubleDiamond Field Operations Platform</title>
   <link rel="icon" href="data:,">
+  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,7 +15,7 @@
         <div class="brand-icon">💎</div>
         <div>
           <h2>DoubleDiamond</h2>
-          <span>Executive Growth Platform</span>
+          <span>Field Operations Platform</span>
         </div>
       </div>
 
@@ -28,6 +29,12 @@
         <button class="menu-btn" onclick="changePage('automationCenter', event)">⚙️ Automações</button>
         <button class="menu-btn" onclick="changePage('reportCenter', event)">📑 Relatórios</button>
         <button class="menu-btn" onclick="changePage('mobileReady', event)">📱 Mobile Ready</button>
+        <button class="menu-btn" onclick="changePage('fieldDashboard', event)">🌱 Campo</button>
+        <button class="menu-btn" onclick="changePage('pwaCenter', event)">📲 PWA</button>
+        <button class="menu-btn" onclick="changePage('routePlanning', event)">🗺️ Rotas</button>
+        <button class="menu-btn" onclick="changePage('weatherCenter', event)">🌦️ Clima</button>
+        <button class="menu-btn" onclick="changePage('mobileWorkforce', event)">👷 Mobile Workforce</button>
+        <button class="menu-btn" onclick="changePage('workOrders', event)">🧾 Ordens Serviço</button>
         <button class="menu-btn" onclick="changePage('configuracoes', event)">⚙️ Configurações</button>
       </nav>
     </aside>
@@ -36,11 +43,11 @@
       <header class="topbar">
         <div>
           <p class="eyebrow">DoubleDiamond Platform</p>
-          <h1 id="pageTitle">Executive Growth Platform</h1>
-          <p class="subtitle">Dashboards executivos, KPIs reais, automações, relatórios e mobile ready.</p>
+          <h1 id="pageTitle">Field Operations Platform</h1>
+          <p class="subtitle">PWA, campo, rotas, clima, GPS, fotos, assinaturas e ordens de serviço.</p>
         </div>
         <div class="top-actions">
-          <span class="badge">V26/V27/V28/V29/V30</span>
+          <span class="badge">V31/V32/V33/V34/V35/V36/V37/V38/V39/V40</span>
           <span class="badge success">Foundation</span>
         </div>
       </header>
@@ -50,5 +57,10 @@
   </div>
 
   <script src="script.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+}
+</script>
 </body>
 </html>

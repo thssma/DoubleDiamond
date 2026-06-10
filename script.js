@@ -21,6 +21,20 @@ let reportCenterExports = [];
 let automationCenterItems = [];
 let mobileAppSettings = [];
 
+let pwaSettings = [];
+let offlineCacheItems = [];
+let pushNotificationTemplates = [];
+let routePlans = [];
+let routeStops = [];
+let weatherAlerts = [];
+let mobileWorkforceTasks = [];
+let gpsCheckins = [];
+let fieldPhotos = [];
+let fieldSignatures = [];
+let workOrders = [];
+let workOrderLogs = [];
+
+
 const headers = {
   "apikey": SUPABASE_ANON_KEY,
   "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
@@ -81,6 +95,20 @@ async function loadData(){
   reportCenterExports = await apiGet("report_center_exports");
   automationCenterItems = await apiGet("automation_center_items");
   mobileAppSettings = await apiGet("mobile_app_settings");
+
+  pwaSettings = await apiGet("pwa_settings");
+  offlineCacheItems = await apiGet("offline_cache_items");
+  pushNotificationTemplates = await apiGet("push_notification_templates");
+  routePlans = await apiGet("route_plans");
+  routeStops = await apiGet("route_stops");
+  weatherAlerts = await apiGet("weather_alerts");
+  mobileWorkforceTasks = await apiGet("mobile_workforce_tasks");
+  gpsCheckins = await apiGet("gps_checkins");
+  fieldPhotos = await apiGet("field_photos");
+  fieldSignatures = await apiGet("field_signatures");
+  workOrders = await apiGet("work_orders");
+  workOrderLogs = await apiGet("work_order_logs");
+
 }
 
 function changePage(page, event){
@@ -100,6 +128,12 @@ function changePage(page, event){
     automationCenter: renderAutomationCenter,
     reportCenter: renderReportCenter,
     mobileReady: renderMobileReady,
+    fieldDashboard: renderFieldDashboard,
+    pwaCenter: renderPwaCenter,
+    routePlanning: renderRoutePlanning,
+    weatherCenter: renderWeatherCenter,
+    mobileWorkforce: renderMobileWorkforce,
+    workOrders: renderWorkOrders,
     configuracoes: renderConfiguracoes
   };
 
@@ -1021,6 +1055,20 @@ async function saveMobileSettings(){
   if(!res.ok) return alert("Erro ao salvar configuração mobile.");
 
   mobileAppSettings = await apiGet("mobile_app_settings");
+
+  pwaSettings = await apiGet("pwa_settings");
+  offlineCacheItems = await apiGet("offline_cache_items");
+  pushNotificationTemplates = await apiGet("push_notification_templates");
+  routePlans = await apiGet("route_plans");
+  routeStops = await apiGet("route_stops");
+  weatherAlerts = await apiGet("weather_alerts");
+  mobileWorkforceTasks = await apiGet("mobile_workforce_tasks");
+  gpsCheckins = await apiGet("gps_checkins");
+  fieldPhotos = await apiGet("field_photos");
+  fieldSignatures = await apiGet("field_signatures");
+  workOrders = await apiGet("work_orders");
+  workOrderLogs = await apiGet("work_order_logs");
+
   renderMobileReady();
 }
 
@@ -1029,4 +1077,520 @@ function formatMoneyExecutive(value){
     minimumFractionDigits:2,
     maximumFractionDigits:2
   });
+}
+
+
+/* V31-V40 FIELD OPERATIONS PLATFORM */
+function renderFieldDashboard(){
+  setTitle("Field Operations");
+
+  setContent(`
+    <div class="field-hero">
+      <h2>Field Operations Platform</h2>
+      <p>PWA, offline, push, rotas, clima, equipe externa, GPS, fotos, assinatura e ordens de serviço.</p>
+    </div>
+
+    <div class="cards">
+      ${metric("PWA Settings", pwaSettings.length)}
+      ${metric("Cache Offline", offlineCacheItems.length)}
+      ${metric("Push Templates", pushNotificationTemplates.length)}
+      ${metric("Rotas", routePlans.length)}
+      ${metric("Alertas Clima", weatherAlerts.length)}
+      ${metric("Tarefas Campo", mobileWorkforceTasks.length)}
+      ${metric("GPS Check-ins", gpsCheckins.length)}
+      ${metric("Ordens Serviço", workOrders.length)}
+    </div>
+
+    <div class="field-phone">
+      <div class="field-phone-screen">
+        <h2>DoubleDiamond Field</h2>
+        <p>Modo equipe em campo</p>
+        <button class="field-phone-button">Check-in GPS</button>
+        <button class="field-phone-button">Fotos</button>
+        <button class="field-phone-button">Ordem de Serviço</button>
+        <button class="field-phone-button">Assinatura</button>
+      </div>
+    </div>
+  `);
+}
+
+function renderPwaCenter(){
+  setTitle("PWA / Offline / Push");
+
+  setContent(`
+    <div class="field-hero">
+      <h2>PWA Real + Offline Cache + Push Ready</h2>
+      <p>Preparação para instalação no celular, cache local e notificações futuras.</p>
+    </div>
+
+    <div class="card">
+      <h2>PWA Settings</h2>
+      <div class="form-grid">
+        <select id="pwaCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="pwaAppName" placeholder="Nome do app" value="DoubleDiamond">
+        <input id="pwaShortName" placeholder="Nome curto" value="DD">
+        <input id="pwaTheme" placeholder="Theme color" value="#2563eb">
+        <select id="pwaStatus"><option>Active</option><option>Inactive</option></select>
+      </div>
+      <button class="primary-btn" onclick="savePwaSettings()">Salvar PWA</button>
+    </div>
+
+    <div class="card">
+      <h2>Cache Offline</h2>
+      <div class="form-grid">
+        <select id="cacheCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="cacheKey" placeholder="Cache Key. Ex: projects">
+        <select id="cacheModule"><option>Clientes</option><option>Projetos</option><option>Agenda</option><option>Tarefas</option><option>Ordens</option></select>
+        <select id="cacheStatus"><option>Ready</option><option>Syncing</option><option>Error</option></select>
+      </div>
+      <button class="secondary-btn" onclick="saveOfflineCache()">Salvar Cache</button>
+    </div>
+
+    <div class="card">
+      <h2>Push Template</h2>
+      <div class="form-grid">
+        <select id="pushCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="pushName" placeholder="Nome template">
+        <input id="pushTrigger" placeholder="Trigger. Ex: Task Assigned">
+        <input id="pushTitle" placeholder="Título">
+      </div>
+      <textarea id="pushBody" placeholder="Mensagem"></textarea>
+      <button class="success-btn" onclick="savePushTemplate()">Salvar Push</button>
+    </div>
+
+    <div class="field-grid">
+      ${pwaSettings.map(p => `<div class="field-card"><h2>${p.app_name}</h2><span class="field-badge">${p.status}</span><p>${p.short_name} • ${p.display_mode}</p></div>`).join("")}
+      ${offlineCacheItems.map(c => `<div class="field-card"><h2>${c.module_name}</h2><span class="field-badge">${c.cache_status}</span><p>${c.cache_key}</p></div>`).join("")}
+      ${pushNotificationTemplates.map(p => `<div class="field-card"><h2>${p.template_name}</h2><span class="field-badge">${p.status}</span><p>${p.title}</p></div>`).join("")}
+    </div>
+  `);
+}
+
+async function savePwaSettings(){
+  const companyId = val("pwaCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("pwa_settings", {
+    company_id: companyId,
+    app_name: val("pwaAppName"),
+    short_name: val("pwaShortName"),
+    theme_color: val("pwaTheme"),
+    background_color: "#0f172a",
+    display_mode: "standalone",
+    status: val("pwaStatus")
+  });
+
+  if(!res.ok) return alert("Erro ao salvar PWA.");
+
+  pwaSettings = await apiGet("pwa_settings");
+  renderPwaCenter();
+}
+
+async function saveOfflineCache(){
+  const companyId = val("cacheCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("offline_cache_items", {
+    company_id: companyId,
+    cache_key: val("cacheKey"),
+    module_name: val("cacheModule"),
+    cache_status: val("cacheStatus"),
+    last_sync: new Date().toISOString()
+  });
+
+  if(!res.ok) return alert("Erro ao salvar cache.");
+
+  offlineCacheItems = await apiGet("offline_cache_items");
+  renderPwaCenter();
+}
+
+async function savePushTemplate(){
+  const companyId = val("pushCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("push_notification_templates", {
+    company_id: companyId,
+    template_name: val("pushName"),
+    trigger_name: val("pushTrigger"),
+    title: val("pushTitle"),
+    body: val("pushBody"),
+    status: "Active"
+  });
+
+  if(!res.ok) return alert("Erro ao salvar push.");
+
+  pushNotificationTemplates = await apiGet("push_notification_templates");
+  renderPwaCenter();
+}
+
+function renderRoutePlanning(){
+  setTitle("Route Planning");
+
+  setContent(`
+    <div class="field-hero">
+      <h2>Route Planning Foundation</h2>
+      <p>Planejamento de rotas para visitas, execução e equipe externa.</p>
+    </div>
+
+    <div class="card">
+      <h2>Nova Rota</h2>
+      <div class="form-grid">
+        <select id="routeCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="routeName" placeholder="Nome da rota">
+        <input id="routeAssigned" placeholder="Responsável">
+        <input id="routeDate" type="date">
+        <select id="routeStatus"><option>Planned</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select>
+      </div>
+      <textarea id="routeNotes" placeholder="Observações"></textarea>
+      <button class="primary-btn" onclick="createRoutePlan()">Criar Rota</button>
+    </div>
+
+    <div class="card">
+      <h2>Adicionar Parada</h2>
+      <div class="form-grid">
+        <select id="stopRoute"><option value="">Rota</option>${routePlans.map(r => `<option value="${r.id}">${r.route_name}</option>`).join("")}</select>
+        <input id="stopClient" placeholder="Cliente">
+        <input id="stopAddress" placeholder="Endereço">
+        <input id="stopOrder" type="number" placeholder="Ordem">
+        <input id="stopMinutes" type="number" placeholder="Minutos estimados">
+      </div>
+      <button class="secondary-btn" onclick="addRouteStop()">Adicionar Parada</button>
+    </div>
+
+    <div class="route-grid">
+      ${routePlans.map(route => {
+        const stops = routeStops.filter(s => s.route_id === route.id).sort((a,b) => Number(a.stop_order || 0) - Number(b.stop_order || 0));
+        return `
+          <div class="route-card">
+            <h2>${route.route_name}</h2>
+            <small>${route.route_date || "Sem data"} • ${route.assigned_to || "Sem responsável"}</small><br>
+            <span class="field-badge">${route.status}</span>
+            ${stops.map(stop => `<div class="soft-box"><strong>${stop.stop_order}. ${stop.client_name}</strong><br><small>${stop.address}</small><br><small>${stop.estimated_minutes} min • ${stop.status}</small></div>`).join("")}
+          </div>
+        `;
+      }).join("") || "<div class='card'>Nenhuma rota.</div>"}
+    </div>
+  `);
+}
+
+async function createRoutePlan(){
+  const companyId = val("routeCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("route_plans", {
+    company_id: companyId,
+    route_name: val("routeName"),
+    assigned_to: val("routeAssigned"),
+    route_date: val("routeDate") || null,
+    status: val("routeStatus"),
+    notes: val("routeNotes")
+  });
+
+  if(!res.ok) return alert("Erro ao criar rota.");
+
+  routePlans = await apiGet("route_plans");
+  renderRoutePlanning();
+}
+
+async function addRouteStop(){
+  const routeId = val("stopRoute");
+  if(!routeId) return alert("Selecione a rota.");
+
+  const res = await apiInsert("route_stops", {
+    route_id: routeId,
+    client_name: val("stopClient"),
+    address: val("stopAddress"),
+    stop_order: Number(val("stopOrder") || 1),
+    estimated_minutes: Number(val("stopMinutes") || 30),
+    status: "Pending"
+  });
+
+  if(!res.ok) return alert("Erro ao adicionar parada.");
+
+  routeStops = await apiGet("route_stops");
+  renderRoutePlanning();
+}
+
+function renderWeatherCenter(){
+  setTitle("Weather Intelligence");
+
+  setContent(`
+    <div class="field-hero">
+      <h2>Weather Intelligence Foundation</h2>
+      <p>Alertas climáticos e impacto operacional para paisagismo e manutenção externa.</p>
+    </div>
+
+    <div class="card">
+      <h2>Novo Alerta Climático</h2>
+      <div class="form-grid">
+        <select id="weatherCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="weatherLocation" placeholder="Local">
+        <select id="weatherType"><option>Rain</option><option>Storm</option><option>Heat</option><option>Snow</option><option>Wind</option></select>
+        <select id="weatherSeverity"><option>Low</option><option>Medium</option><option>Critical</option></select>
+        <input id="weatherDate" type="date">
+        <select id="weatherImpact"><option>Monitor</option><option>Reschedule</option><option>Notify Client</option><option>Stop Field Work</option></select>
+      </div>
+      <textarea id="weatherMessage" placeholder="Mensagem"></textarea>
+      <button class="primary-btn" onclick="addWeatherAlert()">Salvar Alerta</button>
+    </div>
+
+    <div class="weather-grid">
+      ${weatherAlerts.map(alert => `
+        <div class="weather-card weather-${String(alert.severity || "medium").toLowerCase()}">
+          <h2>${alert.alert_type}</h2>
+          <small>${alert.location_name} • ${alert.alert_date || "Sem data"}</small><br>
+          <span class="field-badge">${alert.severity}</span>
+          <p>${alert.message || ""}</p>
+          <strong>Impacto: ${alert.impact_status}</strong>
+        </div>
+      `).join("") || "<div class='card'>Nenhum alerta climático.</div>"}
+    </div>
+  `);
+}
+
+async function addWeatherAlert(){
+  const companyId = val("weatherCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("weather_alerts", {
+    company_id: companyId,
+    location_name: val("weatherLocation"),
+    alert_type: val("weatherType"),
+    severity: val("weatherSeverity"),
+    message: val("weatherMessage"),
+    impact_status: val("weatherImpact"),
+    alert_date: val("weatherDate") || null
+  });
+
+  if(!res.ok) return alert("Erro ao salvar alerta.");
+
+  weatherAlerts = await apiGet("weather_alerts");
+  renderWeatherCenter();
+}
+
+function renderMobileWorkforce(){
+  setTitle("Mobile Workforce");
+
+  setContent(`
+    <div class="field-hero">
+      <h2>Mobile Workforce + GPS + Fotos + Assinatura</h2>
+      <p>Controle de equipe externa, check-in GPS, upload de fotos e aceite digital.</p>
+    </div>
+
+    <div class="card">
+      <h2>Nova Tarefa de Campo</h2>
+      <div class="form-grid">
+        <select id="mwCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="mwEmployee" placeholder="Funcionário">
+        <input id="mwTitle" placeholder="Tarefa">
+        <input id="mwProject" placeholder="Projeto">
+        <select id="mwPriority"><option>Normal</option><option>High</option><option>Urgent</option></select>
+        <select id="mwStatus"><option>Assigned</option><option>In Progress</option><option>Completed</option></select>
+      </div>
+      <button class="primary-btn" onclick="addMobileWorkforceTask()">Criar Tarefa</button>
+    </div>
+
+    <div class="card">
+      <h2>GPS Check-in</h2>
+      <div class="form-grid">
+        <select id="gpsCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="gpsEmployee" placeholder="Funcionário">
+        <input id="gpsProject" placeholder="Projeto">
+        <select id="gpsType"><option>IN</option><option>OUT</option></select>
+        <input id="gpsLat" placeholder="Latitude">
+        <input id="gpsLng" placeholder="Longitude">
+      </div>
+      <textarea id="gpsNotes" placeholder="Notas"></textarea>
+      <button class="success-btn" onclick="addGpsCheckin()">Registrar GPS</button>
+    </div>
+
+    <div class="card">
+      <h2>Foto de Campo</h2>
+      <div class="form-grid">
+        <select id="photoCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="photoProject" placeholder="Projeto">
+        <input id="photoEmployee" placeholder="Funcionário">
+        <select id="photoType"><option>Before</option><option>During</option><option>After</option><option>Problem</option><option>Material</option></select>
+        <input id="photoUrl" placeholder="URL da foto">
+      </div>
+      <textarea id="photoNotes" placeholder="Notas"></textarea>
+      <button class="secondary-btn" onclick="addFieldPhoto()">Salvar Foto</button>
+    </div>
+
+    <div class="field-grid">
+      ${mobileWorkforceTasks.map(t => `<div class="field-card"><h2>${t.task_title}</h2><small>${t.employee_name} • ${t.project_name}</small><br><span class="field-badge">${t.task_status}</span></div>`).join("")}
+      ${gpsCheckins.map(g => `<div class="field-card"><h2>${g.employee_name}</h2><small>${g.project_name} • ${g.check_type}</small><p>${g.latitude}, ${g.longitude}</p></div>`).join("")}
+      ${fieldPhotos.map(p => `<div class="field-card"><h2>${p.photo_type}</h2><small>${p.project_name} • ${p.employee_name}</small><p>${p.photo_url || "Sem URL"}</p></div>`).join("")}
+    </div>
+  `);
+}
+
+async function addMobileWorkforceTask(){
+  const companyId = val("mwCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("mobile_workforce_tasks", {
+    company_id: companyId,
+    employee_name: val("mwEmployee"),
+    task_title: val("mwTitle"),
+    project_name: val("mwProject"),
+    task_status: val("mwStatus"),
+    priority: val("mwPriority")
+  });
+
+  if(!res.ok) return alert("Erro ao criar tarefa.");
+
+  mobileWorkforceTasks = await apiGet("mobile_workforce_tasks");
+  renderMobileWorkforce();
+}
+
+async function addGpsCheckin(){
+  const companyId = val("gpsCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("gps_checkins", {
+    company_id: companyId,
+    employee_name: val("gpsEmployee"),
+    project_name: val("gpsProject"),
+    check_type: val("gpsType"),
+    latitude: val("gpsLat"),
+    longitude: val("gpsLng"),
+    notes: val("gpsNotes")
+  });
+
+  if(!res.ok) return alert("Erro ao registrar GPS.");
+
+  gpsCheckins = await apiGet("gps_checkins");
+  renderMobileWorkforce();
+}
+
+async function addFieldPhoto(){
+  const companyId = val("photoCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("field_photos", {
+    company_id: companyId,
+    project_name: val("photoProject"),
+    employee_name: val("photoEmployee"),
+    photo_type: val("photoType"),
+    photo_url: val("photoUrl"),
+    notes: val("photoNotes")
+  });
+
+  if(!res.ok) return alert("Erro ao salvar foto.");
+
+  fieldPhotos = await apiGet("field_photos");
+  renderMobileWorkforce();
+}
+
+function renderWorkOrders(){
+  setTitle("Ordens de Serviço");
+
+  setContent(`
+    <div class="field-hero">
+      <h2>Smart Work Orders</h2>
+      <p>Ordens de serviço com status, prioridade, execução, assinatura e histórico.</p>
+    </div>
+
+    <div class="card">
+      <h2>Nova Ordem de Serviço</h2>
+      <div class="form-grid">
+        <select id="woCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="woNumber" placeholder="Número OS">
+        <input id="woClient" placeholder="Cliente">
+        <input id="woProject" placeholder="Projeto">
+        <input id="woAssigned" placeholder="Responsável">
+        <input id="woService" placeholder="Tipo de serviço">
+        <input id="woDate" type="date">
+        <select id="woStatus"><option>Open</option><option>Scheduled</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select>
+        <select id="woPriority"><option>Normal</option><option>High</option><option>Emergency</option></select>
+      </div>
+      <textarea id="woNotes" placeholder="Notas"></textarea>
+      <button class="primary-btn" onclick="createWorkOrder()">Criar OS</button>
+    </div>
+
+    <div class="card">
+      <h2>Assinatura Digital</h2>
+      <div class="form-grid">
+        <select id="sigWorkOrder"><option value="">Ordem de Serviço</option>${workOrders.map(w => `<option value="${w.id}">${w.work_order_number} - ${w.client_name}</option>`).join("")}</select>
+        <input id="sigName" placeholder="Nome assinante">
+        <select id="sigRole"><option>Client</option><option>Technician</option><option>Manager</option></select>
+      </div>
+      <div class="signature-box">
+        <p>Digite EU APROVO para registrar aceite digital.</p>
+        <input id="sigText" placeholder="EU APROVO">
+      </div>
+      <button class="success-btn" onclick="signWorkOrder()">Assinar OS</button>
+    </div>
+
+    <div class="work-grid">
+      ${workOrders.map(w => {
+        const logs = workOrderLogs.filter(l => l.work_order_id === w.id);
+        const signatures = fieldSignatures.filter(s => s.work_order_id === w.id);
+        return `
+          <div class="work-card">
+            <h2>${w.work_order_number}</h2>
+            <small>${w.client_name} • ${w.project_name}</small><br>
+            <span class="field-badge">${w.status}</span>
+            <p>${w.service_type} • ${w.priority}</p>
+            <p>Responsável: ${w.assigned_to || "N/A"}</p>
+            <p>Assinaturas: ${signatures.length}</p>
+            ${logs.map(l => `<div class="soft-box"><strong>${l.log_type}</strong><br><small>${l.message}</small></div>`).join("")}
+          </div>
+        `;
+      }).join("") || "<div class='card'>Nenhuma ordem de serviço.</div>"}
+    </div>
+  `);
+}
+
+async function createWorkOrder(){
+  const companyId = val("woCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("work_orders", {
+    company_id: companyId,
+    work_order_number: val("woNumber"),
+    client_name: val("woClient"),
+    project_name: val("woProject"),
+    assigned_to: val("woAssigned"),
+    service_type: val("woService"),
+    status: val("woStatus"),
+    priority: val("woPriority"),
+    scheduled_date: val("woDate") || null,
+    notes: val("woNotes")
+  });
+
+  if(!res.ok) return alert("Erro ao criar OS.");
+
+  workOrders = await apiGet("work_orders");
+  renderWorkOrders();
+}
+
+async function signWorkOrder(){
+  const workOrderId = val("sigWorkOrder");
+  if(!workOrderId) return alert("Selecione a OS.");
+  if(val("sigText").trim().toUpperCase() !== "EU APROVO") return alert("Digite EU APROVO.");
+
+  const companyId = companies[0]?.id || "";
+
+  const res = await apiInsert("field_signatures", {
+    company_id: companyId,
+    work_order_id: workOrderId,
+    signer_name: val("sigName"),
+    signer_role: val("sigRole"),
+    signature_text: val("sigText"),
+    status: "Signed"
+  });
+
+  if(!res.ok) return alert("Erro ao assinar OS.");
+
+  await apiInsert("work_order_logs", {
+    work_order_id: workOrderId,
+    log_type: "Signature",
+    message: `${val("sigRole")} ${val("sigName")} assinou a ordem de serviço.`
+  });
+
+  fieldSignatures = await apiGet("field_signatures");
+  workOrderLogs = await apiGet("work_order_logs");
+  renderWorkOrders();
 }
