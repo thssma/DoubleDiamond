@@ -79,44 +79,52 @@ function changePage(page, event){
   (routes[page] || (() => renderPlaceholder(page)))();
 }
 
-function setTitle(title){
-  document.getElementById("pageTitle").innerText = title;
-}
+function setTitle(title){ document.getElementById("pageTitle").innerText = title; }
+function setContent(html){ document.getElementById("pageContent").innerHTML = html; }
 
-function setContent(html){
-  document.getElementById("pageContent").innerHTML = html;
-}
-
+/* DASHBOARD EXECUTIVO */
 function renderDashboard(){
-  setTitle("Dashboard");
+  setTitle("Dashboard Executivo");
 
-  const income = financeItems.filter(i => i.type === "Income" && i.status === "Paid")
-    .reduce((s,i) => s + Number(i.amount || 0), 0);
-
-  const expense = financeItems.filter(i => i.type === "Expense" && i.status === "Paid")
-    .reduce((s,i) => s + Number(i.amount || 0), 0);
+  const approvedRevenue = quotes.filter(q => q.status === "Approved").reduce((s,q) => s + Number(q.value || 0), 0);
+  const incomePaid = financeItems.filter(i => i.type === "Income" && i.status === "Paid").reduce((s,i) => s + Number(i.amount || 0), 0);
+  const expensesPaid = financeItems.filter(i => i.type === "Expense" && i.status === "Paid").reduce((s,i) => s + Number(i.amount || 0), 0);
+  const pendingIncome = financeItems.filter(i => i.type === "Income" && i.status === "Pending").reduce((s,i) => s + Number(i.amount || 0), 0);
+  const activeProjects = projects.filter(p => ["Planning","Quoted","Scheduled","In Progress"].includes(p.status)).length;
+  const completedProjects = projects.filter(p => p.status === "Completed").length;
+  const totalPhotos = quotePhotos.length + projectPhotos.length;
 
   setContent(`
+    <div class="notice">
+      V4.5 ativa: Dashboard executivo + Conversão Orçamento → Projeto + Relatório automático.
+    </div>
+
     <div class="cards">
-      ${metric("Clientes", clients.length)}
-      ${metric("Orçamentos", quotes.length)}
-      ${metric("Serviços", services.length)}
-      ${metric("Projetos", projects.length)}
-      ${metric("Fotos", quotePhotos.length + projectPhotos.length)}
-      ${metric("Agenda", appointments.length)}
-      ${metric("Equipe", employees.length)}
-      ${metric("Lucro", "R$ " + formatMoney(income - expense))}
+      ${metric("Receita Prevista", "R$ " + formatMoney(approvedRevenue), "purple")}
+      ${metric("Receita Recebida", "R$ " + formatMoney(incomePaid), "good")}
+      ${metric("Despesas Pagas", "R$ " + formatMoney(expensesPaid), "bad")}
+      ${metric("Lucro Real", "R$ " + formatMoney(incomePaid - expensesPaid), "good")}
+      ${metric("A Receber", "R$ " + formatMoney(pendingIncome), "warn")}
+      ${metric("Projetos Ativos", activeProjects, "purple")}
+      ${metric("Projetos Concluídos", completedProjects, "good")}
+      ${metric("Fotos", totalPhotos, "")}
+      ${metric("Clientes", clients.length, "")}
+      ${metric("Equipe", employees.length, "")}
     </div>
 
     <div class="card">
-      <h2>Resumo Operacional</h2>
-      <p>Fluxo ativo: Cliente → Orçamento → Serviço → Projeto → Fotos → Financeiro.</p>
+      <h2>Atalhos de Operação</h2>
+      <p>1. Aprove um orçamento em Orçamentos. 2. Clique em Converter em Projeto. 3. Gere relatório automático em Relatórios.</p>
+      <div class="action-row">
+        <button class="primary-btn" onclick="changePage('orcamentos')">Ir para Orçamentos</button>
+        <button class="secondary-btn" onclick="changePage('relatorios')">Gerar Relatório</button>
+      </div>
     </div>
   `);
 }
 
-function metric(label, value){
-  return `<div class="card metric"><h3>${label}</h3><p class="big">${value}</p></div>`;
+function metric(label, value, type=""){
+  return `<div class="card metric ${type}"><h3>${label}</h3><p class="big ${type}">${value}</p></div>`;
 }
 
 /* CLIENTES */
@@ -180,7 +188,7 @@ function updateClientList(){
   `, `removeClient('${c.id}')`)).join("");
 }
 
-/* ORÇAMENTOS */
+/* ORÇAMENTOS + CONVERSÃO */
 function renderOrcamentos(){
   setTitle("Orçamentos");
   setContent(`
@@ -220,16 +228,90 @@ async function removeQuote(id){
   quotes = await apiGet("quotes"); renderOrcamentos();
 }
 
+async function convertQuoteToProject(quoteId){
+  const quote = quotes.find(q => q.id === quoteId);
+  if(!quote) return alert("Orçamento não encontrado.");
+
+  if(quote.status !== "Approved"){
+    return alert("Somente orçamentos com status Approved podem virar projeto.");
+  }
+
+  const alreadyExists = projects.some(p =>
+    p.client_name === quote.client_name &&
+    p.service_name === quote.service &&
+    (p.notes || "").includes(`Origem orçamento: ${quote.id}`)
+  );
+
+  if(alreadyExists){
+    return alert("Este orçamento já foi convertido em projeto.");
+  }
+
+  const newProject = {
+    client_id: quote.client_id || "",
+    client_name: quote.client_name || "",
+    service_name: quote.service || "",
+    project_name: `${quote.service} - ${quote.client_name}`,
+    start_date: null,
+    end_date: null,
+    status: "Planning",
+    notes: `Criado automaticamente a partir de orçamento aprovado.\nOrigem orçamento: ${quote.id}\nValor estimado: R$ ${formatMoney(quote.value)}\nDescrição: ${quote.description || ""}`
+  };
+
+  const projectRes = await apiInsert("projects", newProject);
+
+  if(!projectRes.ok){
+    alert("Erro ao converter orçamento em projeto.");
+    return;
+  }
+
+  const financeRes = await apiInsert("finance", {
+    type: "Income",
+    title: `Receber - ${quote.service} - ${quote.client_name}`,
+    related_client: quote.client_name || "",
+    related_project: newProject.project_name,
+    amount: Number(quote.value || 0),
+    status: "Pending",
+    due_date: null,
+    notes: `Criado automaticamente junto com o projeto.\nOrigem orçamento: ${quote.id}`
+  });
+
+  if(!financeRes.ok){
+    alert("Projeto criado, mas houve erro ao criar lançamento financeiro.");
+  }else{
+    alert("Projeto e lançamento financeiro criados com sucesso.");
+  }
+
+  await loadData();
+  renderOrcamentos();
+}
+
 function updateQuoteList(){
   const el = document.getElementById("quoteList");
   if(!quotes.length) return el.innerHTML = "<p>Nenhum orçamento cadastrado.</p>";
-  el.innerHTML = quotes.map(q => item(`
-    <strong>${q.client_name}</strong><br>
-    <small>${q.service}</small><br>
-    <small>${q.description || "Sem descrição"}</small><br>
-    <strong>R$ ${formatMoney(q.value)}</strong><br>
-    <span class="status ${quoteStatusClass(q.status)}">${q.status}</span>
-  `, `removeQuote('${q.id}')`)).join("");
+  el.innerHTML = quotes.map(q => {
+    const converted = projects.some(p =>
+      p.client_name === q.client_name &&
+      p.service_name === q.service &&
+      (p.notes || "").includes(`Origem orçamento: ${q.id}`)
+    );
+
+    return `
+      <div class="list-item">
+        <div>
+          <strong>${q.client_name}</strong><br>
+          <small>${q.service}</small><br>
+          <small>${q.description || "Sem descrição"}</small><br>
+          <strong>R$ ${formatMoney(q.value)}</strong><br>
+          <span class="status ${quoteStatusClass(q.status)}">${q.status}</span>
+          ${converted ? `<span class="status status-completed">Projeto criado</span>` : ""}
+          <div class="action-row">
+            ${q.status === "Approved" && !converted ? `<button class="success-btn" onclick="convertQuoteToProject('${q.id}')">Converter em Projeto</button>` : ""}
+          </div>
+        </div>
+        <button class="danger-btn" onclick="removeQuote('${q.id}')">Remover</button>
+      </div>
+    `;
+  }).join("");
 }
 
 /* SERVIÇOS */
@@ -506,6 +588,7 @@ function updateFinanceList(){
   el.innerHTML = financeItems.map(f => item(`
     <strong>${f.title}</strong><br>
     <small>${f.type} • ${f.status} • ${f.due_date || "Sem vencimento"}</small><br>
+    <small>${f.related_client || "Sem cliente"} • ${f.related_project || "Sem projeto"}</small><br>
     <strong>R$ ${formatMoney(f.amount)}</strong><br>
     <span class="status ${financeStatusClass(f)}">${f.status}</span>
   `, `removeFinance('${f.id}')`)).join("");
@@ -565,21 +648,24 @@ function updateAppointmentList(){
   `, `removeAppointment('${a.id}')`)).join("");
 }
 
-/* RELATÓRIOS */
+/* RELATÓRIOS + AUTOMAÇÃO */
 function renderRelatorios(){
   setTitle("Relatórios");
   setContent(`
     <div class="card">
       <h2>Novo Relatório</h2>
       <div class="form-grid">
-        <select id="reportType"><option>Project</option><option>Client</option><option>Financial</option><option>Photo</option></select>
+        <select id="reportType"><option>Project</option><option>Client</option><option>Financial</option><option>Photo</option><option>Executive</option></select>
         <input id="reportTitle" placeholder="Título">
         <input id="reportClient" placeholder="Cliente relacionado">
         <input id="reportProject" placeholder="Projeto relacionado">
       </div>
       <textarea id="reportNotes" placeholder="Conteúdo / observações"></textarea>
-      <button class="primary-btn" onclick="addReport()">Salvar Relatório</button>
-      <button class="secondary-btn" onclick="generateSummaryReport()">Gerar Resumo Atual</button>
+      <div class="action-row">
+        <button class="primary-btn" onclick="addReport()">Salvar Relatório</button>
+        <button class="secondary-btn" onclick="generateSummaryReport()">Gerar Resumo Atual</button>
+        <button class="success-btn" onclick="generateExecutiveReport()">Gerar Relatório Executivo</button>
+      </div>
     </div>
     <div class="card"><h2>Relatórios</h2><div id="reportList"></div></div>
   `);
@@ -597,6 +683,25 @@ async function addReport(){
   reports = await apiGet("reports"); renderRelatorios();
 }
 
+async function saveAutoReport(title, notes, type="Executive"){
+  const res = await apiInsert("reports", {
+    report_type:type,
+    title,
+    related_client:"",
+    related_project:"",
+    notes
+  });
+
+  if(!res.ok){
+    alert("Erro ao salvar relatório automático.");
+    return;
+  }
+
+  reports = await apiGet("reports");
+  alert("Relatório automático salvo.");
+  renderRelatorios();
+}
+
 async function removeReport(id){
   const res = await apiDelete("reports", id);
   if(!res.ok) return alert("Erro ao remover relatório.");
@@ -609,22 +714,56 @@ function updateReportList(){
   el.innerHTML = reports.map(r => item(`
     <strong>${r.title}</strong><br>
     <small>${r.report_type} • ${r.related_client || "Sem cliente"} • ${r.related_project || "Sem projeto"}</small><br>
-    <small>${r.notes || "Sem observações"}</small>
+    <div class="report-box">${r.notes || "Sem observações"}</div>
   `, `removeReport('${r.id}')`)).join("");
 }
 
 function generateSummaryReport(){
-  const summary = `Resumo DoubleDiamond
-
-Clientes: ${clients.length}
-Orçamentos: ${quotes.length}
-Serviços: ${services.length}
-Projetos: ${projects.length}
-Fotos: ${quotePhotos.length + projectPhotos.length}
-Lançamentos financeiros: ${financeItems.length}
-Agendamentos: ${appointments.length}
-Equipe: ${employees.length}`;
+  const summary = buildSummaryReport();
+  document.getElementById("reportTitle").value = `Resumo DoubleDiamond - ${todayBR()}`;
+  document.getElementById("reportType").value = "Executive";
   document.getElementById("reportNotes").value = summary;
+}
+
+function generateExecutiveReport(){
+  const summary = buildSummaryReport();
+  saveAutoReport(`Relatório Executivo DoubleDiamond - ${todayBR()}`, summary, "Executive");
+}
+
+function buildSummaryReport(){
+  const approvedRevenue = quotes.filter(q => q.status === "Approved").reduce((s,q) => s + Number(q.value || 0), 0);
+  const incomePaid = financeItems.filter(i => i.type === "Income" && i.status === "Paid").reduce((s,i) => s + Number(i.amount || 0), 0);
+  const expensesPaid = financeItems.filter(i => i.type === "Expense" && i.status === "Paid").reduce((s,i) => s + Number(i.amount || 0), 0);
+  const pendingIncome = financeItems.filter(i => i.type === "Income" && i.status === "Pending").reduce((s,i) => s + Number(i.amount || 0), 0);
+  const activeProjects = projects.filter(p => ["Planning","Quoted","Scheduled","In Progress"].includes(p.status)).length;
+  const completedProjects = projects.filter(p => p.status === "Completed").length;
+
+  return `RELATÓRIO EXECUTIVO DOUBLEDIAMOND
+Data: ${todayBR()}
+
+OPERAÇÃO
+Clientes cadastrados: ${clients.length}
+Serviços cadastrados: ${services.length}
+Orçamentos cadastrados: ${quotes.length}
+Projetos ativos: ${activeProjects}
+Projetos concluídos: ${completedProjects}
+Agendamentos: ${appointments.length}
+Equipe cadastrada: ${employees.length}
+
+FOTOS E COMPROVAÇÕES
+Fotos de orçamentos: ${quotePhotos.length}
+Fotos de projetos: ${projectPhotos.length}
+Total de fotos: ${quotePhotos.length + projectPhotos.length}
+
+FINANCEIRO
+Receita prevista em orçamentos aprovados: R$ ${formatMoney(approvedRevenue)}
+Receita recebida: R$ ${formatMoney(incomePaid)}
+Despesas pagas: R$ ${formatMoney(expensesPaid)}
+Lucro real: R$ ${formatMoney(incomePaid - expensesPaid)}
+A receber: R$ ${formatMoney(pendingIncome)}
+
+OBSERVAÇÃO
+Este relatório foi gerado automaticamente pelo DoubleDiamond V4.5 Business Automation.`;
 }
 
 /* EQUIPE */
@@ -683,8 +822,14 @@ function renderConfiguracoes(){
     <div class="card">
       <h2>Configurações</h2>
       <p>Projeto conectado ao Supabase.</p>
-      <div class="report-box">URL: ${SUPABASE_URL}
-Módulos ativos: Clientes, Orçamentos, Serviços, Projetos, Fotos, Financeiro, Agenda, Relatórios e Equipe.</div>
+      <div class="report-box">Versão: V4.5 Business Automation
+URL: ${SUPABASE_URL}
+
+Automações ativas:
+- Dashboard executivo
+- Conversão Orçamento Approved → Projeto
+- Lançamento financeiro automático
+- Relatório executivo automático</div>
     </div>
   `);
 }
@@ -724,17 +869,15 @@ function financeStatusClass(item){
   return "status-pending";
 }
 
-function getApprovedRevenue(){
-  const total = quotes.filter(q => q.status === "Approved")
-    .reduce((sum,q) => sum + Number(q.value || 0), 0);
-  return formatMoney(total);
-}
-
 function formatMoney(value){
   return Number(value || 0).toLocaleString("pt-BR", {
     minimumFractionDigits:2,
     maximumFractionDigits:2
   });
+}
+
+function todayBR(){
+  return new Date().toLocaleDateString("pt-BR");
 }
 
 function renderPlaceholder(page){
