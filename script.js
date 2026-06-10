@@ -9,6 +9,14 @@ let integrationLogs = [];
 let aiAgents = [];
 let aiInsights = [];
 
+let integrationCredentials = [];
+let integrationQueue = [];
+let integrationWebhooks = [];
+
+let copilotConversations = [];
+let copilotMessages = [];
+let promptTemplates = [];
+
 const headers = {
   "apikey": SUPABASE_ANON_KEY,
   "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
@@ -57,6 +65,14 @@ async function loadData(){
   integrationLogs = await apiGet("integration_logs");
   aiAgents = await apiGet("ai_agents");
   aiInsights = await apiGet("ai_insights");
+
+  integrationCredentials = await apiGet("integration_credentials");
+  integrationQueue = await apiGet("integration_execution_queue");
+  integrationWebhooks = await apiGet("integration_webhooks");
+
+  copilotConversations = await apiGet("copilot_conversations");
+  copilotMessages = await apiGet("copilot_messages");
+  promptTemplates = await apiGet("prompt_templates");
 }
 
 function changePage(page, event){
