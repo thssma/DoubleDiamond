@@ -8,6 +8,19 @@ let integrationConnections = [];
 let integrationLogs = [];
 let aiAgents = [];
 let aiInsights = [];
+let subscriptionPlans = [];
+let companySubscriptions = [];
+let featureFlags = [];
+let invoices = [];
+let payments = [];
+let billingLogs = [];
+let marketplaceSuppliers = [];
+let marketplaceServices = [];
+let marketplaceRequests = [];
+let stripeCustomers = [];
+let stripeCheckoutSessions = [];
+let googleConnections = [];
+let googleSyncLogs = [];
 
 const headers = {
   "apikey": SUPABASE_ANON_KEY,
@@ -57,6 +70,19 @@ async function loadData(){
   integrationLogs = await apiGet("integration_logs");
   aiAgents = await apiGet("ai_agents");
   aiInsights = await apiGet("ai_insights");
+  subscriptionPlans = await apiGet("subscription_plans");
+  companySubscriptions = await apiGet("company_subscriptions");
+  featureFlags = await apiGet("feature_flags");
+  invoices = await apiGet("invoices");
+  payments = await apiGet("payments");
+  billingLogs = await apiGet("billing_logs");
+  marketplaceSuppliers = await apiGet("marketplace_suppliers");
+  marketplaceServices = await apiGet("marketplace_services");
+  marketplaceRequests = await apiGet("marketplace_requests");
+  stripeCustomers = await apiGet("stripe_customers");
+  stripeCheckoutSessions = await apiGet("stripe_checkout_sessions");
+  googleConnections = await apiGet("google_connections");
+  googleSyncLogs = await apiGet("google_sync_logs");
 }
 
 function changePage(page, event){
@@ -68,6 +94,11 @@ function changePage(page, event){
     empresas: renderEmpresas,
     integrationHub: renderIntegrationHub,
     aiFoundation: renderAIFoundation,
+    saasDashboard: renderSaasDashboard,
+    billingDashboard: renderBillingDashboard,
+    marketplaceDashboard: renderMarketplaceDashboard,
+    stripeReady: renderStripeReady,
+    googleReady: renderGoogleReady,
     configuracoes: renderConfiguracoes
   };
 
@@ -382,6 +413,19 @@ async function generateAIInsights(){
   }
 
   aiInsights = await apiGet("ai_insights");
+  subscriptionPlans = await apiGet("subscription_plans");
+  companySubscriptions = await apiGet("company_subscriptions");
+  featureFlags = await apiGet("feature_flags");
+  invoices = await apiGet("invoices");
+  payments = await apiGet("payments");
+  billingLogs = await apiGet("billing_logs");
+  marketplaceSuppliers = await apiGet("marketplace_suppliers");
+  marketplaceServices = await apiGet("marketplace_services");
+  marketplaceRequests = await apiGet("marketplace_requests");
+  stripeCustomers = await apiGet("stripe_customers");
+  stripeCheckoutSessions = await apiGet("stripe_checkout_sessions");
+  googleConnections = await apiGet("google_connections");
+  googleSyncLogs = await apiGet("google_sync_logs");
   renderAIFoundation();
 }
 
@@ -390,6 +434,19 @@ async function closeAIInsight(id){
   if(!res.ok) return alert("Erro ao concluir insight.");
 
   aiInsights = await apiGet("ai_insights");
+  subscriptionPlans = await apiGet("subscription_plans");
+  companySubscriptions = await apiGet("company_subscriptions");
+  featureFlags = await apiGet("feature_flags");
+  invoices = await apiGet("invoices");
+  payments = await apiGet("payments");
+  billingLogs = await apiGet("billing_logs");
+  marketplaceSuppliers = await apiGet("marketplace_suppliers");
+  marketplaceServices = await apiGet("marketplace_services");
+  marketplaceRequests = await apiGet("marketplace_requests");
+  stripeCustomers = await apiGet("stripe_customers");
+  stripeCheckoutSessions = await apiGet("stripe_checkout_sessions");
+  googleConnections = await apiGet("google_connections");
+  googleSyncLogs = await apiGet("google_sync_logs");
   renderAIFoundation();
 }
 
@@ -398,8 +455,391 @@ async function removeAIInsight(id){
   if(!res.ok) return alert("Erro ao remover insight.");
 
   aiInsights = await apiGet("ai_insights");
+  subscriptionPlans = await apiGet("subscription_plans");
+  companySubscriptions = await apiGet("company_subscriptions");
+  featureFlags = await apiGet("feature_flags");
+  invoices = await apiGet("invoices");
+  payments = await apiGet("payments");
+  billingLogs = await apiGet("billing_logs");
+  marketplaceSuppliers = await apiGet("marketplace_suppliers");
+  marketplaceServices = await apiGet("marketplace_services");
+  marketplaceRequests = await apiGet("marketplace_requests");
+  stripeCustomers = await apiGet("stripe_customers");
+  stripeCheckoutSessions = await apiGet("stripe_checkout_sessions");
+  googleConnections = await apiGet("google_connections");
+  googleSyncLogs = await apiGet("google_sync_logs");
   renderAIFoundation();
 }
+
+
+/* V17 SaaS Dashboard */
+function renderSaasDashboard(){
+  setTitle("SaaS Dashboard");
+
+  const activeSubs = companySubscriptions.filter(s => s.status === "Active");
+  const mrr = activeSubs.reduce((sum, sub) => {
+    const plan = subscriptionPlans.find(p => p.id === sub.plan_id);
+    return sum + Number(plan?.monthly_price || 0);
+  }, 0);
+
+  setContent(`
+    <div class="foundation-note">V17 transforma a fundação SaaS em painel comercial.</div>
+
+    <div class="cards">
+      ${metric("MRR", "R$ " + formatMoneyGrowth(mrr))}
+      ${metric("Empresas", companies.length)}
+      ${metric("Assinaturas Ativas", activeSubs.length)}
+      ${metric("Planos", subscriptionPlans.length)}
+      ${metric("Feature Flags", featureFlags.length)}
+    </div>
+
+    <div class="card">
+      <h2>Novo Plano</h2>
+      <div class="form-grid">
+        <input id="planName" placeholder="Nome do plano">
+        <input id="planPrice" type="number" placeholder="Preço mensal">
+        <input id="planUsers" type="number" placeholder="Máx usuários">
+        <input id="planProjects" type="number" placeholder="Máx projetos">
+        <input id="planClients" type="number" placeholder="Máx clientes">
+        <input id="planIntegrations" type="number" placeholder="Máx integrações">
+        <select id="planAI"><option value="false">IA desativada</option><option value="true">IA ativada</option></select>
+      </div>
+      <button class="primary-btn" onclick="addSubscriptionPlan()">Criar Plano</button>
+    </div>
+
+    <div class="card">
+      <h2>Assinar Empresa</h2>
+      <div class="form-grid">
+        <select id="subCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="subPlan"><option value="">Plano</option>${subscriptionPlans.map(p => `<option value="${p.id}">${p.name} - R$ ${formatMoneyGrowth(p.monthly_price)}</option>`).join("")}</select>
+        <select id="subStatus"><option>Active</option><option>Trial</option><option>Cancelled</option><option>Past Due</option></select>
+      </div>
+      <button class="success-btn" onclick="addCompanySubscription()">Criar Assinatura</button>
+    </div>
+
+    <div class="growth-grid">
+      ${subscriptionPlans.map(plan => `
+        <div class="growth-card">
+          <h2>${plan.name}</h2>
+          <p class="money">R$ ${formatMoneyGrowth(plan.monthly_price)}</p>
+          <span class="plan-badge">${plan.ai_enabled ? "IA ON" : "IA OFF"}</span>
+          <p>Usuários: ${plan.max_users || 0}</p>
+          <p>Projetos: ${plan.max_projects || 0}</p>
+          <p>Clientes: ${plan.max_clients || 0}</p>
+          <p>Integrações: ${plan.max_integrations || 0}</p>
+        </div>
+      `).join("") || "<div class='card'>Nenhum plano cadastrado.</div>"}
+    </div>
+  `);
+}
+
+async function addSubscriptionPlan(){
+  const name = val("planName").trim();
+  if(!name) return alert("Digite o nome do plano.");
+
+  const res = await apiInsert("subscription_plans", {
+    name,
+    monthly_price:Number(val("planPrice") || 0),
+    max_users:Number(val("planUsers") || 0),
+    max_projects:Number(val("planProjects") || 0),
+    max_clients:Number(val("planClients") || 0),
+    max_integrations:Number(val("planIntegrations") || 0),
+    ai_enabled: val("planAI") === "true"
+  });
+
+  if(!res.ok) return alert("Erro ao criar plano.");
+
+  subscriptionPlans = await apiGet("subscription_plans");
+  renderSaasDashboard();
+}
+
+async function addCompanySubscription(){
+  const companyId = val("subCompany");
+  const planId = val("subPlan");
+
+  if(!companyId) return alert("Selecione a empresa.");
+  if(!planId) return alert("Selecione o plano.");
+
+  const res = await apiInsert("company_subscriptions", {
+    company_id: companyId,
+    plan_id: planId,
+    status: val("subStatus")
+  });
+
+  if(!res.ok) return alert("Erro ao criar assinatura.");
+
+  companySubscriptions = await apiGet("company_subscriptions");
+  renderSaasDashboard();
+}
+
+/* V18 Billing Dashboard */
+function renderBillingDashboard(){
+  setTitle("Billing Dashboard");
+
+  const totalInvoices = invoices.reduce((s,i) => s + Number(i.amount || 0), 0);
+  const paid = payments.filter(p => p.status === "Paid").reduce((s,p) => s + Number(p.amount || 0), 0);
+
+  setContent(`
+    <div class="foundation-note">V18 prepara faturamento real, invoices, payments e logs.</div>
+
+    <div class="cards">
+      ${metric("Invoices", invoices.length)}
+      ${metric("Total Faturado", "R$ " + formatMoneyGrowth(totalInvoices))}
+      ${metric("Pagamentos", payments.length)}
+      ${metric("Recebido", "R$ " + formatMoneyGrowth(paid))}
+      ${metric("Logs", billingLogs.length)}
+    </div>
+
+    <div class="card">
+      <h2>Nova Invoice</h2>
+      <div class="form-grid">
+        <select id="invoiceCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="invoiceNumber" placeholder="Número da invoice">
+        <input id="invoiceAmount" type="number" placeholder="Valor">
+        <input id="invoiceDue" type="date">
+        <select id="invoiceStatus"><option>Pending</option><option>Paid</option><option>Overdue</option><option>Cancelled</option></select>
+      </div>
+      <button class="primary-btn" onclick="addInvoice()">Criar Invoice</button>
+    </div>
+
+    <div class="card">
+      <h2>Invoices</h2>
+      ${invoices.length ? invoices.map(inv => `
+        <div class="soft-box">
+          <strong>${inv.invoice_number}</strong><br>
+          <small>${companies.find(c => c.id === inv.company_id)?.name || "Empresa"} • ${inv.status}</small>
+          <p class="money">R$ ${formatMoneyGrowth(inv.amount)}</p>
+          <button class="success-btn" onclick="markInvoicePaid('${inv.id}', ${Number(inv.amount || 0)})">Marcar Pago</button>
+        </div>
+      `).join("") : "<p>Nenhuma invoice.</p>"}
+    </div>
+  `);
+}
+
+async function addInvoice(){
+  const companyId = val("invoiceCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("invoices", {
+    company_id:companyId,
+    invoice_number:val("invoiceNumber"),
+    amount:Number(val("invoiceAmount") || 0),
+    status:val("invoiceStatus"),
+    due_date:val("invoiceDue") || null
+  });
+
+  if(!res.ok) return alert("Erro ao criar invoice.");
+
+  await apiInsert("billing_logs", {
+    company_id:companyId,
+    action:"Invoice Created",
+    details:`Invoice ${val("invoiceNumber")} criada.`
+  });
+
+  invoices = await apiGet("invoices");
+  billingLogs = await apiGet("billing_logs");
+  renderBillingDashboard();
+}
+
+async function markInvoicePaid(invoiceId, amount){
+  const res = await apiInsert("payments", {
+    invoice_id:invoiceId,
+    amount,
+    payment_method:"Manual",
+    status:"Paid",
+    paid_at:new Date().toISOString()
+  });
+
+  if(!res.ok) return alert("Erro ao registrar pagamento.");
+
+  await apiPatch("invoices", invoiceId, {status:"Paid"});
+
+  payments = await apiGet("payments");
+  invoices = await apiGet("invoices");
+  renderBillingDashboard();
+}
+
+/* V19 Marketplace Dashboard */
+function renderMarketplaceDashboard(){
+  setTitle("Marketplace Dashboard");
+
+  setContent(`
+    <div class="foundation-note">V19 prepara fornecedores, serviços e solicitações futuras.</div>
+
+    <div class="cards">
+      ${metric("Fornecedores", marketplaceSuppliers.length)}
+      ${metric("Serviços", marketplaceServices.length)}
+      ${metric("Requests", marketplaceRequests.length)}
+    </div>
+
+    <div class="card">
+      <h2>Novo Fornecedor</h2>
+      <div class="form-grid">
+        <input id="supplierName" placeholder="Nome">
+        <input id="supplierCategory" placeholder="Categoria">
+        <input id="supplierPhone" placeholder="Telefone">
+      </div>
+      <button class="primary-btn" onclick="addSupplier()">Adicionar Fornecedor</button>
+    </div>
+
+    <div class="card">
+      <h2>Novo Serviço Marketplace</h2>
+      <div class="form-grid">
+        <select id="serviceSupplier"><option value="">Fornecedor</option>${marketplaceSuppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join("")}</select>
+        <input id="marketServiceName" placeholder="Serviço">
+        <input id="marketServicePrice" type="number" placeholder="Preço">
+      </div>
+      <button class="success-btn" onclick="addMarketplaceService()">Adicionar Serviço</button>
+    </div>
+
+    <div class="growth-grid">
+      ${marketplaceSuppliers.map(supplier => `
+        <div class="growth-card">
+          <h2>${supplier.name}</h2>
+          <small>${supplier.category || "Sem categoria"} • ${supplier.phone || "Sem telefone"}</small>
+          ${marketplaceServices.filter(s => s.supplier_id === supplier.id).map(service => `
+            <div class="soft-box">
+              <strong>${service.service_name}</strong><br>
+              <span class="money">R$ ${formatMoneyGrowth(service.price)}</span>
+            </div>
+          `).join("")}
+        </div>
+      `).join("") || "<div class='card'>Nenhum fornecedor.</div>"}
+    </div>
+  `);
+}
+
+async function addSupplier(){
+  const name = val("supplierName").trim();
+  if(!name) return alert("Digite o nome.");
+
+  const res = await apiInsert("marketplace_suppliers", {
+    name,
+    category:val("supplierCategory"),
+    phone:val("supplierPhone")
+  });
+
+  if(!res.ok) return alert("Erro ao criar fornecedor.");
+
+  marketplaceSuppliers = await apiGet("marketplace_suppliers");
+  renderMarketplaceDashboard();
+}
+
+async function addMarketplaceService(){
+  const supplierId = val("serviceSupplier");
+  if(!supplierId) return alert("Selecione o fornecedor.");
+
+  const res = await apiInsert("marketplace_services", {
+    supplier_id:supplierId,
+    service_name:val("marketServiceName"),
+    price:Number(val("marketServicePrice") || 0)
+  });
+
+  if(!res.ok) return alert("Erro ao criar serviço.");
+
+  marketplaceServices = await apiGet("marketplace_services");
+  renderMarketplaceDashboard();
+}
+
+/* V20 Stripe Ready */
+function renderStripeReady(){
+  setTitle("Stripe Ready");
+
+  setContent(`
+    <div class="foundation-note">V20 cria a estrutura para Stripe. Ainda sem chave secreta ou checkout real.</div>
+
+    <div class="cards">
+      ${metric("Stripe Customers", stripeCustomers.length)}
+      ${metric("Checkout Sessions", stripeCheckoutSessions.length)}
+    </div>
+
+    <div class="card">
+      <h2>Criar Customer Placeholder</h2>
+      <div class="form-grid">
+        <select id="stripeCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="stripeCustomerId" placeholder="stripe_customer_id placeholder">
+      </div>
+      <button class="primary-btn" onclick="addStripeCustomer()">Criar</button>
+    </div>
+  `);
+}
+
+async function addStripeCustomer(){
+  const companyId = val("stripeCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("stripe_customers", {
+    company_id:companyId,
+    stripe_customer_id:val("stripeCustomerId"),
+    status:"Pending"
+  });
+
+  if(!res.ok) return alert("Erro ao criar customer.");
+
+  stripeCustomers = await apiGet("stripe_customers");
+  renderStripeReady();
+}
+
+/* V21 Google Ready */
+function renderGoogleReady(){
+  setTitle("Google Ready");
+
+  setContent(`
+    <div class="foundation-note">V21 prepara Google Calendar, Drive e Gmail. Ainda sem OAuth real.</div>
+
+    <div class="cards">
+      ${metric("Google Connections", googleConnections.length)}
+      ${metric("Sync Logs", googleSyncLogs.length)}
+    </div>
+
+    <div class="card">
+      <h2>Nova Conexão Google Placeholder</h2>
+      <div class="form-grid">
+        <select id="googleCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="googleService"><option>Google Calendar</option><option>Google Drive</option><option>Gmail</option></select>
+        <select id="googleStatus"><option>Disconnected</option><option>Connected</option><option>Error</option></select>
+      </div>
+      <textarea id="googleNotes" placeholder="Notas"></textarea>
+      <button class="primary-btn" onclick="addGoogleConnection()">Salvar</button>
+    </div>
+
+    <div class="card">
+      <h2>Conexões</h2>
+      ${googleConnections.map(conn => `
+        <div class="soft-box">
+          <strong>${conn.service_name}</strong><br>
+          <small>${companies.find(c => c.id === conn.company_id)?.name || "Empresa"} • ${conn.connection_status}</small>
+          <p>${conn.notes || ""}</p>
+        </div>
+      `).join("") || "<p>Nenhuma conexão.</p>"}
+    </div>
+  `);
+}
+
+async function addGoogleConnection(){
+  const companyId = val("googleCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("google_connections", {
+    company_id:companyId,
+    service_name:val("googleService"),
+    connection_status:val("googleStatus"),
+    notes:val("googleNotes")
+  });
+
+  if(!res.ok) return alert("Erro ao salvar conexão.");
+
+  googleConnections = await apiGet("google_connections");
+  renderGoogleReady();
+}
+
+function formatMoneyGrowth(value){
+  return Number(value || 0).toLocaleString("pt-BR", {
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+}
+
 
 function renderConfiguracoes(){
   setTitle("Configurações");
@@ -415,6 +855,3 @@ function renderConfiguracoes(){
     </div>
   `);
 }
-
-
-/* V17-V19 foundation placeholder integrated */
