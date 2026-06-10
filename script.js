@@ -2520,3 +2520,32 @@ async function runAutomationFlow(id, name){
   automationFlowRuns = await apiGet("automation_flow_runs");
   renderAutomationFlowsReal();
 }
+
+
+/* FIX V46-V50: renderFlowSteps robusto */
+function renderFlowSteps(steps){
+  if(!steps) return "<p>Sem steps.</p>";
+
+  let arr = [];
+
+  try{
+    if(Array.isArray(steps)){
+      arr = steps;
+    }else if(typeof steps === "string"){
+      const parsed = JSON.parse(steps);
+      arr = Array.isArray(parsed) ? parsed : Object.values(parsed);
+    }else if(typeof steps === "object"){
+      arr = Object.values(steps);
+    }else{
+      arr = [String(steps)];
+    }
+  }catch(e){
+    arr = [String(steps)];
+  }
+
+  if(!Array.isArray(arr)){
+    arr = [String(arr)];
+  }
+
+  return arr.map((s, i) => `<div class="flow-step"><strong>${i + 1}.</strong> ${String(s)}</div>`).join("");
+}

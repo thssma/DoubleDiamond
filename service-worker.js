@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-v50-real-integrations-fix-20260610';
+const CACHE_NAME = 'doublediamond-v50-render-flowsteps-fix-20260610';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -25,5 +25,6 @@ self.addEventListener('fetch', event => {
     event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
     return;
   }
+
   event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
 });
