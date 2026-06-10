@@ -415,3 +415,6 @@ function renderConfiguracoes(){
     </div>
   `);
 }
+
+
+/* V17-V19 foundation placeholder integrated */
