@@ -228,13 +228,12 @@ textarea{
   .main{padding:18px}
 }
 
-
-.growth-grid{
+.real-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
   gap:18px;
 }
-.growth-card{
+.real-card{
   background:linear-gradient(135deg,#ffffff,#f8fafc);
   border:1px solid var(--border);
   border-radius:20px;
@@ -242,12 +241,16 @@ textarea{
   box-shadow:var(--shadow);
   margin-bottom:14px;
 }
-.money{
-  color:#16a34a;
-  font-size:30px;
-  font-weight:900;
+.secret-warning{
+  background:#fef2f2;
+  border:1px solid #fecaca;
+  color:#991b1b;
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:18px;
+  font-weight:800;
 }
-.plan-badge{
+.queue-status{
   display:inline-block;
   padding:6px 10px;
   border-radius:999px;
@@ -255,5 +258,24 @@ textarea{
   color:#3730a3;
   font-size:12px;
   font-weight:900;
-  margin-top:8px;
+}
+.copilot-chat{
+  background:#f8fafc;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+  max-height:420px;
+  overflow:auto;
+}
+.chat-user{
+  background:#dbeafe;
+  padding:12px;
+  border-radius:14px;
+  margin-bottom:10px;
+}
+.chat-ai{
+  background:#dcfce7;
+  padding:12px;
+  border-radius:14px;
+  margin-bottom:10px;
 }

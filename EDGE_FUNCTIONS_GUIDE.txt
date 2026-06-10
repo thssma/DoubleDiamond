@@ -1,0 +1,23 @@
+
+DOUBLEDIAMOND V22-V25 PLAN B REAL BACKEND GUIDE
+
+Nunca coloque secrets no frontend.
+
+Credenciais devem ficar em:
+- Supabase Edge Functions Secrets
+- Backend server
+- Ambiente seguro
+
+Funções futuras recomendadas:
+1. google-calendar-event
+2. gmail-send-email
+3. whatsapp-send-message
+4. openai-copilot
+5. stripe-checkout
+
+Fluxo:
+Frontend cria item em integration_execution_queue
+Scheduler/Edge Function lê fila
+Executa provider real
+Atualiza execution_status
+Cria logs
