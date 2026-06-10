@@ -1,10 +1,11 @@
 const SUPABASE_URL = "https://phpphqcxzwpuiglkqkls.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBocHBocWN4endwdWlnbGtxa2xzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNDE0NTAsImV4cCI6MjA5NjYxNzQ1MH0.z0F0KAHCWKdRTyg5JeNDzAWEbIdFEknT_kmx4QyMz3I";
+const SUPABASE_ANON_KEY = "COLE_SUA_ANON_KEY_AQUI";
 
 let clients = [];
 let quotes = [];
 let services = [];
 let projects = [];
+let quotePhotos = [];
 
 const headers = {
     "apikey": SUPABASE_ANON_KEY,
@@ -22,6 +23,7 @@ async function loadData(){
     await loadQuotes();
     await loadServices();
     await loadProjects();
+    await loadQuotePhotos();
 }
 
 async function loadClients(){
@@ -42,6 +44,11 @@ async function loadServices(){
 async function loadProjects(){
     const response = await fetch(`${SUPABASE_URL}/rest/v1/projects?select=*&order=created_at.desc`, { headers });
     projects = await response.json();
+}
+
+async function loadQuotePhotos(){
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/quote_photos?select=*&order=created_at.desc`, { headers });
+    quotePhotos = await response.json();
 }
 
 function changePage(page, event){
@@ -67,6 +74,9 @@ function changePage(page, event){
         case "projetos":
             renderProjetos();
             break;
+        case "fotos":
+            renderFotos();
+            break;
         default:
             renderPlaceholder(page);
     }
@@ -77,30 +87,12 @@ function renderDashboard(){
 
     document.getElementById("pageContent").innerHTML = `
         <div class="cards">
-            <div class="card">
-                <h3>Clientes</h3>
-                <p>${clients.length}</p>
-            </div>
-
-            <div class="card">
-                <h3>Orçamentos</h3>
-                <p>${quotes.length}</p>
-            </div>
-
-            <div class="card">
-                <h3>Serviços</h3>
-                <p>${services.length}</p>
-            </div>
-
-            <div class="card">
-                <h3>Projetos</h3>
-                <p>${projects.length}</p>
-            </div>
-
-            <div class="card">
-                <h3>Receita Estimada</h3>
-                <p>R$ ${getApprovedRevenue()}</p>
-            </div>
+            <div class="card"><h3>Clientes</h3><p>${clients.length}</p></div>
+            <div class="card"><h3>Orçamentos</h3><p>${quotes.length}</p></div>
+            <div class="card"><h3>Serviços</h3><p>${services.length}</p></div>
+            <div class="card"><h3>Projetos</h3><p>${projects.length}</p></div>
+            <div class="card"><h3>Fotos</h3><p>${quotePhotos.length}</p></div>
+            <div class="card"><h3>Receita Estimada</h3><p>R$ ${getApprovedRevenue()}</p></div>
         </div>
     `;
 }
@@ -134,7 +126,6 @@ function renderClientes(){
             </div>
 
             <textarea id="notes" placeholder="Observações"></textarea>
-
             <button class="primary-btn" onclick="addClient()">Adicionar Cliente</button>
         </div>
 
@@ -254,7 +245,6 @@ function renderOrcamentos(){
             </div>
 
             <textarea id="quoteDescription" placeholder="Descrição do orçamento"></textarea>
-
             <button class="primary-btn" onclick="addQuote()">Adicionar Orçamento</button>
         </div>
 
@@ -379,7 +369,6 @@ function renderServicos(){
             </div>
 
             <textarea id="serviceDescription" placeholder="Descrição do serviço"></textarea>
-
             <button class="primary-btn" onclick="addService()">Adicionar Serviço</button>
         </div>
 
@@ -497,7 +486,6 @@ function renderProjetos(){
             </div>
 
             <textarea id="projectNotes" placeholder="Observações"></textarea>
-
             <button class="primary-btn" onclick="addProject()">Criar Projeto</button>
         </div>
 
@@ -584,6 +572,141 @@ function updateProjectList(){
             <button class="danger-btn" onclick="removeProject('${project.id}')">Remover</button>
         </div>
     `).join("");
+}
+
+function renderFotos(){
+    document.getElementById("pageTitle").innerText = "Fotos de Orçamentos";
+
+    document.getElementById("pageContent").innerHTML = `
+        <div class="card">
+            <h2>Enviar Foto</h2>
+
+            <div class="form-grid">
+                <select id="photoQuote">
+                    <option value="">Selecione o orçamento</option>
+                    ${quotes.map(quote => `
+                        <option value="${quote.id}">
+                            ${quote.client_name} - ${quote.service}
+                        </option>
+                    `).join("")}
+                </select>
+
+                <input id="photoFile" type="file" accept="image/*">
+            </div>
+
+            <button class="primary-btn" onclick="uploadQuotePhoto()">Enviar Foto</button>
+        </div>
+
+        <div class="card">
+            <h2>Galeria de Fotos</h2>
+            <div id="photoList"></div>
+        </div>
+    `;
+
+    updatePhotoList();
+}
+
+async function uploadQuotePhoto(){
+    const quoteId = document.getElementById("photoQuote").value;
+    const fileInput = document.getElementById("photoFile");
+    const file = fileInput.files[0];
+
+    if(!quoteId){
+        alert("Selecione um orçamento.");
+        return;
+    }
+
+    if(!file){
+        alert("Selecione uma foto.");
+        return;
+    }
+
+    const selectedQuote = quotes.find(quote => quote.id === quoteId);
+
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${quoteId}-${Date.now()}.${fileExt}`;
+
+    const uploadResponse = await fetch(`${SUPABASE_URL}/storage/v1/object/quote-photos/${fileName}`, {
+        method: "POST",
+        headers: {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": file.type
+        },
+        body: file
+    });
+
+    if(!uploadResponse.ok){
+        alert("Erro ao enviar foto para o Storage.");
+        return;
+    }
+
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/quote-photos/${fileName}`;
+
+    const newPhoto = {
+        quote_id: quoteId,
+        quote_label: `${selectedQuote.client_name} - ${selectedQuote.service}`,
+        photo_url: publicUrl
+    };
+
+    const saveResponse = await fetch(`${SUPABASE_URL}/rest/v1/quote_photos`, {
+        method: "POST",
+        headers: { ...headers, "Prefer": "return=representation" },
+        body: JSON.stringify(newPhoto)
+    });
+
+    if(!saveResponse.ok){
+        alert("Foto enviada, mas erro ao salvar registro.");
+        return;
+    }
+
+    await loadQuotePhotos();
+    renderFotos();
+}
+
+async function removePhoto(id){
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/quote_photos?id=eq.${id}`, {
+        method: "DELETE",
+        headers
+    });
+
+    if(!response.ok){
+        alert("Erro ao remover foto.");
+        return;
+    }
+
+    await loadQuotePhotos();
+    renderFotos();
+}
+
+function updatePhotoList(){
+    const container = document.getElementById("photoList");
+
+    if(!container) return;
+
+    if(quotePhotos.length === 0){
+        container.innerHTML = "<p>Nenhuma foto enviada.</p>";
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="photo-grid">
+            ${quotePhotos.map(photo => `
+                <div class="photo-card">
+                    <img src="${photo.photo_url}" alt="Foto do orçamento">
+
+                    <div class="photo-card-content">
+                        <strong>${photo.quote_label || "Orçamento"}</strong>
+                        <small>${photo.created_at ? new Date(photo.created_at).toLocaleDateString("pt-BR") : ""}</small>
+
+                        <button class="danger-btn" onclick="removePhoto('${photo.id}')">
+                            Remover
+                        </button>
+                    </div>
+                </div>
+            `).join("")}
+        </div>
+    `;
 }
 
 function getStatusClass(status){
