@@ -4,6 +4,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let clients = [];
 let quotes = [];
 let services = [];
+let projects = [];
 
 const headers = {
     "apikey": SUPABASE_ANON_KEY,
@@ -20,6 +21,7 @@ async function loadData(){
     await loadClients();
     await loadQuotes();
     await loadServices();
+    await loadProjects();
 }
 
 async function loadClients(){
@@ -35,6 +37,11 @@ async function loadQuotes(){
 async function loadServices(){
     const response = await fetch(`${SUPABASE_URL}/rest/v1/services?select=*&order=created_at.desc`, { headers });
     services = await response.json();
+}
+
+async function loadProjects(){
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/projects?select=*&order=created_at.desc`, { headers });
+    projects = await response.json();
 }
 
 function changePage(page, event){
@@ -56,6 +63,9 @@ function changePage(page, event){
             break;
         case "servicos":
             renderServicos();
+            break;
+        case "projetos":
+            renderProjetos();
             break;
         default:
             renderPlaceholder(page);
@@ -80,6 +90,11 @@ function renderDashboard(){
             <div class="card">
                 <h3>Serviços</h3>
                 <p>${services.length}</p>
+            </div>
+
+            <div class="card">
+                <h3>Projetos</h3>
+                <p>${projects.length}</p>
             </div>
 
             <div class="card">
@@ -221,15 +236,10 @@ function renderOrcamentos(){
                     <option value="">Serviço</option>
                     ${services.length > 0
                         ? services.map(service => `<option value="${service.name}">${service.name}</option>`).join("")
-                        : `
-                            <option value="Lawn Care">Lawn Care</option>
-                            <option value="Landscaping">Landscaping</option>
-                            <option value="Irrigation">Irrigation</option>
-                            <option value="Pressure Washing">Pressure Washing</option>
-                            <option value="Gutter Cleaning">Gutter Cleaning</option>
-                            <option value="Tree Care">Tree Care</option>
-                            <option value="Seasonal Cleanup">Seasonal Cleanup</option>
-                        `
+                        : `<option value="Lawn Care">Lawn Care</option>
+                           <option value="Landscaping">Landscaping</option>
+                           <option value="Irrigation">Irrigation</option>
+                           <option value="Pressure Washing">Pressure Washing</option>`
                     }
                 </select>
 
@@ -360,7 +370,6 @@ function renderServicos(){
                 </select>
 
                 <input id="serviceBasePrice" type="number" placeholder="Preço base">
-
                 <input id="serviceDuration" placeholder="Duração estimada">
 
                 <select id="serviceStatus">
@@ -447,12 +456,132 @@ function updateServiceList(){
                 <small>${service.category || "Sem categoria"} • ${service.estimated_duration || "Sem duração"}</small><br>
                 <strong>R$ ${formatMoney(service.base_price)}</strong><br>
                 <small>${service.description || "Sem descrição"}</small><br>
-                <span class="status ${service.status === "Active" ? "status-active" : "status-inactive"}">
-                    ${service.status}
-                </span>
+                <span class="status ${service.status === "Active" ? "status-active" : "status-inactive"}">${service.status}</span>
             </div>
 
             <button class="danger-btn" onclick="removeService('${service.id}')">Remover</button>
+        </div>
+    `).join("");
+}
+
+function renderProjetos(){
+    document.getElementById("pageTitle").innerText = "Projetos";
+
+    document.getElementById("pageContent").innerHTML = `
+        <div class="card">
+            <h2>Novo Projeto</h2>
+
+            <div class="form-grid">
+                <select id="projectClient">
+                    <option value="">Cliente</option>
+                    ${clients.map(client => `<option value="${client.id}">${client.name}</option>`).join("")}
+                </select>
+
+                <select id="projectService">
+                    <option value="">Serviço</option>
+                    ${services.map(service => `<option value="${service.name}">${service.name}</option>`).join("")}
+                </select>
+
+                <input id="projectName" placeholder="Nome do Projeto">
+                <input id="projectStart" type="date">
+                <input id="projectEnd" type="date">
+
+                <select id="projectStatus">
+                    <option value="Planning">Planning</option>
+                    <option value="Quoted">Quoted</option>
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+
+            <textarea id="projectNotes" placeholder="Observações"></textarea>
+
+            <button class="primary-btn" onclick="addProject()">Criar Projeto</button>
+        </div>
+
+        <div class="card">
+            <h2>Projetos Cadastrados</h2>
+            <div id="projectList"></div>
+        </div>
+    `;
+
+    updateProjectList();
+}
+
+async function addProject(){
+    const clientId = document.getElementById("projectClient").value;
+
+    if(!clientId){
+        alert("Selecione um cliente.");
+        return;
+    }
+
+    const selectedClient = clients.find(client => client.id === clientId);
+
+    const newProject = {
+        client_id: clientId,
+        client_name: selectedClient.name,
+        service_name: document.getElementById("projectService").value,
+        project_name: document.getElementById("projectName").value || "Projeto sem nome",
+        start_date: document.getElementById("projectStart").value || null,
+        end_date: document.getElementById("projectEnd").value || null,
+        status: document.getElementById("projectStatus").value,
+        notes: document.getElementById("projectNotes").value
+    };
+
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/projects`, {
+        method: "POST",
+        headers: { ...headers, "Prefer": "return=representation" },
+        body: JSON.stringify(newProject)
+    });
+
+    if(!response.ok){
+        alert("Erro ao criar projeto.");
+        return;
+    }
+
+    await loadProjects();
+    renderProjetos();
+}
+
+async function removeProject(id){
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${id}`, {
+        method: "DELETE",
+        headers
+    });
+
+    if(!response.ok){
+        alert("Erro ao remover projeto.");
+        return;
+    }
+
+    await loadProjects();
+    renderProjetos();
+}
+
+function updateProjectList(){
+    const container = document.getElementById("projectList");
+
+    if(!container) return;
+
+    if(projects.length === 0){
+        container.innerHTML = "<p>Nenhum projeto cadastrado.</p>";
+        return;
+    }
+
+    container.innerHTML = projects.map(project => `
+        <div class="project-item">
+            <div>
+                <strong>${project.project_name}</strong><br>
+                <small>Cliente: ${project.client_name || "Sem cliente"}</small><br>
+                <small>Serviço: ${project.service_name || "Sem serviço"}</small><br>
+                <small>Início: ${project.start_date || "Sem data"} • Fim: ${project.end_date || "Sem data"}</small><br>
+                <span class="status ${getProjectStatusClass(project.status)}">${project.status}</span>
+            </div>
+
+            <button class="danger-btn" onclick="removeProject('${project.id}')">Remover</button>
         </div>
     `).join("");
 }
@@ -464,6 +593,18 @@ function getStatusClass(status){
         case "Approved": return "status-approved";
         case "Rejected": return "status-rejected";
         default: return "status-draft";
+    }
+}
+
+function getProjectStatusClass(status){
+    switch(status){
+        case "Planning": return "status-planning";
+        case "Quoted": return "status-quoted";
+        case "Scheduled": return "status-scheduled";
+        case "In Progress": return "status-progress";
+        case "Completed": return "status-completed";
+        case "Cancelled": return "status-cancelled";
+        default: return "status-planning";
     }
 }
 
