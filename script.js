@@ -11,6 +11,10 @@ let financeItems = [];
 let appointments = [];
 let reports = [];
 let employees = [];
+let projectChecklists = [];
+let projectTasks = [];
+let projectTimeline = [];
+let projectTeam = [];
 
 const headers = {
   "apikey": SUPABASE_ANON_KEY,
@@ -44,6 +48,15 @@ async function apiDelete(table, id){
   });
 }
 
+
+async function apiPatch(table, id, data){
+  return await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method:"PATCH",
+    headers:{...headers, "Prefer":"return=representation"},
+    body:JSON.stringify(data)
+  });
+}
+
 async function loadData(){
   clients = await apiGet("clients");
   quotes = await apiGet("quotes");
@@ -55,6 +68,10 @@ async function loadData(){
   appointments = await apiGet("appointments");
   reports = await apiGet("reports");
   employees = await apiGet("employees");
+  projectChecklists = await apiGet("project_checklists");
+  projectTasks = await apiGet("project_tasks");
+  projectTimeline = await apiGet("project_timeline");
+  projectTeam = await apiGet("project_team");
 }
 
 function changePage(page, event){
@@ -73,7 +90,8 @@ function changePage(page, event){
     agenda: renderAgenda,
     relatorios: renderRelatorios,
     equipe: renderEquipe,
-    configuracoes: renderConfiguracoes
+    configuracoes: renderConfiguracoes,
+    operacoes: renderOperacoes
   };
 
   (routes[page] || (() => renderPlaceholder(page)))();
@@ -110,6 +128,8 @@ function renderDashboard(){
       ${metric("Fotos", totalPhotos, "")}
       ${metric("Clientes", clients.length, "")}
       ${metric("Equipe", employees.length, "")}
+      ${metric("Tarefas Pendentes", projectTasks.filter(t => t.status !== "Completed").length, "warn")}
+      ${metric("Checklist Concluído", getChecklistCompletion() + "%", "good")}
     </div>
 
     <div class="card">
@@ -796,13 +816,21 @@ async function addEmployee(){
     hourly_rate:Number(val("employeeRate") || 0), status:val("employeeStatus"), notes:val("employeeNotes")
   });
   if(!res.ok) return alert("Erro ao salvar funcionário.");
-  employees = await apiGet("employees"); renderEquipe();
+  employees = await apiGet("employees");
+  projectChecklists = await apiGet("project_checklists");
+  projectTasks = await apiGet("project_tasks");
+  projectTimeline = await apiGet("project_timeline");
+  projectTeam = await apiGet("project_team"); renderEquipe();
 }
 
 async function removeEmployee(id){
   const res = await apiDelete("employees", id);
   if(!res.ok) return alert("Erro ao remover funcionário.");
-  employees = await apiGet("employees"); renderEquipe();
+  employees = await apiGet("employees");
+  projectChecklists = await apiGet("project_checklists");
+  projectTasks = await apiGet("project_tasks");
+  projectTimeline = await apiGet("project_timeline");
+  projectTeam = await apiGet("project_team"); renderEquipe();
 }
 
 function updateEmployeeList(){
@@ -816,20 +844,357 @@ function updateEmployeeList(){
   `, `removeEmployee('${e.id}')`)).join("");
 }
 
+
+/* OPERAÇÕES V5 */
+function renderOperacoes(){
+  setTitle("Operations Center");
+
+  setContent(`
+    <div class="notice">
+      V5.0 ativa: Checklist, Tarefas, Equipe por Projeto e Timeline Operacional.
+    </div>
+
+    <div class="operation-grid">
+      <div class="card">
+        <h2>Checklist por Projeto</h2>
+        <div class="form-grid">
+          <select id="checkProject">
+            <option value="">Projeto</option>
+            ${projects.map(p => `<option value="${p.id}">${p.project_name} - ${p.client_name}</option>`).join("")}
+          </select>
+          <input id="checkItem" placeholder="Item do checklist">
+        </div>
+        <button class="primary-btn" onclick="addChecklistItem()">Adicionar Item</button>
+      </div>
+
+      <div class="card">
+        <h2>Tarefa por Projeto</h2>
+        <div class="form-grid">
+          <select id="taskProject">
+            <option value="">Projeto</option>
+            ${projects.map(p => `<option value="${p.id}">${p.project_name} - ${p.client_name}</option>`).join("")}
+          </select>
+          <input id="taskTitle" placeholder="Título da tarefa">
+          <select id="taskEmployee">
+            <option value="">Responsável</option>
+            ${employees.map(e => `<option value="${e.name}">${e.name}</option>`).join("")}
+          </select>
+          <select id="taskStatus">
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+        <button class="primary-btn" onclick="addProjectTask()">Adicionar Tarefa</button>
+      </div>
+
+      <div class="card">
+        <h2>Equipe por Projeto</h2>
+        <div class="form-grid">
+          <select id="teamProject">
+            <option value="">Projeto</option>
+            ${projects.map(p => `<option value="${p.id}">${p.project_name} - ${p.client_name}</option>`).join("")}
+          </select>
+          <select id="teamEmployee">
+            <option value="">Funcionário</option>
+            ${employees.map(e => `<option value="${e.id}">${e.name} - ${e.role || "Equipe"}</option>`).join("")}
+          </select>
+        </div>
+        <button class="primary-btn" onclick="addProjectTeamMember()">Vincular Equipe</button>
+      </div>
+
+      <div class="card">
+        <h2>Evento Manual</h2>
+        <div class="form-grid">
+          <select id="timelineProject">
+            <option value="">Projeto</option>
+            ${projects.map(p => `<option value="${p.id}">${p.project_name} - ${p.client_name}</option>`).join("")}
+          </select>
+          <input id="timelineEvent" placeholder="Evento da timeline">
+        </div>
+        <button class="primary-btn" onclick="addTimelineManual()">Registrar Evento</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Resumo Operacional</h2>
+      <div id="operationsSummary"></div>
+    </div>
+  `);
+
+  renderOperationsSummary();
+}
+
+async function createTimeline(projectId, event){
+  if(!projectId || !event) return;
+
+  await apiInsert("project_timeline", {
+    project_id: projectId,
+    event
+  });
+
+  projectTimeline = await apiGet("project_timeline");
+}
+
+async function addChecklistItem(){
+  const projectId = val("checkProject");
+  const item = val("checkItem").trim();
+
+  if(!projectId) return alert("Selecione um projeto.");
+  if(!item) return alert("Digite o item do checklist.");
+
+  const res = await apiInsert("project_checklists", {
+    project_id: projectId,
+    item,
+    completed: false
+  });
+
+  if(!res.ok) return alert("Erro ao criar item.");
+
+  await createTimeline(projectId, `Checklist criado: ${item}`);
+  projectChecklists = await apiGet("project_checklists");
+  renderOperacoes();
+}
+
+async function toggleChecklist(id, currentStatus){
+  const record = projectChecklists.find(i => i.id === id);
+  const res = await apiPatch("project_checklists", id, {
+    completed: !currentStatus
+  });
+
+  if(!res.ok) return alert("Erro ao atualizar checklist.");
+
+  await createTimeline(record.project_id, `Checklist ${!currentStatus ? "concluído" : "reaberto"}: ${record.item}`);
+  projectChecklists = await apiGet("project_checklists");
+  renderOperacoes();
+}
+
+async function removeChecklistItem(id){
+  const record = projectChecklists.find(i => i.id === id);
+  const res = await apiDelete("project_checklists", id);
+
+  if(!res.ok) return alert("Erro ao remover checklist.");
+
+  if(record) await createTimeline(record.project_id, `Checklist removido: ${record.item}`);
+  projectChecklists = await apiGet("project_checklists");
+  renderOperacoes();
+}
+
+async function addProjectTask(){
+  const projectId = val("taskProject");
+  const title = val("taskTitle").trim();
+
+  if(!projectId) return alert("Selecione um projeto.");
+  if(!title) return alert("Digite o título da tarefa.");
+
+  const res = await apiInsert("project_tasks", {
+    project_id: projectId,
+    title,
+    assigned_to: val("taskEmployee"),
+    status: val("taskStatus")
+  });
+
+  if(!res.ok) return alert("Erro ao criar tarefa.");
+
+  await createTimeline(projectId, `Tarefa criada: ${title}`);
+  projectTasks = await apiGet("project_tasks");
+  renderOperacoes();
+}
+
+async function updateTaskStatus(id, status){
+  const task = projectTasks.find(t => t.id === id);
+
+  const res = await apiPatch("project_tasks", id, { status });
+
+  if(!res.ok) return alert("Erro ao atualizar tarefa.");
+
+  await createTimeline(task.project_id, `Tarefa atualizada para ${status}: ${task.title}`);
+  projectTasks = await apiGet("project_tasks");
+  renderOperacoes();
+}
+
+async function removeProjectTask(id){
+  const task = projectTasks.find(t => t.id === id);
+
+  const res = await apiDelete("project_tasks", id);
+
+  if(!res.ok) return alert("Erro ao remover tarefa.");
+
+  if(task) await createTimeline(task.project_id, `Tarefa removida: ${task.title}`);
+  projectTasks = await apiGet("project_tasks");
+  renderOperacoes();
+}
+
+async function addProjectTeamMember(){
+  const projectId = val("teamProject");
+  const employeeId = val("teamEmployee");
+
+  if(!projectId) return alert("Selecione um projeto.");
+  if(!employeeId) return alert("Selecione um funcionário.");
+
+  const exists = projectTeam.some(t => t.project_id === projectId && t.employee_id === employeeId);
+
+  if(exists) return alert("Esse funcionário já está vinculado a este projeto.");
+
+  const res = await apiInsert("project_team", {
+    project_id: projectId,
+    employee_id: employeeId
+  });
+
+  if(!res.ok) return alert("Erro ao vincular equipe.");
+
+  const employee = employees.find(e => e.id === employeeId);
+  await createTimeline(projectId, `Equipe vinculada: ${employee?.name || "Funcionário"}`);
+  projectTeam = await apiGet("project_team");
+  renderOperacoes();
+}
+
+async function removeProjectTeamMember(id){
+  const relation = projectTeam.find(t => t.id === id);
+
+  const res = await apiDelete("project_team", id);
+
+  if(!res.ok) return alert("Erro ao remover membro da equipe.");
+
+  if(relation) await createTimeline(relation.project_id, "Membro removido da equipe.");
+  projectTeam = await apiGet("project_team");
+  renderOperacoes();
+}
+
+async function addTimelineManual(){
+  const projectId = val("timelineProject");
+  const event = val("timelineEvent").trim();
+
+  if(!projectId) return alert("Selecione um projeto.");
+  if(!event) return alert("Digite o evento.");
+
+  await createTimeline(projectId, event);
+  renderOperacoes();
+}
+
+function renderOperationsSummary(){
+  const el = document.getElementById("operationsSummary");
+
+  if(!projects.length){
+    el.innerHTML = "<p>Nenhum projeto cadastrado.</p>";
+    return;
+  }
+
+  el.innerHTML = projects.map(project => {
+    const checks = projectChecklists.filter(c => c.project_id === project.id);
+    const done = checks.filter(c => c.completed).length;
+    const percent = checks.length ? Math.round((done / checks.length) * 100) : 0;
+    const tasks = projectTasks.filter(t => t.project_id === project.id);
+    const team = projectTeam.filter(t => t.project_id === project.id);
+    const timeline = projectTimeline.filter(t => t.project_id === project.id).slice(0, 6);
+
+    return `
+      <div class="card">
+        <h2>${project.project_name}</h2>
+        <small>Cliente: ${project.client_name || "Sem cliente"} • Status: ${project.status}</small>
+
+        <div class="progress-wrap">
+          <div class="progress-bar" style="width:${percent}%"></div>
+        </div>
+        <span class="mini-label">${percent}% do checklist concluído</span>
+
+        <div class="operation-grid">
+          <div>
+            <h3>Checklist</h3>
+            ${checks.length ? checks.map(c => `
+              <div class="list-item">
+                <div>
+                  <strong>${c.completed ? "✅" : "⬜"} ${c.item}</strong>
+                </div>
+                <div class="action-row">
+                  <button class="secondary-btn" onclick="toggleChecklist('${c.id}', ${c.completed})">
+                    ${c.completed ? "Reabrir" : "Concluir"}
+                  </button>
+                  <button class="danger-btn" onclick="removeChecklistItem('${c.id}')">Remover</button>
+                </div>
+              </div>
+            `).join("") : "<p>Nenhum item.</p>"}
+          </div>
+
+          <div>
+            <h3>Tarefas</h3>
+            ${tasks.length ? tasks.map(t => `
+              <div class="list-item">
+                <div>
+                  <strong>${t.title}</strong><br>
+                  <small>${t.assigned_to || "Sem responsável"}</small><br>
+                  <span class="status ${projectStatusClass(t.status)}">${t.status}</span>
+                </div>
+                <div class="action-row">
+                  <button class="secondary-btn" onclick="updateTaskStatus('${t.id}', 'In Progress')">Em andamento</button>
+                  <button class="success-btn" onclick="updateTaskStatus('${t.id}', 'Completed')">Concluir</button>
+                  <button class="danger-btn" onclick="removeProjectTask('${t.id}')">Remover</button>
+                </div>
+              </div>
+            `).join("") : "<p>Nenhuma tarefa.</p>"}
+          </div>
+
+          <div>
+            <h3>Equipe</h3>
+            ${team.length ? team.map(member => {
+              const emp = employees.find(e => e.id === member.employee_id);
+              return `
+                <div class="list-item">
+                  <div>
+                    <strong>${emp?.name || "Funcionário"}</strong><br>
+                    <small>${emp?.role || "Sem função"}</small>
+                  </div>
+                  <button class="danger-btn" onclick="removeProjectTeamMember('${member.id}')">Remover</button>
+                </div>
+              `;
+            }).join("") : "<p>Nenhuma equipe vinculada.</p>"}
+          </div>
+
+          <div>
+            <h3>Timeline</h3>
+            ${timeline.length ? timeline.map(t => `
+              <div class="list-item">
+                <div>
+                  <strong>${t.event}</strong><br>
+                  <small>${t.created_at ? new Date(t.created_at).toLocaleString("pt-BR") : ""}</small>
+                </div>
+              </div>
+            `).join("") : "<p>Nenhum evento.</p>"}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function getChecklistCompletion(){
+  if(!projectChecklists.length) return 0;
+
+  const done = projectChecklists.filter(i => i.completed).length;
+
+  return Math.round((done / projectChecklists.length) * 100);
+}
+
+
 function renderConfiguracoes(){
   setTitle("Configurações");
   setContent(`
     <div class="card">
       <h2>Configurações</h2>
       <p>Projeto conectado ao Supabase.</p>
-      <div class="report-box">Versão: V4.5 Business Automation
+      <div class="report-box">Versão: V5.0 Operations Center
 URL: ${SUPABASE_URL}
 
 Automações ativas:
 - Dashboard executivo
 - Conversão Orçamento Approved → Projeto
 - Lançamento financeiro automático
-- Relatório executivo automático</div>
+- Relatório executivo automático
+- Checklist por projeto
+- Tarefas por projeto
+- Equipe por projeto
+- Timeline operacional
+- Operations Center V5</div>
     </div>
   `);
 }

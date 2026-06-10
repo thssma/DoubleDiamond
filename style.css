@@ -368,3 +368,35 @@ textarea{
   .topbar{flex-direction:column}
   .list-item{flex-direction:column;align-items:flex-start}
 }
+
+
+.operation-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:18px;
+}
+
+.progress-wrap{
+  background:#e2e8f0;
+  border-radius:999px;
+  height:12px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+.progress-bar{
+  height:100%;
+  background:linear-gradient(135deg,#16a34a,#22c55e);
+  border-radius:999px;
+}
+
+.mini-label{
+  display:inline-block;
+  background:#f1f5f9;
+  color:#334155;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  margin-top:6px;
+}
