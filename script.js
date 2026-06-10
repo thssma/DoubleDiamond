@@ -91,7 +91,8 @@ function changePage(page, event){
     relatorios: renderRelatorios,
     equipe: renderEquipe,
     configuracoes: renderConfiguracoes,
-    operacoes: renderOperacoes
+    operacoes: renderOperacoes,
+    kanban: renderKanban
   };
 
   (routes[page] || (() => renderPlaceholder(page)))();
@@ -102,7 +103,7 @@ function setContent(html){ document.getElementById("pageContent").innerHTML = ht
 
 /* DASHBOARD EXECUTIVO */
 function renderDashboard(){
-  setTitle("Dashboard Executivo");
+  setTitle("Dashboard Executivo V6");
 
   const approvedRevenue = quotes.filter(q => q.status === "Approved").reduce((s,q) => s + Number(q.value || 0), 0);
   const incomePaid = financeItems.filter(i => i.type === "Income" && i.status === "Paid").reduce((s,i) => s + Number(i.amount || 0), 0);
@@ -111,10 +112,12 @@ function renderDashboard(){
   const activeProjects = projects.filter(p => ["Planning","Quoted","Scheduled","In Progress"].includes(p.status)).length;
   const completedProjects = projects.filter(p => p.status === "Completed").length;
   const totalPhotos = quotePhotos.length + projectPhotos.length;
+  const pendingTasks = projectTasks.filter(t => t.status !== "Completed").length;
+  const weekAppointments = appointments.filter(a => isThisWeek(a.appointment_date)).length;
 
   setContent(`
     <div class="notice">
-      V4.5 ativa: Dashboard executivo + Conversão Orçamento → Projeto + Relatório automático.
+      V6.0 ativa: Agenda Inteligente + Financeiro por Projeto + Relatórios Operacionais + Dashboard Executivo + Kanban de Obras.
     </div>
 
     <div class="cards">
@@ -125,19 +128,21 @@ function renderDashboard(){
       ${metric("A Receber", "R$ " + formatMoney(pendingIncome), "warn")}
       ${metric("Projetos Ativos", activeProjects, "purple")}
       ${metric("Projetos Concluídos", completedProjects, "good")}
+      ${metric("Tarefas Pendentes", pendingTasks, "warn")}
+      ${metric("Agenda da Semana", weekAppointments, "")}
       ${metric("Fotos", totalPhotos, "")}
       ${metric("Clientes", clients.length, "")}
       ${metric("Equipe", employees.length, "")}
-      ${metric("Tarefas Pendentes", projectTasks.filter(t => t.status !== "Completed").length, "warn")}
-      ${metric("Checklist Concluído", getChecklistCompletion() + "%", "good")}
     </div>
 
     <div class="card">
-      <h2>Atalhos de Operação</h2>
-      <p>1. Aprove um orçamento em Orçamentos. 2. Clique em Converter em Projeto. 3. Gere relatório automático em Relatórios.</p>
+      <h2>Centro Executivo</h2>
+      <p>Use o Kanban para acompanhar obras, a Agenda para planejar execução e o Financeiro para acompanhar lucro por projeto.</p>
       <div class="action-row">
-        <button class="primary-btn" onclick="changePage('orcamentos')">Ir para Orçamentos</button>
-        <button class="secondary-btn" onclick="changePage('relatorios')">Gerar Relatório</button>
+        <button class="primary-btn" onclick="changePage('kanban')">Abrir Kanban</button>
+        <button class="secondary-btn" onclick="changePage('agenda')">Abrir Agenda</button>
+        <button class="secondary-btn" onclick="changePage('financeiro')">Abrir Financeiro</button>
+        <button class="success-btn" onclick="changePage('relatorios')">Gerar Relatório</button>
       </div>
     </div>
   `);
@@ -561,9 +566,9 @@ function renderPhotoGrid(containerId, photos, type){
   `).join("")}</div>`;
 }
 
-/* FINANCEIRO */
+/* FINANCEIRO POR PROJETO V6 */
 function renderFinanceiro(){
-  setTitle("Financeiro");
+  setTitle("Financeiro por Projeto");
   setContent(`
     <div class="card">
       <h2>Novo Lançamento</h2>
@@ -573,65 +578,206 @@ function renderFinanceiro(){
         <input id="financeAmount" type="number" placeholder="Valor">
         <select id="financeStatus"><option>Pending</option><option>Paid</option><option>Overdue</option></select>
         <input id="financeDue" type="date">
+
+        <select id="financeProjectSelect">
+          <option value="">Projeto relacionado</option>
+          ${projects.map(p => `<option value="${p.project_name}">${p.project_name} - ${p.client_name}</option>`).join("")}
+        </select>
+
         <input id="financeClient" placeholder="Cliente relacionado">
-        <input id="financeProject" placeholder="Projeto relacionado">
+        <select id="financeCategory">
+          <option value="">Categoria</option>
+          <option>Labor</option>
+          <option>Material</option>
+          <option>Equipment</option>
+          <option>Fuel</option>
+          <option>Subscription</option>
+          <option>Other</option>
+        </select>
       </div>
       <textarea id="financeNotes" placeholder="Observações"></textarea>
       <button class="primary-btn" onclick="addFinance()">Adicionar</button>
     </div>
+
+    <div class="card">
+      <h2>Resumo Financeiro por Projeto</h2>
+      <div id="projectFinanceSummary"></div>
+    </div>
+
     <div class="card"><h2>Lançamentos</h2><div id="financeList"></div></div>
   `);
+  updateProjectFinanceSummary();
   updateFinanceList();
 }
 
 async function addFinance(){
   const title = val("financeTitle").trim();
   if(!title) return alert("Digite o título.");
+
   const res = await apiInsert("finance", {
-    type:val("financeType"), title, amount:Number(val("financeAmount") || 0), status:val("financeStatus"),
-    due_date:val("financeDue") || null, related_client:val("financeClient"),
-    related_project:val("financeProject"), notes:val("financeNotes")
+    type: val("financeType"),
+    title,
+    amount: Number(val("financeAmount") || 0),
+    status: val("financeStatus"),
+    due_date: val("financeDue") || null,
+    related_client: val("financeClient"),
+    related_project: val("financeProjectSelect"),
+    category: val("financeCategory"),
+    notes: val("financeNotes")
   });
+
   if(!res.ok) return alert("Erro ao salvar financeiro.");
-  financeItems = await apiGet("finance"); renderFinanceiro();
+
+  const project = projects.find(p => p.project_name === val("financeProjectSelect"));
+  if(project?.id){
+    await createTimeline(project.id, `Lançamento financeiro criado: ${title} - R$ ${formatMoney(val("financeAmount"))}`);
+  }
+
+  financeItems = await apiGet("finance");
+  projectTimeline = await apiGet("project_timeline");
+  renderFinanceiro();
+}
+
+async function updateFinanceStatus(id, status){
+  const item = financeItems.find(f => f.id === id);
+  const res = await apiPatch("finance", id, { status });
+
+  if(!res.ok) return alert("Erro ao atualizar lançamento.");
+
+  const project = projects.find(p => p.project_name === item?.related_project);
+  if(project?.id){
+    await createTimeline(project.id, `Financeiro atualizado para ${status}: ${item.title}`);
+  }
+
+  financeItems = await apiGet("finance");
+  projectTimeline = await apiGet("project_timeline");
+  renderFinanceiro();
 }
 
 async function removeFinance(id){
+  const item = financeItems.find(f => f.id === id);
   const res = await apiDelete("finance", id);
+
   if(!res.ok) return alert("Erro ao remover lançamento.");
-  financeItems = await apiGet("finance"); renderFinanceiro();
+
+  const project = projects.find(p => p.project_name === item?.related_project);
+  if(project?.id){
+    await createTimeline(project.id, `Lançamento financeiro removido: ${item.title}`);
+  }
+
+  financeItems = await apiGet("finance");
+  projectTimeline = await apiGet("project_timeline");
+  renderFinanceiro();
+}
+
+function updateProjectFinanceSummary(){
+  const el = document.getElementById("projectFinanceSummary");
+
+  if(!projects.length){
+    el.innerHTML = "<p>Nenhum projeto cadastrado.</p>";
+    return;
+  }
+
+  el.innerHTML = projects.map(project => {
+    const related = financeItems.filter(f => f.related_project === project.project_name);
+    const income = related.filter(f => f.type === "Income").reduce((s,f) => s + Number(f.amount || 0), 0);
+    const expense = related.filter(f => f.type === "Expense").reduce((s,f) => s + Number(f.amount || 0), 0);
+    const paidIncome = related.filter(f => f.type === "Income" && f.status === "Paid").reduce((s,f) => s + Number(f.amount || 0), 0);
+    const paidExpense = related.filter(f => f.type === "Expense" && f.status === "Paid").reduce((s,f) => s + Number(f.amount || 0), 0);
+
+    return `
+      <div class="soft-box">
+        <strong>${project.project_name}</strong><br>
+        <small>${project.client_name || "Sem cliente"}</small>
+        <div class="kpi-row">
+          ${metric("Receita", "R$ " + formatMoney(income), "good")}
+          ${metric("Custo", "R$ " + formatMoney(expense), "bad")}
+          ${metric("Lucro Previsto", "R$ " + formatMoney(income - expense), "purple")}
+          ${metric("Lucro Real", "R$ " + formatMoney(paidIncome - paidExpense), "good")}
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
 function updateFinanceList(){
   const el = document.getElementById("financeList");
   if(!financeItems.length) return el.innerHTML = "<p>Nenhum lançamento cadastrado.</p>";
-  el.innerHTML = financeItems.map(f => item(`
-    <strong>${f.title}</strong><br>
-    <small>${f.type} • ${f.status} • ${f.due_date || "Sem vencimento"}</small><br>
-    <small>${f.related_client || "Sem cliente"} • ${f.related_project || "Sem projeto"}</small><br>
-    <strong>R$ ${formatMoney(f.amount)}</strong><br>
-    <span class="status ${financeStatusClass(f)}">${f.status}</span>
-  `, `removeFinance('${f.id}')`)).join("");
+
+  el.innerHTML = financeItems.map(f => `
+    <div class="list-item">
+      <div>
+        <strong>${f.title}</strong><br>
+        <small>${f.type} • ${f.status} • ${f.due_date || "Sem vencimento"} • ${f.category || "Sem categoria"}</small><br>
+        <small>${f.related_client || "Sem cliente"} • ${f.related_project || "Sem projeto"}</small><br>
+        <strong>R$ ${formatMoney(f.amount)}</strong><br>
+        <span class="status ${financeStatusClass(f)}">${f.status}</span>
+      </div>
+      <div class="action-row">
+        <button class="secondary-btn" onclick="updateFinanceStatus('${f.id}', 'Paid')">Pago</button>
+        <button class="secondary-btn" onclick="updateFinanceStatus('${f.id}', 'Overdue')">Atrasado</button>
+        <button class="danger-btn" onclick="removeFinance('${f.id}')">Remover</button>
+      </div>
+    </div>
+  `).join("");
 }
 
-/* AGENDA */
+/* AGENDA INTELIGENTE V6 */
 function renderAgenda(){
-  setTitle("Agenda");
+  setTitle("Agenda Inteligente");
   setContent(`
     <div class="card">
       <h2>Novo Agendamento</h2>
       <div class="form-grid">
         <input id="appointmentTitle" placeholder="Título">
-        <select id="appointmentClient"><option value="">Cliente</option>${clients.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
-        <select id="appointmentProject"><option value="">Projeto</option>${projects.map(p => `<option value="${p.id}">${p.project_name}</option>`).join("")}</select>
+
+        <select id="appointmentType">
+          <option value="Visit">Visita</option>
+          <option value="Maintenance">Manutenção</option>
+          <option value="Execution">Execução</option>
+          <option value="Delivery">Entrega</option>
+          <option value="Emergency">Emergência</option>
+        </select>
+
+        <select id="appointmentClient">
+          <option value="">Cliente</option>
+          ${clients.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
+        </select>
+
+        <select id="appointmentProject">
+          <option value="">Projeto</option>
+          ${projects.map(p => `<option value="${p.id}">${p.project_name}</option>`).join("")}
+        </select>
+
+        <select id="appointmentEmployee">
+          <option value="">Responsável</option>
+          ${employees.map(e => `<option value="${e.name}">${e.name}</option>`).join("")}
+        </select>
+
         <input id="appointmentDate" type="date">
         <input id="appointmentTime" type="time">
-        <select id="appointmentStatus"><option>Scheduled</option><option>Completed</option><option>Cancelled</option></select>
+
+        <select id="appointmentStatus">
+          <option>Scheduled</option>
+          <option>Completed</option>
+          <option>Cancelled</option>
+        </select>
       </div>
+
       <textarea id="appointmentNotes" placeholder="Observações"></textarea>
       <button class="primary-btn" onclick="addAppointment()">Agendar</button>
     </div>
-    <div class="card"><h2>Agendamentos</h2><div id="appointmentList"></div></div>
+
+    <div class="card">
+      <h2>Agenda</h2>
+      <div class="action-row">
+        <button class="secondary-btn" onclick="renderAgenda()">Todos</button>
+        <button class="secondary-btn" onclick="filterAgenda('Scheduled')">Scheduled</button>
+        <button class="secondary-btn" onclick="filterAgenda('Completed')">Completed</button>
+        <button class="secondary-btn" onclick="filterAgenda('Cancelled')">Cancelled</button>
+      </div>
+      <div id="appointmentList"></div>
+    </div>
   `);
   updateAppointmentList();
 }
@@ -639,33 +785,96 @@ function renderAgenda(){
 async function addAppointment(){
   const title = val("appointmentTitle").trim();
   if(!title) return alert("Digite o título.");
+
   const client = clients.find(c => c.id === val("appointmentClient"));
   const project = projects.find(p => p.id === val("appointmentProject"));
+
   const res = await apiInsert("appointments", {
-    title, client_id:client?.id || "", client_name:client?.name || "",
-    project_id:project?.id || "", project_name:project?.project_name || "",
-    appointment_date:val("appointmentDate") || null, appointment_time:val("appointmentTime"),
-    status:val("appointmentStatus"), notes:val("appointmentNotes")
+    title,
+    appointment_type: val("appointmentType"),
+    client_id: client?.id || "",
+    client_name: client?.name || "",
+    project_id: project?.id || "",
+    project_name: project?.project_name || "",
+    assigned_to: val("appointmentEmployee"),
+    appointment_date: val("appointmentDate") || null,
+    appointment_time: val("appointmentTime"),
+    status: val("appointmentStatus"),
+    notes: val("appointmentNotes")
   });
+
   if(!res.ok) return alert("Erro ao salvar agendamento.");
-  appointments = await apiGet("appointments"); renderAgenda();
+
+  if(project?.id){
+    await createTimeline(project.id, `Agendamento criado: ${title} (${val("appointmentType")})`);
+  }
+
+  appointments = await apiGet("appointments");
+  projectTimeline = await apiGet("project_timeline");
+  renderAgenda();
+}
+
+async function updateAppointmentStatus(id, status){
+  const appointment = appointments.find(a => a.id === id);
+  const res = await apiPatch("appointments", id, { status });
+
+  if(!res.ok) return alert("Erro ao atualizar agendamento.");
+
+  if(appointment?.project_id){
+    await createTimeline(appointment.project_id, `Agendamento atualizado para ${status}: ${appointment.title}`);
+  }
+
+  appointments = await apiGet("appointments");
+  projectTimeline = await apiGet("project_timeline");
+  renderAgenda();
 }
 
 async function removeAppointment(id){
+  const appointment = appointments.find(a => a.id === id);
   const res = await apiDelete("appointments", id);
+
   if(!res.ok) return alert("Erro ao remover agendamento.");
-  appointments = await apiGet("appointments"); renderAgenda();
+
+  if(appointment?.project_id){
+    await createTimeline(appointment.project_id, `Agendamento removido: ${appointment.title}`);
+  }
+
+  appointments = await apiGet("appointments");
+  projectTimeline = await apiGet("project_timeline");
+  renderAgenda();
 }
 
-function updateAppointmentList(){
+function filterAgenda(status){
+  updateAppointmentList(status);
+}
+
+function updateAppointmentList(filterStatus = ""){
   const el = document.getElementById("appointmentList");
-  if(!appointments.length) return el.innerHTML = "<p>Nenhum agendamento cadastrado.</p>";
-  el.innerHTML = appointments.map(a => item(`
-    <strong>${a.title}</strong><br>
-    <small>${a.client_name || "Sem cliente"} • ${a.project_name || "Sem projeto"}</small><br>
-    <small>${a.appointment_date || "Sem data"} às ${a.appointment_time || "--:--"}</small><br>
-    <span class="status ${projectStatusClass(a.status)}">${a.status}</span>
-  `, `removeAppointment('${a.id}')`)).join("");
+  let list = [...appointments];
+
+  if(filterStatus){
+    list = list.filter(a => a.status === filterStatus);
+  }
+
+  list.sort((a,b) => String(a.appointment_date || "").localeCompare(String(b.appointment_date || "")));
+
+  if(!list.length) return el.innerHTML = "<p>Nenhum agendamento encontrado.</p>";
+
+  el.innerHTML = list.map(a => `
+    <div class="list-item">
+      <div>
+        <strong>${a.title}</strong><br>
+        <small>${a.appointment_type || "Visit"} • ${a.client_name || "Sem cliente"} • ${a.project_name || "Sem projeto"}</small><br>
+        <small>${a.appointment_date || "Sem data"} às ${a.appointment_time || "--:--"} • Responsável: ${a.assigned_to || "Sem responsável"}</small><br>
+        <span class="status ${projectStatusClass(a.status)}">${a.status}</span>
+      </div>
+      <div class="action-row">
+        <button class="secondary-btn" onclick="updateAppointmentStatus('${a.id}', 'Completed')">Concluir</button>
+        <button class="secondary-btn" onclick="updateAppointmentStatus('${a.id}', 'Cancelled')">Cancelar</button>
+        <button class="danger-btn" onclick="removeAppointment('${a.id}')">Remover</button>
+      </div>
+    </div>
+  `).join("");
 }
 
 /* RELATÓRIOS + AUTOMAÇÃO */
@@ -757,8 +966,19 @@ function buildSummaryReport(){
   const pendingIncome = financeItems.filter(i => i.type === "Income" && i.status === "Pending").reduce((s,i) => s + Number(i.amount || 0), 0);
   const activeProjects = projects.filter(p => ["Planning","Quoted","Scheduled","In Progress"].includes(p.status)).length;
   const completedProjects = projects.filter(p => p.status === "Completed").length;
+  const pendingTasks = projectTasks.filter(t => t.status !== "Completed").length;
+  const checklistPercent = getChecklistCompletion();
 
-  return `RELATÓRIO EXECUTIVO DOUBLEDIAMOND
+  const projectLines = projects.map(project => {
+    const relatedFinance = financeItems.filter(f => f.related_project === project.project_name);
+    const income = relatedFinance.filter(f => f.type === "Income").reduce((s,f) => s + Number(f.amount || 0), 0);
+    const expense = relatedFinance.filter(f => f.type === "Expense").reduce((s,f) => s + Number(f.amount || 0), 0);
+    const tasks = projectTasks.filter(t => t.project_id === project.id);
+    const photos = projectPhotos.filter(p => p.project_id === project.id);
+    return `- ${project.project_name} | Cliente: ${project.client_name || "N/A"} | Status: ${project.status} | Tarefas: ${tasks.length} | Fotos: ${photos.length} | Lucro previsto: R$ ${formatMoney(income - expense)}`;
+  }).join("\n");
+
+  return `RELATÓRIO EXECUTIVO DOUBLEDIAMOND V6
 Data: ${todayBR()}
 
 OPERAÇÃO
@@ -767,7 +987,10 @@ Serviços cadastrados: ${services.length}
 Orçamentos cadastrados: ${quotes.length}
 Projetos ativos: ${activeProjects}
 Projetos concluídos: ${completedProjects}
+Tarefas pendentes: ${pendingTasks}
+Checklist geral concluído: ${checklistPercent}%
 Agendamentos: ${appointments.length}
+Agendamentos nesta semana: ${appointments.filter(a => isThisWeek(a.appointment_date)).length}
 Equipe cadastrada: ${employees.length}
 
 FOTOS E COMPROVAÇÕES
@@ -782,8 +1005,11 @@ Despesas pagas: R$ ${formatMoney(expensesPaid)}
 Lucro real: R$ ${formatMoney(incomePaid - expensesPaid)}
 A receber: R$ ${formatMoney(pendingIncome)}
 
+PROJETOS
+${projectLines || "Nenhum projeto cadastrado."}
+
 OBSERVAÇÃO
-Este relatório foi gerado automaticamente pelo DoubleDiamond V4.5 Business Automation.`;
+Este relatório foi gerado automaticamente pelo DoubleDiamond V6.0 Full Suite.`;
 }
 
 /* EQUIPE */
@@ -978,7 +1204,6 @@ async function removeChecklistItem(id){
   if(record) await createTimeline(record.project_id, `Checklist removido: ${record.item}`);
   projectChecklists = await apiGet("project_checklists");
   renderOperacoes();
-
 }
 
 async function addProjectTask(){
@@ -995,17 +1220,10 @@ async function addProjectTask(){
     status: val("taskStatus")
   });
 
-  console.log("TASK RESULT:", res);
-
-  if(!res.ok){
-    console.error(res);
-    return alert("Erro ao criar tarefa.");
-  }
+  if(!res.ok) return alert("Erro ao criar tarefa.");
 
   await createTimeline(projectId, `Tarefa criada: ${title}`);
-
   projectTasks = await apiGet("project_tasks");
-
   renderOperacoes();
 }
 
@@ -1190,7 +1408,7 @@ function renderConfiguracoes(){
     <div class="card">
       <h2>Configurações</h2>
       <p>Projeto conectado ao Supabase.</p>
-      <div class="report-box">Versão: V5.0 Operations Center
+      <div class="report-box">Versão: V6.0 Full Suite
 URL: ${SUPABASE_URL}
 
 Automações ativas:
@@ -1202,10 +1420,89 @@ Automações ativas:
 - Tarefas por projeto
 - Equipe por projeto
 - Timeline operacional
-- Operations Center V5</div>
+- Operations Center V5
+- Agenda Inteligente V6
+- Financeiro por Projeto V6
+- Kanban de Obras V6
+- Relatório Executivo V6</div>
     </div>
   `);
 }
+
+
+/* KANBAN V6 */
+function renderKanban(){
+  setTitle("Kanban de Obras");
+
+  const columns = [
+    "Planning",
+    "Quoted",
+    "Scheduled",
+    "In Progress",
+    "Completed",
+    "Cancelled"
+  ];
+
+  setContent(`
+    <div class="notice">
+      Use o Kanban para acompanhar o estágio das obras. A mudança de status atualiza o projeto no Supabase.
+    </div>
+
+    <div class="kanban-board">
+      ${columns.map(status => `
+        <div class="kanban-column">
+          <h3>${status}</h3>
+          ${projects.filter(p => p.status === status).map(project => `
+            <div class="kanban-card">
+              <strong>${project.project_name}</strong>
+              <small>${project.client_name || "Sem cliente"}</small><br>
+              <small>${project.service_name || "Sem serviço"}</small>
+              <select onchange="updateProjectStatus('${project.id}', this.value)">
+                ${columns.map(option => `
+                  <option value="${option}" ${option === project.status ? "selected" : ""}>${option}</option>
+                `).join("")}
+              </select>
+            </div>
+          `).join("") || "<p>Nenhum projeto.</p>"}
+        </div>
+      `).join("")}
+    </div>
+  `);
+}
+
+async function updateProjectStatus(projectId, status){
+  const project = projects.find(p => p.id === projectId);
+
+  const res = await apiPatch("projects", projectId, { status });
+
+  if(!res.ok){
+    alert("Erro ao atualizar status do projeto.");
+    return;
+  }
+
+  await createTimeline(projectId, `Status do projeto alterado para ${status}`);
+
+  projects = await apiGet("projects");
+  projectTimeline = await apiGet("project_timeline");
+
+  renderKanban();
+}
+
+function isThisWeek(dateString){
+  if(!dateString) return false;
+
+  const date = new Date(dateString + "T00:00:00");
+  const today = new Date();
+
+  const first = new Date(today);
+  first.setDate(today.getDate() - today.getDay());
+
+  const last = new Date(first);
+  last.setDate(first.getDate() + 6);
+
+  return date >= first && date <= last;
+}
+
 
 /* HELPERS */
 function item(content, removeFn){
