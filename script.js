@@ -6,753 +6,738 @@ let quotes = [];
 let services = [];
 let projects = [];
 let quotePhotos = [];
+let projectPhotos = [];
+let financeItems = [];
+let appointments = [];
+let reports = [];
+let employees = [];
 
 const headers = {
-    "apikey": SUPABASE_ANON_KEY,
-    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-    "Content-Type": "application/json"
+  "apikey": SUPABASE_ANON_KEY,
+  "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+  "Content-Type": "application/json"
 };
 
 window.onload = async () => {
-    await loadData();
-    renderDashboard();
+  await loadData();
+  renderDashboard();
 };
 
+async function apiGet(table){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*&order=created_at.desc`, { headers });
+  if(!res.ok) return [];
+  return await res.json();
+}
+
+async function apiInsert(table, data){
+  return await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method:"POST",
+    headers:{...headers, "Prefer":"return=representation"},
+    body:JSON.stringify(data)
+  });
+}
+
+async function apiDelete(table, id){
+  return await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method:"DELETE",
+    headers
+  });
+}
+
 async function loadData(){
-    await loadClients();
-    await loadQuotes();
-    await loadServices();
-    await loadProjects();
-    await loadQuotePhotos();
-}
-
-async function loadClients(){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/clients?select=*&order=created_at.desc`, { headers });
-    clients = await response.json();
-}
-
-async function loadQuotes(){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/quotes?select=*&order=created_at.desc`, { headers });
-    quotes = await response.json();
-}
-
-async function loadServices(){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/services?select=*&order=created_at.desc`, { headers });
-    services = await response.json();
-}
-
-async function loadProjects(){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/projects?select=*&order=created_at.desc`, { headers });
-    projects = await response.json();
-}
-
-async function loadQuotePhotos(){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/quote_photos?select=*&order=created_at.desc`, { headers });
-    quotePhotos = await response.json();
+  clients = await apiGet("clients");
+  quotes = await apiGet("quotes");
+  services = await apiGet("services");
+  projects = await apiGet("projects");
+  quotePhotos = await apiGet("quote_photos");
+  projectPhotos = await apiGet("project_photos");
+  financeItems = await apiGet("finance");
+  appointments = await apiGet("appointments");
+  reports = await apiGet("reports");
+  employees = await apiGet("employees");
 }
 
 function changePage(page, event){
-    document.querySelectorAll(".menu-btn").forEach(btn => btn.classList.remove("active"));
+  document.querySelectorAll(".menu-btn").forEach(btn => btn.classList.remove("active"));
+  if(event) event.target.classList.add("active");
 
-    if(event){
-        event.target.classList.add("active");
-    }
+  const routes = {
+    dashboard: renderDashboard,
+    clientes: renderClientes,
+    orcamentos: renderOrcamentos,
+    servicos: renderServicos,
+    projetos: renderProjetos,
+    fotos: renderFotos,
+    fotosProjetos: renderFotosProjetos,
+    financeiro: renderFinanceiro,
+    agenda: renderAgenda,
+    relatorios: renderRelatorios,
+    equipe: renderEquipe,
+    configuracoes: renderConfiguracoes
+  };
 
-    switch(page){
-        case "dashboard":
-            renderDashboard();
-            break;
-        case "clientes":
-            renderClientes();
-            break;
-        case "orcamentos":
-            renderOrcamentos();
-            break;
-        case "servicos":
-            renderServicos();
-            break;
-        case "projetos":
-            renderProjetos();
-            break;
-        case "fotos":
-            renderFotos();
-            break;
-        default:
-            renderPlaceholder(page);
-    }
+  (routes[page] || (() => renderPlaceholder(page)))();
+}
+
+function setTitle(title){
+  document.getElementById("pageTitle").innerText = title;
+}
+
+function setContent(html){
+  document.getElementById("pageContent").innerHTML = html;
 }
 
 function renderDashboard(){
-    document.getElementById("pageTitle").innerText = "Dashboard";
+  setTitle("Dashboard");
 
-    document.getElementById("pageContent").innerHTML = `
-        <div class="cards">
-            <div class="card"><h3>Clientes</h3><p>${clients.length}</p></div>
-            <div class="card"><h3>Orçamentos</h3><p>${quotes.length}</p></div>
-            <div class="card"><h3>Serviços</h3><p>${services.length}</p></div>
-            <div class="card"><h3>Projetos</h3><p>${projects.length}</p></div>
-            <div class="card"><h3>Fotos</h3><p>${quotePhotos.length}</p></div>
-            <div class="card"><h3>Receita Estimada</h3><p>R$ ${getApprovedRevenue()}</p></div>
-        </div>
-    `;
+  const income = financeItems.filter(i => i.type === "Income" && i.status === "Paid")
+    .reduce((s,i) => s + Number(i.amount || 0), 0);
+
+  const expense = financeItems.filter(i => i.type === "Expense" && i.status === "Paid")
+    .reduce((s,i) => s + Number(i.amount || 0), 0);
+
+  setContent(`
+    <div class="cards">
+      ${metric("Clientes", clients.length)}
+      ${metric("Orçamentos", quotes.length)}
+      ${metric("Serviços", services.length)}
+      ${metric("Projetos", projects.length)}
+      ${metric("Fotos", quotePhotos.length + projectPhotos.length)}
+      ${metric("Agenda", appointments.length)}
+      ${metric("Equipe", employees.length)}
+      ${metric("Lucro", "R$ " + formatMoney(income - expense))}
+    </div>
+
+    <div class="card">
+      <h2>Resumo Operacional</h2>
+      <p>Fluxo ativo: Cliente → Orçamento → Serviço → Projeto → Fotos → Financeiro.</p>
+    </div>
+  `);
 }
 
+function metric(label, value){
+  return `<div class="card metric"><h3>${label}</h3><p class="big">${value}</p></div>`;
+}
+
+/* CLIENTES */
 function renderClientes(){
-    document.getElementById("pageTitle").innerText = "Clientes";
-
-    document.getElementById("pageContent").innerHTML = `
-        <div class="card">
-            <h2>Novo Cliente</h2>
-
-            <div class="form-grid">
-                <input id="name" placeholder="Nome">
-                <input id="phone" placeholder="Telefone">
-                <input id="email" placeholder="Email">
-                <input id="address" placeholder="Endereço">
-
-                <select id="propertyType">
-                    <option value="">Tipo de propriedade</option>
-                    <option value="Residential">Residential</option>
-                    <option value="Commercial">Commercial</option>
-                    <option value="HOA Community">HOA Community</option>
-                    <option value="Office Building">Office Building</option>
-                </select>
-
-                <select id="clientStatus">
-                    <option value="Lead">Lead</option>
-                    <option value="Ativo">Ativo</option>
-                    <option value="Inativo">Inativo</option>
-                </select>
-            </div>
-
-            <textarea id="notes" placeholder="Observações"></textarea>
-            <button class="primary-btn" onclick="addClient()">Adicionar Cliente</button>
-        </div>
-
-        <div class="card">
-            <h2>Clientes Cadastrados</h2>
-            <div id="clientList"></div>
-        </div>
-    `;
-
-    updateClientList();
+  setTitle("Clientes");
+  setContent(`
+    <div class="card">
+      <h2>Novo Cliente</h2>
+      <div class="form-grid">
+        <input id="name" placeholder="Nome">
+        <input id="phone" placeholder="Telefone">
+        <input id="email" placeholder="Email">
+        <input id="address" placeholder="Endereço">
+        <select id="propertyType">
+          <option value="">Tipo de propriedade</option>
+          <option value="Residential">Residential</option>
+          <option value="Commercial">Commercial</option>
+          <option value="HOA Community">HOA Community</option>
+          <option value="Office Building">Office Building</option>
+        </select>
+        <select id="clientStatus">
+          <option value="Lead">Lead</option>
+          <option value="Ativo">Ativo</option>
+          <option value="Inativo">Inativo</option>
+        </select>
+      </div>
+      <textarea id="notes" placeholder="Observações"></textarea>
+      <button class="primary-btn" onclick="addClient()">Adicionar Cliente</button>
+    </div>
+    <div class="card"><h2>Clientes Cadastrados</h2><div id="clientList"></div></div>
+  `);
+  updateClientList();
 }
 
 async function addClient(){
-    const name = document.getElementById("name").value.trim();
-
-    if(!name){
-        alert("Digite o nome do cliente.");
-        return;
-    }
-
-    const newClient = {
-        name,
-        phone: document.getElementById("phone").value,
-        email: document.getElementById("email").value,
-        address: document.getElementById("address").value,
-        property_type: document.getElementById("propertyType").value,
-        status: document.getElementById("clientStatus").value,
-        notes: document.getElementById("notes").value
-    };
-
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/clients`, {
-        method: "POST",
-        headers: { ...headers, "Prefer": "return=representation" },
-        body: JSON.stringify(newClient)
-    });
-
-    if(!response.ok){
-        alert("Erro ao salvar cliente.");
-        return;
-    }
-
-    await loadClients();
-    renderClientes();
+  const name = val("name").trim();
+  if(!name) return alert("Digite o nome do cliente.");
+  const res = await apiInsert("clients", {
+    name, phone:val("phone"), email:val("email"), address:val("address"),
+    property_type:val("propertyType"), status:val("clientStatus"), notes:val("notes")
+  });
+  if(!res.ok) return alert("Erro ao salvar cliente.");
+  clients = await apiGet("clients");
+  renderClientes();
 }
 
 async function removeClient(id){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/clients?id=eq.${id}`, {
-        method: "DELETE",
-        headers
-    });
-
-    if(!response.ok){
-        alert("Erro ao remover cliente.");
-        return;
-    }
-
-    await loadData();
-    renderClientes();
+  const res = await apiDelete("clients", id);
+  if(!res.ok) return alert("Erro ao remover cliente.");
+  await loadData(); renderClientes();
 }
 
 function updateClientList(){
-    const container = document.getElementById("clientList");
-
-    if(!container) return;
-
-    if(clients.length === 0){
-        container.innerHTML = "<p>Nenhum cliente cadastrado.</p>";
-        return;
-    }
-
-    container.innerHTML = clients.map(client => `
-        <div class="client-item">
-            <div>
-                <strong>${client.name}</strong><br>
-                <small>${client.phone || "Sem telefone"} | ${client.email || "Sem email"}</small><br>
-                <small>${client.address || "Sem endereço"}</small><br>
-                <small>${client.property_type || "Sem tipo"} • ${client.status}</small>
-            </div>
-
-            <button class="danger-btn" onclick="removeClient('${client.id}')">Remover</button>
-        </div>
-    `).join("");
+  const el = document.getElementById("clientList");
+  if(!clients.length) return el.innerHTML = "<p>Nenhum cliente cadastrado.</p>";
+  el.innerHTML = clients.map(c => item(`
+    <strong>${c.name}</strong><br>
+    <small>${c.phone || "Sem telefone"} | ${c.email || "Sem email"}</small><br>
+    <small>${c.address || "Sem endereço"}</small><br>
+    <small>${c.property_type || "Sem tipo"} • ${c.status}</small>
+  `, `removeClient('${c.id}')`)).join("");
 }
 
+/* ORÇAMENTOS */
 function renderOrcamentos(){
-    document.getElementById("pageTitle").innerText = "Orçamentos";
-
-    document.getElementById("pageContent").innerHTML = `
-        <div class="card">
-            <h2>Novo Orçamento</h2>
-
-            <div class="form-grid">
-                <select id="quoteClient">
-                    <option value="">Selecione o cliente</option>
-                    ${clients.map(client => `<option value="${client.id}">${client.name}</option>`).join("")}
-                </select>
-
-                <select id="quoteService">
-                    <option value="">Serviço</option>
-                    ${services.length > 0
-                        ? services.map(service => `<option value="${service.name}">${service.name}</option>`).join("")
-                        : `<option value="Lawn Care">Lawn Care</option>
-                           <option value="Landscaping">Landscaping</option>
-                           <option value="Irrigation">Irrigation</option>
-                           <option value="Pressure Washing">Pressure Washing</option>`
-                    }
-                </select>
-
-                <input id="quoteValue" type="number" placeholder="Valor estimado">
-
-                <select id="quoteStatus">
-                    <option value="Draft">Draft</option>
-                    <option value="Sent">Sent</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
-                </select>
-            </div>
-
-            <textarea id="quoteDescription" placeholder="Descrição do orçamento"></textarea>
-            <button class="primary-btn" onclick="addQuote()">Adicionar Orçamento</button>
-        </div>
-
-        <div class="card">
-            <h2>Orçamentos Cadastrados</h2>
-            <div id="quoteList"></div>
-        </div>
-    `;
-
-    updateQuoteList();
+  setTitle("Orçamentos");
+  setContent(`
+    <div class="card">
+      <h2>Novo Orçamento</h2>
+      <div class="form-grid">
+        <select id="quoteClient"><option value="">Selecione o cliente</option>${clients.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="quoteService"><option value="">Serviço</option>${services.map(s => `<option value="${s.name}">${s.name}</option>`).join("")}</select>
+        <input id="quoteValue" type="number" placeholder="Valor estimado">
+        <select id="quoteStatus"><option>Draft</option><option>Sent</option><option>Approved</option><option>Rejected</option></select>
+      </div>
+      <textarea id="quoteDescription" placeholder="Descrição"></textarea>
+      <button class="primary-btn" onclick="addQuote()">Adicionar Orçamento</button>
+    </div>
+    <div class="card"><h2>Orçamentos Cadastrados</h2><div id="quoteList"></div></div>
+  `);
+  updateQuoteList();
 }
 
 async function addQuote(){
-    const clientId = document.getElementById("quoteClient").value;
-    const service = document.getElementById("quoteService").value;
-
-    if(!clientId){
-        alert("Selecione um cliente.");
-        return;
-    }
-
-    if(!service){
-        alert("Selecione um serviço.");
-        return;
-    }
-
-    const selectedClient = clients.find(client => client.id === clientId);
-
-    const newQuote = {
-        client_id: clientId,
-        client_name: selectedClient.name,
-        service,
-        value: Number(document.getElementById("quoteValue").value || 0),
-        status: document.getElementById("quoteStatus").value,
-        description: document.getElementById("quoteDescription").value
-    };
-
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/quotes`, {
-        method: "POST",
-        headers: { ...headers, "Prefer": "return=representation" },
-        body: JSON.stringify(newQuote)
-    });
-
-    if(!response.ok){
-        alert("Erro ao salvar orçamento.");
-        return;
-    }
-
-    await loadQuotes();
-    renderOrcamentos();
+  const clientId = val("quoteClient");
+  const service = val("quoteService");
+  if(!clientId) return alert("Selecione um cliente.");
+  if(!service) return alert("Selecione um serviço.");
+  const client = clients.find(c => c.id === clientId);
+  const res = await apiInsert("quotes", {
+    client_id:clientId, client_name:client.name, service,
+    value:Number(val("quoteValue") || 0), status:val("quoteStatus"), description:val("quoteDescription")
+  });
+  if(!res.ok) return alert("Erro ao salvar orçamento.");
+  quotes = await apiGet("quotes"); renderOrcamentos();
 }
 
 async function removeQuote(id){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/quotes?id=eq.${id}`, {
-        method: "DELETE",
-        headers
-    });
-
-    if(!response.ok){
-        alert("Erro ao remover orçamento.");
-        return;
-    }
-
-    await loadQuotes();
-    renderOrcamentos();
+  const res = await apiDelete("quotes", id);
+  if(!res.ok) return alert("Erro ao remover orçamento.");
+  quotes = await apiGet("quotes"); renderOrcamentos();
 }
 
 function updateQuoteList(){
-    const container = document.getElementById("quoteList");
-
-    if(!container) return;
-
-    if(quotes.length === 0){
-        container.innerHTML = "<p>Nenhum orçamento cadastrado.</p>";
-        return;
-    }
-
-    container.innerHTML = quotes.map(quote => `
-        <div class="quote-item">
-            <div>
-                <strong>${quote.client_name}</strong><br>
-                <small>${quote.service}</small><br>
-                <small>${quote.description || "Sem descrição"}</small><br>
-                <strong>R$ ${formatMoney(quote.value)}</strong><br>
-                <span class="status ${getStatusClass(quote.status)}">${quote.status}</span>
-            </div>
-
-            <button class="danger-btn" onclick="removeQuote('${quote.id}')">Remover</button>
-        </div>
-    `).join("");
+  const el = document.getElementById("quoteList");
+  if(!quotes.length) return el.innerHTML = "<p>Nenhum orçamento cadastrado.</p>";
+  el.innerHTML = quotes.map(q => item(`
+    <strong>${q.client_name}</strong><br>
+    <small>${q.service}</small><br>
+    <small>${q.description || "Sem descrição"}</small><br>
+    <strong>R$ ${formatMoney(q.value)}</strong><br>
+    <span class="status ${quoteStatusClass(q.status)}">${q.status}</span>
+  `, `removeQuote('${q.id}')`)).join("");
 }
 
+/* SERVIÇOS */
 function renderServicos(){
-    document.getElementById("pageTitle").innerText = "Serviços";
-
-    document.getElementById("pageContent").innerHTML = `
-        <div class="card">
-            <h2>Novo Serviço</h2>
-
-            <div class="form-grid">
-                <input id="serviceName" placeholder="Nome do serviço">
-
-                <select id="serviceCategory">
-                    <option value="">Categoria</option>
-                    <option value="Lawn Care">Lawn Care</option>
-                    <option value="Landscaping">Landscaping</option>
-                    <option value="Irrigation">Irrigation</option>
-                    <option value="Pressure Washing">Pressure Washing</option>
-                    <option value="Gutter Cleaning">Gutter Cleaning</option>
-                    <option value="Tree Care">Tree Care</option>
-                    <option value="Seasonal Cleanup">Seasonal Cleanup</option>
-                    <option value="Other">Other</option>
-                </select>
-
-                <input id="serviceBasePrice" type="number" placeholder="Preço base">
-                <input id="serviceDuration" placeholder="Duração estimada">
-
-                <select id="serviceStatus">
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
-            </div>
-
-            <textarea id="serviceDescription" placeholder="Descrição do serviço"></textarea>
-            <button class="primary-btn" onclick="addService()">Adicionar Serviço</button>
-        </div>
-
-        <div class="card">
-            <h2>Serviços Cadastrados</h2>
-            <div id="serviceList"></div>
-        </div>
-    `;
-
-    updateServiceList();
+  setTitle("Serviços");
+  setContent(`
+    <div class="card">
+      <h2>Novo Serviço</h2>
+      <div class="form-grid">
+        <input id="serviceName" placeholder="Nome do serviço">
+        <select id="serviceCategory"><option value="">Categoria</option><option>Lawn Care</option><option>Landscaping</option><option>Irrigation</option><option>Pressure Washing</option><option>Gutter Cleaning</option><option>Tree Care</option><option>Seasonal Cleanup</option><option>Other</option></select>
+        <input id="serviceBasePrice" type="number" placeholder="Preço base">
+        <input id="serviceDuration" placeholder="Duração estimada">
+        <select id="serviceStatus"><option>Active</option><option>Inactive</option></select>
+      </div>
+      <textarea id="serviceDescription" placeholder="Descrição"></textarea>
+      <button class="primary-btn" onclick="addService()">Adicionar Serviço</button>
+    </div>
+    <div class="card"><h2>Serviços Cadastrados</h2><div id="serviceList"></div></div>
+  `);
+  updateServiceList();
 }
 
 async function addService(){
-    const name = document.getElementById("serviceName").value.trim();
-
-    if(!name){
-        alert("Digite o nome do serviço.");
-        return;
-    }
-
-    const newService = {
-        name,
-        category: document.getElementById("serviceCategory").value,
-        base_price: Number(document.getElementById("serviceBasePrice").value || 0),
-        estimated_duration: document.getElementById("serviceDuration").value,
-        status: document.getElementById("serviceStatus").value,
-        description: document.getElementById("serviceDescription").value
-    };
-
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/services`, {
-        method: "POST",
-        headers: { ...headers, "Prefer": "return=representation" },
-        body: JSON.stringify(newService)
-    });
-
-    if(!response.ok){
-        alert("Erro ao salvar serviço.");
-        return;
-    }
-
-    await loadServices();
-    renderServicos();
+  const name = val("serviceName").trim();
+  if(!name) return alert("Digite o nome do serviço.");
+  const res = await apiInsert("services", {
+    name, category:val("serviceCategory"), base_price:Number(val("serviceBasePrice") || 0),
+    estimated_duration:val("serviceDuration"), status:val("serviceStatus"), description:val("serviceDescription")
+  });
+  if(!res.ok) return alert("Erro ao salvar serviço.");
+  services = await apiGet("services"); renderServicos();
 }
 
 async function removeService(id){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/services?id=eq.${id}`, {
-        method: "DELETE",
-        headers
-    });
-
-    if(!response.ok){
-        alert("Erro ao remover serviço.");
-        return;
-    }
-
-    await loadServices();
-    renderServicos();
+  const res = await apiDelete("services", id);
+  if(!res.ok) return alert("Erro ao remover serviço.");
+  services = await apiGet("services"); renderServicos();
 }
 
 function updateServiceList(){
-    const container = document.getElementById("serviceList");
-
-    if(!container) return;
-
-    if(services.length === 0){
-        container.innerHTML = "<p>Nenhum serviço cadastrado.</p>";
-        return;
-    }
-
-    container.innerHTML = services.map(service => `
-        <div class="service-item">
-            <div>
-                <strong>${service.name}</strong><br>
-                <small>${service.category || "Sem categoria"} • ${service.estimated_duration || "Sem duração"}</small><br>
-                <strong>R$ ${formatMoney(service.base_price)}</strong><br>
-                <small>${service.description || "Sem descrição"}</small><br>
-                <span class="status ${service.status === "Active" ? "status-active" : "status-inactive"}">${service.status}</span>
-            </div>
-
-            <button class="danger-btn" onclick="removeService('${service.id}')">Remover</button>
-        </div>
-    `).join("");
+  const el = document.getElementById("serviceList");
+  if(!services.length) return el.innerHTML = "<p>Nenhum serviço cadastrado.</p>";
+  el.innerHTML = services.map(s => item(`
+    <strong>${s.name}</strong><br>
+    <small>${s.category || "Sem categoria"} • ${s.estimated_duration || "Sem duração"}</small><br>
+    <strong>R$ ${formatMoney(s.base_price)}</strong><br>
+    <small>${s.description || "Sem descrição"}</small><br>
+    <span class="status ${s.status === "Active" ? "status-active" : "status-inactive"}">${s.status}</span>
+  `, `removeService('${s.id}')`)).join("");
 }
 
+/* PROJETOS */
 function renderProjetos(){
-    document.getElementById("pageTitle").innerText = "Projetos";
-
-    document.getElementById("pageContent").innerHTML = `
-        <div class="card">
-            <h2>Novo Projeto</h2>
-
-            <div class="form-grid">
-                <select id="projectClient">
-                    <option value="">Cliente</option>
-                    ${clients.map(client => `<option value="${client.id}">${client.name}</option>`).join("")}
-                </select>
-
-                <select id="projectService">
-                    <option value="">Serviço</option>
-                    ${services.map(service => `<option value="${service.name}">${service.name}</option>`).join("")}
-                </select>
-
-                <input id="projectName" placeholder="Nome do Projeto">
-                <input id="projectStart" type="date">
-                <input id="projectEnd" type="date">
-
-                <select id="projectStatus">
-                    <option value="Planning">Planning</option>
-                    <option value="Quoted">Quoted</option>
-                    <option value="Scheduled">Scheduled</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
-            </div>
-
-            <textarea id="projectNotes" placeholder="Observações"></textarea>
-            <button class="primary-btn" onclick="addProject()">Criar Projeto</button>
-        </div>
-
-        <div class="card">
-            <h2>Projetos Cadastrados</h2>
-            <div id="projectList"></div>
-        </div>
-    `;
-
-    updateProjectList();
+  setTitle("Projetos");
+  setContent(`
+    <div class="card">
+      <h2>Novo Projeto</h2>
+      <div class="form-grid">
+        <select id="projectClient"><option value="">Cliente</option>${clients.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="projectService"><option value="">Serviço</option>${services.map(s => `<option value="${s.name}">${s.name}</option>`).join("")}</select>
+        <input id="projectName" placeholder="Nome do Projeto">
+        <input id="projectStart" type="date">
+        <input id="projectEnd" type="date">
+        <select id="projectStatus"><option>Planning</option><option>Quoted</option><option>Scheduled</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select>
+      </div>
+      <textarea id="projectNotes" placeholder="Observações"></textarea>
+      <button class="primary-btn" onclick="addProject()">Criar Projeto</button>
+    </div>
+    <div class="card"><h2>Projetos Cadastrados</h2><div id="projectList"></div></div>
+  `);
+  updateProjectList();
 }
 
 async function addProject(){
-    const clientId = document.getElementById("projectClient").value;
-
-    if(!clientId){
-        alert("Selecione um cliente.");
-        return;
-    }
-
-    const selectedClient = clients.find(client => client.id === clientId);
-
-    const newProject = {
-        client_id: clientId,
-        client_name: selectedClient.name,
-        service_name: document.getElementById("projectService").value,
-        project_name: document.getElementById("projectName").value || "Projeto sem nome",
-        start_date: document.getElementById("projectStart").value || null,
-        end_date: document.getElementById("projectEnd").value || null,
-        status: document.getElementById("projectStatus").value,
-        notes: document.getElementById("projectNotes").value
-    };
-
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/projects`, {
-        method: "POST",
-        headers: { ...headers, "Prefer": "return=representation" },
-        body: JSON.stringify(newProject)
-    });
-
-    if(!response.ok){
-        alert("Erro ao criar projeto.");
-        return;
-    }
-
-    await loadProjects();
-    renderProjetos();
+  const clientId = val("projectClient");
+  if(!clientId) return alert("Selecione um cliente.");
+  const client = clients.find(c => c.id === clientId);
+  const res = await apiInsert("projects", {
+    client_id:clientId, client_name:client.name, service_name:val("projectService"),
+    project_name:val("projectName") || "Projeto sem nome", start_date:val("projectStart") || null,
+    end_date:val("projectEnd") || null, status:val("projectStatus"), notes:val("projectNotes")
+  });
+  if(!res.ok) return alert("Erro ao criar projeto.");
+  projects = await apiGet("projects"); renderProjetos();
 }
 
 async function removeProject(id){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${id}`, {
-        method: "DELETE",
-        headers
-    });
-
-    if(!response.ok){
-        alert("Erro ao remover projeto.");
-        return;
-    }
-
-    await loadProjects();
-    renderProjetos();
+  const res = await apiDelete("projects", id);
+  if(!res.ok) return alert("Erro ao remover projeto.");
+  projects = await apiGet("projects"); renderProjetos();
 }
 
 function updateProjectList(){
-    const container = document.getElementById("projectList");
-
-    if(!container) return;
-
-    if(projects.length === 0){
-        container.innerHTML = "<p>Nenhum projeto cadastrado.</p>";
-        return;
-    }
-
-    container.innerHTML = projects.map(project => `
-        <div class="project-item">
-            <div>
-                <strong>${project.project_name}</strong><br>
-                <small>Cliente: ${project.client_name || "Sem cliente"}</small><br>
-                <small>Serviço: ${project.service_name || "Sem serviço"}</small><br>
-                <small>Início: ${project.start_date || "Sem data"} • Fim: ${project.end_date || "Sem data"}</small><br>
-                <span class="status ${getProjectStatusClass(project.status)}">${project.status}</span>
-            </div>
-
-            <button class="danger-btn" onclick="removeProject('${project.id}')">Remover</button>
-        </div>
-    `).join("");
+  const el = document.getElementById("projectList");
+  if(!projects.length) return el.innerHTML = "<p>Nenhum projeto cadastrado.</p>";
+  el.innerHTML = projects.map(p => item(`
+    <strong>${p.project_name}</strong><br>
+    <small>Cliente: ${p.client_name || "Sem cliente"}</small><br>
+    <small>Serviço: ${p.service_name || "Sem serviço"}</small><br>
+    <small>Início: ${p.start_date || "Sem data"} • Fim: ${p.end_date || "Sem data"}</small><br>
+    <span class="status ${projectStatusClass(p.status)}">${p.status}</span>
+  `, `removeProject('${p.id}')`)).join("");
 }
 
+/* FOTOS ORÇAMENTOS */
 function renderFotos(){
-    document.getElementById("pageTitle").innerText = "Fotos de Orçamentos";
-
-    document.getElementById("pageContent").innerHTML = `
-        <div class="card">
-            <h2>Enviar Foto</h2>
-
-            <div class="form-grid">
-                <select id="photoQuote">
-                    <option value="">Selecione o orçamento</option>
-                    ${quotes.map(quote => `
-                        <option value="${quote.id}">
-                            ${quote.client_name} - ${quote.service}
-                        </option>
-                    `).join("")}
-                </select>
-
-                <input id="photoFile" type="file" accept="image/*">
-            </div>
-
-            <button class="primary-btn" onclick="uploadQuotePhoto()">Enviar Foto</button>
-        </div>
-
-        <div class="card">
-            <h2>Galeria de Fotos</h2>
-            <div id="photoList"></div>
-        </div>
-    `;
-
-    updatePhotoList();
+  setTitle("Fotos de Orçamentos");
+  setContent(`
+    <div class="card">
+      <h2>Enviar Foto</h2>
+      <div class="form-grid">
+        <select id="photoQuote"><option value="">Selecione o orçamento</option>${quotes.map(q => `<option value="${q.id}">${q.client_name} - ${q.service}</option>`).join("")}</select>
+        <input id="photoFile" type="file" accept="image/*">
+      </div>
+      <button class="primary-btn" onclick="uploadPhoto('quote')">Enviar Foto</button>
+    </div>
+    <div class="card"><h2>Galeria</h2><div id="photoList"></div></div>
+  `);
+  renderPhotoGrid("photoList", quotePhotos, "quote");
 }
 
-async function uploadQuotePhoto(){
-    const quoteId = document.getElementById("photoQuote").value;
-    const fileInput = document.getElementById("photoFile");
-    const file = fileInput.files[0];
+/* FOTOS PROJETOS */
+function renderFotosProjetos(){
+  setTitle("Fotos de Projetos");
+  setContent(`
+    <div class="card">
+      <h2>Enviar Foto do Projeto</h2>
+      <div class="form-grid">
+        <select id="projectPhotoProject"><option value="">Selecione o projeto</option>${projects.map(p => `<option value="${p.id}">${p.project_name} - ${p.client_name}</option>`).join("")}</select>
+        <select id="projectPhotoType"><option>Before</option><option>During</option><option>After</option></select>
+        <input id="projectPhotoFile" type="file" accept="image/*">
+      </div>
+      <button class="primary-btn" onclick="uploadPhoto('project')">Enviar Foto</button>
+    </div>
+    <div class="card"><h2>Galeria de Projetos</h2><div id="projectPhotoList"></div></div>
+  `);
+  renderPhotoGrid("projectPhotoList", projectPhotos, "project");
+}
 
-    if(!quoteId){
-        alert("Selecione um orçamento.");
-        return;
-    }
+async function uploadPhoto(type){
+  const isProject = type === "project";
+  const selectId = isProject ? "projectPhotoProject" : "photoQuote";
+  const fileId = isProject ? "projectPhotoFile" : "photoFile";
+  const bucket = isProject ? "project-photos" : "quote-photos";
+  const table = isProject ? "project_photos" : "quote_photos";
 
-    if(!file){
-        alert("Selecione uma foto.");
-        return;
-    }
+  const recordId = val(selectId);
+  const file = document.getElementById(fileId).files[0];
+  if(!recordId) return alert("Selecione o registro.");
+  if(!file) return alert("Selecione uma foto.");
 
-    const selectedQuote = quotes.find(quote => quote.id === quoteId);
+  const ext = file.name.split(".").pop();
+  const fileName = `${recordId}-${Date.now()}.${ext}`;
 
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${quoteId}-${Date.now()}.${fileExt}`;
+  const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${fileName}`, {
+    method:"POST",
+    headers:{
+      "apikey":SUPABASE_ANON_KEY,
+      "Authorization":`Bearer ${SUPABASE_ANON_KEY}`,
+      "Content-Type":file.type,
+      "x-upsert":"true"
+    },
+    body:file
+  });
 
-    const uploadResponse = await fetch(`${SUPABASE_URL}/storage/v1/object/quote-photos/${fileName}`, {
-        method: "POST",
-        headers: {
-            "apikey": SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-            "Content-Type": file.type
-        },
-        body: file
-    });
+  if(!uploadRes.ok) return alert("Erro ao enviar foto para o Storage.");
 
-    if(!uploadResponse.ok){
-        alert("Erro ao enviar foto para o Storage.");
-        return;
-    }
+  const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${fileName}`;
 
-    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/quote-photos/${fileName}`;
-
-    const newPhoto = {
-        quote_id: quoteId,
-        quote_label: `${selectedQuote.client_name} - ${selectedQuote.service}`,
-        photo_url: publicUrl
+  let payload;
+  if(isProject){
+    const project = projects.find(p => p.id === recordId);
+    payload = {
+      project_id:recordId,
+      project_label:`${project.project_name} - ${project.client_name}`,
+      photo_type:val("projectPhotoType"),
+      photo_url:publicUrl
     };
+  }else{
+    const quote = quotes.find(q => q.id === recordId);
+    payload = {
+      quote_id:recordId,
+      quote_label:`${quote.client_name} - ${quote.service}`,
+      photo_url:publicUrl
+    };
+  }
 
-    const saveResponse = await fetch(`${SUPABASE_URL}/rest/v1/quote_photos`, {
-        method: "POST",
-        headers: { ...headers, "Prefer": "return=representation" },
-        body: JSON.stringify(newPhoto)
-    });
+  const saveRes = await apiInsert(table, payload);
+  if(!saveRes.ok) return alert("Foto enviada, mas erro ao salvar registro.");
 
-    if(!saveResponse.ok){
-        alert("Foto enviada, mas erro ao salvar registro.");
-        return;
-    }
-
-    await loadQuotePhotos();
+  if(isProject){
+    projectPhotos = await apiGet("project_photos");
+    renderFotosProjetos();
+  }else{
+    quotePhotos = await apiGet("quote_photos");
     renderFotos();
+  }
 }
 
-async function removePhoto(id){
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/quote_photos?id=eq.${id}`, {
-        method: "DELETE",
-        headers
-    });
-
-    if(!response.ok){
-        alert("Erro ao remover foto.");
-        return;
-    }
-
-    await loadQuotePhotos();
+async function removePhoto(type, id){
+  const table = type === "project" ? "project_photos" : "quote_photos";
+  const res = await apiDelete(table, id);
+  if(!res.ok) return alert("Erro ao remover foto.");
+  if(type === "project"){
+    projectPhotos = await apiGet("project_photos");
+    renderFotosProjetos();
+  }else{
+    quotePhotos = await apiGet("quote_photos");
     renderFotos();
+  }
 }
 
-function updatePhotoList(){
-    const container = document.getElementById("photoList");
-
-    if(!container) return;
-
-    if(quotePhotos.length === 0){
-        container.innerHTML = "<p>Nenhuma foto enviada.</p>";
-        return;
-    }
-
-    container.innerHTML = `
-        <div class="photo-grid">
-            ${quotePhotos.map(photo => `
-                <div class="photo-card">
-                    <img src="${photo.photo_url}" alt="Foto do orçamento">
-
-                    <div class="photo-card-content">
-                        <strong>${photo.quote_label || "Orçamento"}</strong>
-                        <small>${photo.created_at ? new Date(photo.created_at).toLocaleDateString("pt-BR") : ""}</small>
-
-                        <button class="danger-btn" onclick="removePhoto('${photo.id}')">
-                            Remover
-                        </button>
-                    </div>
-                </div>
-            `).join("")}
-        </div>
-    `;
+function renderPhotoGrid(containerId, photos, type){
+  const el = document.getElementById(containerId);
+  if(!photos.length) return el.innerHTML = "<p>Nenhuma foto enviada.</p>";
+  el.innerHTML = `<div class="photo-grid">${photos.map(p => `
+    <div class="photo-card">
+      <img src="${p.photo_url}" alt="Foto">
+      <div class="photo-card-content">
+        <strong>${p.quote_label || p.project_label || "Registro"}</strong>
+        <small>${p.photo_type || ""}</small>
+        <small>${p.created_at ? new Date(p.created_at).toLocaleDateString("pt-BR") : ""}</small>
+        <button class="danger-btn" onclick="removePhoto('${type}','${p.id}')">Remover</button>
+      </div>
+    </div>
+  `).join("")}</div>`;
 }
 
-function getStatusClass(status){
-    switch(status){
-        case "Draft": return "status-draft";
-        case "Sent": return "status-sent";
-        case "Approved": return "status-approved";
-        case "Rejected": return "status-rejected";
-        default: return "status-draft";
-    }
+/* FINANCEIRO */
+function renderFinanceiro(){
+  setTitle("Financeiro");
+  setContent(`
+    <div class="card">
+      <h2>Novo Lançamento</h2>
+      <div class="form-grid">
+        <select id="financeType"><option>Income</option><option>Expense</option></select>
+        <input id="financeTitle" placeholder="Título">
+        <input id="financeAmount" type="number" placeholder="Valor">
+        <select id="financeStatus"><option>Pending</option><option>Paid</option><option>Overdue</option></select>
+        <input id="financeDue" type="date">
+        <input id="financeClient" placeholder="Cliente relacionado">
+        <input id="financeProject" placeholder="Projeto relacionado">
+      </div>
+      <textarea id="financeNotes" placeholder="Observações"></textarea>
+      <button class="primary-btn" onclick="addFinance()">Adicionar</button>
+    </div>
+    <div class="card"><h2>Lançamentos</h2><div id="financeList"></div></div>
+  `);
+  updateFinanceList();
 }
 
-function getProjectStatusClass(status){
-    switch(status){
-        case "Planning": return "status-planning";
-        case "Quoted": return "status-quoted";
-        case "Scheduled": return "status-scheduled";
-        case "In Progress": return "status-progress";
-        case "Completed": return "status-completed";
-        case "Cancelled": return "status-cancelled";
-        default: return "status-planning";
-    }
+async function addFinance(){
+  const title = val("financeTitle").trim();
+  if(!title) return alert("Digite o título.");
+  const res = await apiInsert("finance", {
+    type:val("financeType"), title, amount:Number(val("financeAmount") || 0), status:val("financeStatus"),
+    due_date:val("financeDue") || null, related_client:val("financeClient"),
+    related_project:val("financeProject"), notes:val("financeNotes")
+  });
+  if(!res.ok) return alert("Erro ao salvar financeiro.");
+  financeItems = await apiGet("finance"); renderFinanceiro();
+}
+
+async function removeFinance(id){
+  const res = await apiDelete("finance", id);
+  if(!res.ok) return alert("Erro ao remover lançamento.");
+  financeItems = await apiGet("finance"); renderFinanceiro();
+}
+
+function updateFinanceList(){
+  const el = document.getElementById("financeList");
+  if(!financeItems.length) return el.innerHTML = "<p>Nenhum lançamento cadastrado.</p>";
+  el.innerHTML = financeItems.map(f => item(`
+    <strong>${f.title}</strong><br>
+    <small>${f.type} • ${f.status} • ${f.due_date || "Sem vencimento"}</small><br>
+    <strong>R$ ${formatMoney(f.amount)}</strong><br>
+    <span class="status ${financeStatusClass(f)}">${f.status}</span>
+  `, `removeFinance('${f.id}')`)).join("");
+}
+
+/* AGENDA */
+function renderAgenda(){
+  setTitle("Agenda");
+  setContent(`
+    <div class="card">
+      <h2>Novo Agendamento</h2>
+      <div class="form-grid">
+        <input id="appointmentTitle" placeholder="Título">
+        <select id="appointmentClient"><option value="">Cliente</option>${clients.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="appointmentProject"><option value="">Projeto</option>${projects.map(p => `<option value="${p.id}">${p.project_name}</option>`).join("")}</select>
+        <input id="appointmentDate" type="date">
+        <input id="appointmentTime" type="time">
+        <select id="appointmentStatus"><option>Scheduled</option><option>Completed</option><option>Cancelled</option></select>
+      </div>
+      <textarea id="appointmentNotes" placeholder="Observações"></textarea>
+      <button class="primary-btn" onclick="addAppointment()">Agendar</button>
+    </div>
+    <div class="card"><h2>Agendamentos</h2><div id="appointmentList"></div></div>
+  `);
+  updateAppointmentList();
+}
+
+async function addAppointment(){
+  const title = val("appointmentTitle").trim();
+  if(!title) return alert("Digite o título.");
+  const client = clients.find(c => c.id === val("appointmentClient"));
+  const project = projects.find(p => p.id === val("appointmentProject"));
+  const res = await apiInsert("appointments", {
+    title, client_id:client?.id || "", client_name:client?.name || "",
+    project_id:project?.id || "", project_name:project?.project_name || "",
+    appointment_date:val("appointmentDate") || null, appointment_time:val("appointmentTime"),
+    status:val("appointmentStatus"), notes:val("appointmentNotes")
+  });
+  if(!res.ok) return alert("Erro ao salvar agendamento.");
+  appointments = await apiGet("appointments"); renderAgenda();
+}
+
+async function removeAppointment(id){
+  const res = await apiDelete("appointments", id);
+  if(!res.ok) return alert("Erro ao remover agendamento.");
+  appointments = await apiGet("appointments"); renderAgenda();
+}
+
+function updateAppointmentList(){
+  const el = document.getElementById("appointmentList");
+  if(!appointments.length) return el.innerHTML = "<p>Nenhum agendamento cadastrado.</p>";
+  el.innerHTML = appointments.map(a => item(`
+    <strong>${a.title}</strong><br>
+    <small>${a.client_name || "Sem cliente"} • ${a.project_name || "Sem projeto"}</small><br>
+    <small>${a.appointment_date || "Sem data"} às ${a.appointment_time || "--:--"}</small><br>
+    <span class="status ${projectStatusClass(a.status)}">${a.status}</span>
+  `, `removeAppointment('${a.id}')`)).join("");
+}
+
+/* RELATÓRIOS */
+function renderRelatorios(){
+  setTitle("Relatórios");
+  setContent(`
+    <div class="card">
+      <h2>Novo Relatório</h2>
+      <div class="form-grid">
+        <select id="reportType"><option>Project</option><option>Client</option><option>Financial</option><option>Photo</option></select>
+        <input id="reportTitle" placeholder="Título">
+        <input id="reportClient" placeholder="Cliente relacionado">
+        <input id="reportProject" placeholder="Projeto relacionado">
+      </div>
+      <textarea id="reportNotes" placeholder="Conteúdo / observações"></textarea>
+      <button class="primary-btn" onclick="addReport()">Salvar Relatório</button>
+      <button class="secondary-btn" onclick="generateSummaryReport()">Gerar Resumo Atual</button>
+    </div>
+    <div class="card"><h2>Relatórios</h2><div id="reportList"></div></div>
+  `);
+  updateReportList();
+}
+
+async function addReport(){
+  const title = val("reportTitle").trim();
+  if(!title) return alert("Digite o título.");
+  const res = await apiInsert("reports", {
+    report_type:val("reportType"), title, related_client:val("reportClient"),
+    related_project:val("reportProject"), notes:val("reportNotes")
+  });
+  if(!res.ok) return alert("Erro ao salvar relatório.");
+  reports = await apiGet("reports"); renderRelatorios();
+}
+
+async function removeReport(id){
+  const res = await apiDelete("reports", id);
+  if(!res.ok) return alert("Erro ao remover relatório.");
+  reports = await apiGet("reports"); renderRelatorios();
+}
+
+function updateReportList(){
+  const el = document.getElementById("reportList");
+  if(!reports.length) return el.innerHTML = "<p>Nenhum relatório cadastrado.</p>";
+  el.innerHTML = reports.map(r => item(`
+    <strong>${r.title}</strong><br>
+    <small>${r.report_type} • ${r.related_client || "Sem cliente"} • ${r.related_project || "Sem projeto"}</small><br>
+    <small>${r.notes || "Sem observações"}</small>
+  `, `removeReport('${r.id}')`)).join("");
+}
+
+function generateSummaryReport(){
+  const summary = `Resumo DoubleDiamond
+
+Clientes: ${clients.length}
+Orçamentos: ${quotes.length}
+Serviços: ${services.length}
+Projetos: ${projects.length}
+Fotos: ${quotePhotos.length + projectPhotos.length}
+Lançamentos financeiros: ${financeItems.length}
+Agendamentos: ${appointments.length}
+Equipe: ${employees.length}`;
+  document.getElementById("reportNotes").value = summary;
+}
+
+/* EQUIPE */
+function renderEquipe(){
+  setTitle("Equipe");
+  setContent(`
+    <div class="card">
+      <h2>Novo Funcionário</h2>
+      <div class="form-grid">
+        <input id="employeeName" placeholder="Nome">
+        <input id="employeeRole" placeholder="Função">
+        <input id="employeePhone" placeholder="Telefone">
+        <input id="employeeEmail" placeholder="Email">
+        <input id="employeeRate" type="number" placeholder="Custo por hora">
+        <select id="employeeStatus"><option>Active</option><option>Inactive</option></select>
+      </div>
+      <textarea id="employeeNotes" placeholder="Observações"></textarea>
+      <button class="primary-btn" onclick="addEmployee()">Adicionar Funcionário</button>
+    </div>
+    <div class="card"><h2>Equipe Cadastrada</h2><div id="employeeList"></div></div>
+  `);
+  updateEmployeeList();
+}
+
+async function addEmployee(){
+  const name = val("employeeName").trim();
+  if(!name) return alert("Digite o nome.");
+  const res = await apiInsert("employees", {
+    name, role:val("employeeRole"), phone:val("employeePhone"), email:val("employeeEmail"),
+    hourly_rate:Number(val("employeeRate") || 0), status:val("employeeStatus"), notes:val("employeeNotes")
+  });
+  if(!res.ok) return alert("Erro ao salvar funcionário.");
+  employees = await apiGet("employees"); renderEquipe();
+}
+
+async function removeEmployee(id){
+  const res = await apiDelete("employees", id);
+  if(!res.ok) return alert("Erro ao remover funcionário.");
+  employees = await apiGet("employees"); renderEquipe();
+}
+
+function updateEmployeeList(){
+  const el = document.getElementById("employeeList");
+  if(!employees.length) return el.innerHTML = "<p>Nenhum funcionário cadastrado.</p>";
+  el.innerHTML = employees.map(e => item(`
+    <strong>${e.name}</strong><br>
+    <small>${e.role || "Sem função"} • ${e.phone || "Sem telefone"} • ${e.email || "Sem email"}</small><br>
+    <strong>R$ ${formatMoney(e.hourly_rate)}/h</strong><br>
+    <span class="status ${e.status === "Active" ? "status-active" : "status-inactive"}">${e.status}</span>
+  `, `removeEmployee('${e.id}')`)).join("");
+}
+
+function renderConfiguracoes(){
+  setTitle("Configurações");
+  setContent(`
+    <div class="card">
+      <h2>Configurações</h2>
+      <p>Projeto conectado ao Supabase.</p>
+      <div class="report-box">URL: ${SUPABASE_URL}
+Módulos ativos: Clientes, Orçamentos, Serviços, Projetos, Fotos, Financeiro, Agenda, Relatórios e Equipe.</div>
+    </div>
+  `);
+}
+
+/* HELPERS */
+function item(content, removeFn){
+  return `<div class="list-item"><div>${content}</div><button class="danger-btn" onclick="${removeFn}">Remover</button></div>`;
+}
+
+function val(id){
+  const el = document.getElementById(id);
+  return el ? el.value : "";
+}
+
+function quoteStatusClass(status){
+  const map = {Draft:"status-draft",Sent:"status-sent",Approved:"status-approved",Rejected:"status-rejected"};
+  return map[status] || "status-draft";
+}
+
+function projectStatusClass(status){
+  const map = {
+    Planning:"status-planning",
+    Quoted:"status-quoted",
+    Scheduled:"status-scheduled",
+    "In Progress":"status-progress",
+    Completed:"status-completed",
+    Cancelled:"status-cancelled"
+  };
+  return map[status] || "status-planning";
+}
+
+function financeStatusClass(item){
+  if(item.type === "Income") return "status-income";
+  if(item.type === "Expense") return "status-expense";
+  if(item.status === "Paid") return "status-paid";
+  if(item.status === "Overdue") return "status-overdue";
+  return "status-pending";
 }
 
 function getApprovedRevenue(){
-    const total = quotes
-        .filter(quote => quote.status === "Approved")
-        .reduce((sum, quote) => sum + Number(quote.value || 0), 0);
-
-    return formatMoney(total);
+  const total = quotes.filter(q => q.status === "Approved")
+    .reduce((sum,q) => sum + Number(q.value || 0), 0);
+  return formatMoney(total);
 }
 
 function formatMoney(value){
-    return Number(value || 0).toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
+  return Number(value || 0).toLocaleString("pt-BR", {
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
 }
 
 function renderPlaceholder(page){
-    document.getElementById("pageTitle").innerText =
-        page.charAt(0).toUpperCase() + page.slice(1);
-
-    document.getElementById("pageContent").innerHTML = `
-        <div class="card">
-            <h2>Módulo em desenvolvimento</h2>
-        </div>
-    `;
+  setTitle(page.charAt(0).toUpperCase() + page.slice(1));
+  setContent(`<div class="card"><h2>Módulo em desenvolvimento</h2></div>`);
 }
