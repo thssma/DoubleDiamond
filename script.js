@@ -2184,3 +2184,339 @@ async function runAutomationFlow(id, name){
   automationFlowRuns = await apiGet("automation_flow_runs");
   renderAutomationFlowsReal();
 }
+
+
+/* V46-V50 REAL INTEGRATIONS PLATFORM - ROBUST FIX */
+function companyOptionsReal(){
+  return companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+}
+
+function renderMapsReal(){
+  setTitle("Google Maps Real");
+  setContent(`
+    <div class="realint-hero"><h2>Google Maps Real Ready</h2><p>Crie links reais de rota no Google Maps e registre solicitações para backend.</p></div>
+    <div class="realint-warning">Distância e tempo automáticos exigem Google Maps API em backend/Edge Function.</div>
+
+    <div class="card">
+      <h2>Nova Rota</h2>
+      <div class="form-grid">
+        <select id="mapsCompany"><option value="">Empresa</option>${companyOptionsReal()}</select>
+        <input id="mapsOrigin" placeholder="Origem">
+        <input id="mapsDestination" placeholder="Destino">
+        <select id="mapsMode"><option>driving</option><option>walking</option><option>bicycling</option><option>transit</option></select>
+      </div>
+      <button class="primary-btn" onclick="createMapsRouteRequest()">Criar Link</button>
+    </div>
+
+    <div class="realint-grid">
+      ${mapsRouteRequests.length ? mapsRouteRequests.map(r => `
+        <div class="realint-card">
+          <h2>${r.origin_address || "Origem"} → ${r.destination_address || "Destino"}</h2>
+          <span class="realint-badge">${r.status || "Prepared"}</span>
+          <p>${r.distance_text || "Distância aguardando backend"} • ${r.duration_text || "Tempo aguardando backend"}</p>
+          <a class="primary-btn" href="${r.maps_url || "#"}" target="_blank">Abrir Google Maps</a>
+        </div>
+      `).join("") : "<div class='card'>Nenhuma rota Google criada.</div>"}
+    </div>
+  `);
+}
+
+async function createMapsRouteRequest(){
+  const companyId = val("mapsCompany");
+  const origin = val("mapsOrigin").trim();
+  const destination = val("mapsDestination").trim();
+
+  if(!companyId) return alert("Selecione a empresa.");
+  if(!origin || !destination) return alert("Preencha origem e destino.");
+
+  const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=${encodeURIComponent(val("mapsMode"))}`;
+
+  const res = await apiInsert("maps_route_requests", {
+    company_id: companyId,
+    origin_address: origin,
+    destination_address: destination,
+    travel_mode: val("mapsMode"),
+    maps_url: mapsUrl,
+    status: "Prepared"
+  });
+
+  if(!res.ok) return alert("Erro ao criar rota.");
+
+  mapsRouteRequests = await apiGet("maps_route_requests");
+  renderMapsReal();
+}
+
+function renderWhatsAppReal(){
+  setTitle("WhatsApp Real");
+  setContent(`
+    <div class="realint-hero"><h2>WhatsApp Cloud API Ready</h2><p>Fila segura para mensagens reais via backend.</p></div>
+    <div class="realint-warning">Token da Meta nunca deve ficar no frontend. O backend lê esta fila e envia.</div>
+
+    <div class="card">
+      <h2>Nova Mensagem</h2>
+      <div class="form-grid">
+        <select id="waCompany"><option value="">Empresa</option>${companyOptionsReal()}</select>
+        <input id="waPhone" placeholder="Telefone com DDI. Ex: 5511999999999">
+        <input id="waTemplate" placeholder="Template. Ex: payment_reminder">
+      </div>
+      <textarea id="waBody" placeholder="Mensagem"></textarea>
+      <button class="success-btn" onclick="queueWhatsAppMessage()">Adicionar à Fila</button>
+    </div>
+
+    <div class="realint-grid">
+      ${whatsappMessageQueue.length ? whatsappMessageQueue.map(m => `
+        <div class="realint-card">
+          <h2>${m.phone_number || "Sem telefone"}</h2>
+          <span class="realint-badge">${m.provider_status || "Pending"}</span>
+          <p>${m.message_body || ""}</p>
+          <small>${m.provider_response || "Aguardando backend."}</small><br>
+          <button class="secondary-btn" onclick="simulateWhatsAppSent('${m.id}')">Simular Enviado</button>
+        </div>
+      `).join("") : "<div class='card'>Nenhuma mensagem WhatsApp.</div>"}
+    </div>
+  `);
+}
+
+async function queueWhatsAppMessage(){
+  const companyId = val("waCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("whatsapp_message_queue", {
+    company_id: companyId,
+    phone_number: val("waPhone"),
+    template_name: val("waTemplate"),
+    message_body: val("waBody"),
+    provider_status: "Pending"
+  });
+
+  if(!res.ok) return alert("Erro ao adicionar mensagem.");
+
+  whatsappMessageQueue = await apiGet("whatsapp_message_queue");
+  renderWhatsAppReal();
+}
+
+async function simulateWhatsAppSent(id){
+  const res = await apiPatch("whatsapp_message_queue", id, {
+    provider_status: "Simulated Sent",
+    provider_response: "Envio simulado. Conecte Edge Function Meta Cloud API para envio real."
+  });
+
+  if(!res.ok) return alert("Erro ao simular envio.");
+
+  whatsappMessageQueue = await apiGet("whatsapp_message_queue");
+  renderWhatsAppReal();
+}
+
+function renderGmailReal(){
+  setTitle("Gmail Real");
+  setContent(`
+    <div class="realint-hero"><h2>Gmail Real Ready</h2><p>Fila segura para emails reais via backend OAuth.</p></div>
+    <div class="realint-warning">OAuth/refresh token ficam no backend. O frontend apenas cria a fila.</div>
+
+    <div class="card">
+      <h2>Novo Email</h2>
+      <div class="form-grid">
+        <select id="gmailCompany"><option value="">Empresa</option>${companyOptionsReal()}</select>
+        <input id="gmailTo" placeholder="Email destino">
+        <input id="gmailSubject" placeholder="Assunto">
+      </div>
+      <textarea id="gmailBody" placeholder="Corpo do email"></textarea>
+      <button class="primary-btn" onclick="queueGmailMessage()">Adicionar à Fila</button>
+    </div>
+
+    <div class="realint-grid">
+      ${gmailMessageQueue.length ? gmailMessageQueue.map(m => `
+        <div class="realint-card">
+          <h2>${m.subject || "Sem assunto"}</h2>
+          <small>${m.to_email || ""}</small><br>
+          <span class="realint-badge">${m.provider_status || "Pending"}</span>
+          <p>${m.body || ""}</p>
+          <button class="secondary-btn" onclick="simulateGmailSent('${m.id}')">Simular Enviado</button>
+        </div>
+      `).join("") : "<div class='card'>Nenhum email na fila.</div>"}
+    </div>
+  `);
+}
+
+async function queueGmailMessage(){
+  const companyId = val("gmailCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("gmail_message_queue", {
+    company_id: companyId,
+    to_email: val("gmailTo"),
+    subject: val("gmailSubject"),
+    body: val("gmailBody"),
+    provider_status: "Pending"
+  });
+
+  if(!res.ok) return alert("Erro ao adicionar email.");
+
+  gmailMessageQueue = await apiGet("gmail_message_queue");
+  renderGmailReal();
+}
+
+async function simulateGmailSent(id){
+  const res = await apiPatch("gmail_message_queue", id, {
+    provider_status: "Simulated Sent",
+    provider_response: "Envio simulado. Conecte Edge Function Gmail para envio real."
+  });
+
+  if(!res.ok) return alert("Erro ao simular envio.");
+
+  gmailMessageQueue = await apiGet("gmail_message_queue");
+  renderGmailReal();
+}
+
+function renderPushReal(){
+  setTitle("Push Notifications Real");
+  setContent(`
+    <div class="realint-hero"><h2>Push Notifications Real Ready</h2><p>Fila segura para notificações push.</p></div>
+
+    <div class="card">
+      <h2>Nova Push</h2>
+      <div class="form-grid">
+        <select id="pushRealCompany"><option value="">Empresa</option>${companyOptionsReal()}</select>
+        <input id="pushTarget" placeholder="Usuário alvo">
+        <input id="pushRealTitle" placeholder="Título">
+      </div>
+      <textarea id="pushRealBody" placeholder="Mensagem"></textarea>
+      <button class="success-btn" onclick="queuePushNotification()">Adicionar Push</button>
+    </div>
+
+    <div class="realint-grid">
+      ${pushNotificationQueue.length ? pushNotificationQueue.map(p => `
+        <div class="realint-card">
+          <h2>${p.title || "Sem título"}</h2>
+          <small>${p.target_user || "Todos"}</small><br>
+          <span class="realint-badge">${p.push_status || "Pending"}</span>
+          <p>${p.body || ""}</p>
+          <button class="secondary-btn" onclick="simulatePushSent('${p.id}')">Simular Enviado</button>
+        </div>
+      `).join("") : "<div class='card'>Nenhuma push notification.</div>"}
+    </div>
+  `);
+}
+
+async function queuePushNotification(){
+  const companyId = val("pushRealCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("push_notification_queue", {
+    company_id: companyId,
+    target_user: val("pushTarget"),
+    title: val("pushRealTitle"),
+    body: val("pushRealBody"),
+    push_status: "Pending"
+  });
+
+  if(!res.ok) return alert("Erro ao adicionar push.");
+
+  pushNotificationQueue = await apiGet("push_notification_queue");
+  renderPushReal();
+}
+
+async function simulatePushSent(id){
+  const res = await apiPatch("push_notification_queue", id, {
+    push_status: "Simulated Sent",
+    provider_response: "Push simulado. Conecte push provider/backend para envio real."
+  });
+
+  if(!res.ok) return alert("Erro ao simular push.");
+
+  pushNotificationQueue = await apiGet("push_notification_queue");
+  renderPushReal();
+}
+
+function renderAutomationFlowsReal(){
+  setTitle("Automation Flows Real");
+  setContent(`
+    <div class="realint-hero"><h2>Automation Flows Real</h2><p>Fluxos conectando Lead, Orçamento, Projeto, OS, WhatsApp, Email e Relatório.</p></div>
+
+    <div class="card">
+      <h2>Novo Flow Template</h2>
+      <div class="form-grid">
+        <select id="flowCompany"><option value="">Empresa</option>${companyOptionsReal()}</select>
+        <input id="flowName" placeholder="Nome do fluxo">
+        <input id="flowTrigger" placeholder="Trigger. Ex: Quote Approved">
+        <select id="flowStatus"><option>Active</option><option>Paused</option><option>Error</option></select>
+      </div>
+      <textarea id="flowSteps" placeholder='Steps JSON. Ex: ["Create Project","Create Work Order","Send WhatsApp","Send Email"]'></textarea>
+      <button class="primary-btn" onclick="createAutomationFlowTemplate()">Criar Flow</button>
+    </div>
+
+    <div class="realint-grid">
+      ${automationFlowTemplates.length ? automationFlowTemplates.map(f => `
+        <div class="realint-card">
+          <h2>${f.flow_name || "Flow"}</h2>
+          <small>${f.trigger_name || ""}</small><br>
+          <span class="realint-badge">${f.status || "Active"}</span>
+          ${renderFlowSteps(f.steps)}
+          <button class="success-btn" onclick="runAutomationFlow('${f.id}', '${String(f.flow_name || "Flow").replaceAll("'", "\\'")}')">Executar Flow</button>
+        </div>
+      `).join("") : "<div class='card'>Nenhum flow template.</div>"}
+    </div>
+
+    <div class="card">
+      <h2>Execuções</h2>
+      ${automationFlowRuns.length ? automationFlowRuns.map(r => `
+        <div class="soft-box"><strong>${r.flow_name}</strong><br><small>${r.run_status} • ${r.result_message || ""}</small></div>
+      `).join("") : "<p>Nenhuma execução.</p>"}
+    </div>
+  `);
+}
+
+function renderFlowSteps(steps){
+  if(!steps) return "<p>Sem steps.</p>";
+
+  let arr = [];
+  try{
+    arr = Array.isArray(steps) ? steps : JSON.parse(steps);
+  }catch(e){
+    arr = [String(steps)];
+  }
+
+  return arr.map((s, i) => `<div class="flow-step"><strong>${i + 1}.</strong> ${s}</div>`).join("");
+}
+
+async function createAutomationFlowTemplate(){
+  const companyId = val("flowCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  let steps = [];
+  try{
+    steps = val("flowSteps") ? JSON.parse(val("flowSteps")) : [];
+  }catch(e){
+    return alert("Steps JSON inválido.");
+  }
+
+  const res = await apiInsert("automation_flow_templates", {
+    company_id: companyId,
+    flow_name: val("flowName"),
+    trigger_name: val("flowTrigger"),
+    steps,
+    status: val("flowStatus")
+  });
+
+  if(!res.ok) return alert("Erro ao criar flow.");
+
+  automationFlowTemplates = await apiGet("automation_flow_templates");
+  renderAutomationFlowsReal();
+}
+
+async function runAutomationFlow(id, name){
+  const companyId = companies[0]?.id || "";
+
+  const res = await apiInsert("automation_flow_runs", {
+    company_id: companyId,
+    flow_template_id: id,
+    flow_name: name,
+    run_status: "Simulated",
+    result_message: "Flow executado em modo simulado. Próximo passo: conectar backend real."
+  });
+
+  if(!res.ok) return alert("Erro ao executar flow.");
+
+  automationFlowRuns = await apiGet("automation_flow_runs");
+  renderAutomationFlowsReal();
+}
