@@ -1060,3 +1060,6 @@ body{ background:linear-gradient(180deg,#fbf8f1 0%, #eef2f7 100%); }
   padding:16px;
   color:#64748b;
 }
+
+/* V70-V75 BUNDLE */
+.v75-badge{background:#dcfce7;color:#166534;padding:6px 10px;border-radius:999px;font-weight:700}

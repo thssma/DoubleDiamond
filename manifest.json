@@ -1,10 +1,10 @@
 {
   "name": "DoubleDiamond Command Center",
-  "short_name": "DD V69",
+  "short_name": "DD V75",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#14532d",
-  "description": "DoubleDiamond V69 Real Project Timeline",
+  "description": "DoubleDiamond V70-V75 Bundle",
   "icons": []
 }
