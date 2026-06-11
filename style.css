@@ -896,3 +896,7 @@ body{ background:linear-gradient(180deg,#fbf8f1 0%, #eef2f7 100%); }
 /* V64.1 PERFORMANCE FIX */
 .performance-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#ecfdf5;color:#166534;font-size:12px;font-weight:900;margin-bottom:12px}
 .performance-dot{width:8px;height:8px;border-radius:999px;background:#22c55e;box-shadow:0 0 0 6px rgba(34,197,94,.14)}
+
+/* V64.2 INSTANT NAVIGATION */
+.performance-pill.fast{background:#eff6ff;color:#1d4ed8}
+.performance-dot.fast{background:#2563eb;box-shadow:0 0 0 6px rgba(37,99,235,.12)}

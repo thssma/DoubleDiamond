@@ -74,16 +74,9 @@ const headers = {
 };
 
 window.onload = async () => {
+  ddCurrentPageV642 = "dashboard";
   renderDashboard();
-
-  setTimeout(async () => {
-    try{
-      await loadData();
-      renderDashboard();
-    }catch(e){
-      console.warn("Background data load failed", e);
-    }
-  }, 50);
+  ddStartBackgroundLoadV642();
 };
 
 async function apiGet(table){
@@ -4659,21 +4652,72 @@ function renderClientHome(){
     <div class="v64-feed-card"><h2>Fotos recentes</h2>${photos.slice(0,4).map(p=>`<div class="v64-feed-item"><div class="v64-feed-icon">📸</div><div><strong>${p.photo_type||"Foto de campo"}</strong><br><small>${p.project_name||p.photo_url||"Atualização do projeto"}</small></div></div>`).join("")||"<p>Nenhuma foto enviada ainda.</p>"}</div></div>`);
 }
 
-/* V64.1 PERFORMANCE FIX */
+/* V64.2 INSTANT NAVIGATION */
 let ddInitialDataLoaded = false;
+let ddDataLoadingV642 = false;
+let ddCurrentPageV642 = "dashboard";
 
-const ddOriginalLoadDataV641 = loadData;
+const ddOriginalLoadDataV642 = loadData;
 loadData = async function(){
-  await ddOriginalLoadDataV641();
+  await ddOriginalLoadDataV642();
   ddInitialDataLoaded = true;
 };
 
-const ddOriginalRenderDashboardV641 = renderDashboard;
+function ddStartBackgroundLoadV642(){
+  if(ddInitialDataLoaded || ddDataLoadingV642) return;
+  ddDataLoadingV642 = true;
+
+  setTimeout(async () => {
+    try{
+      await loadData();
+      ddDataLoadingV642 = false;
+      ddRefreshCurrentPageV642();
+    }catch(e){
+      ddDataLoadingV642 = false;
+      console.warn("Background data load failed", e);
+    }
+  }, 30);
+}
+
+function ddRefreshCurrentPageV642(){
+  if(ddCurrentPageV642 === "dashboard") return renderDashboard();
+  if(ddCurrentPageV642 === "ownerHome") return renderOwnerHome();
+  if(ddCurrentPageV642 === "employeeHome") return renderEmployeeHome();
+  if(ddCurrentPageV642 === "clientHome") return renderClientHome();
+
+  try{
+    ddOriginalChangePageV642(ddCurrentPageV642, null);
+  }catch(e){
+    console.warn("Refresh current page failed", e);
+  }
+}
+
+const ddOriginalChangePageV642 = changePage;
+changePage = function(page, event){
+  ddCurrentPageV642 = page;
+
+  ddOriginalChangePageV642(page, event);
+
+  if(!ddInitialDataLoaded){
+    const content = document.getElementById("pageContent");
+    if(content && !content.querySelector(".performance-pill")){
+      content.insertAdjacentHTML("afterbegin", `
+        <div class="performance-pill fast">
+          <span class="performance-dot fast"></span>
+          Abrindo agora. Dados atualizando em segundo plano...
+        </div>
+      `);
+    }
+    ddStartBackgroundLoadV642();
+  }
+};
+
+const ddOriginalRenderDashboardV642 = renderDashboard;
 renderDashboard = function(){
-  ddOriginalRenderDashboardV641();
+  ddOriginalRenderDashboardV642();
 
   const content = document.getElementById("pageContent");
-  if(content && !ddInitialDataLoaded){
+  if(content && !ddInitialDataLoaded && !content.querySelector(".performance-pill")){
     content.insertAdjacentHTML("afterbegin", `
       <div class="performance-pill">
         <span class="performance-dot"></span>
@@ -4681,17 +4725,4 @@ renderDashboard = function(){
       </div>
     `);
   }
-};
-
-const ddOriginalChangePageV641 = changePage;
-changePage = async function(page, event){
-  if(!ddInitialDataLoaded){
-    try{
-      await loadData();
-    }catch(e){
-      console.warn("Lazy data load failed", e);
-    }
-  }
-
-  ddOriginalChangePageV641(page, event);
 };
