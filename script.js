@@ -4743,23 +4743,3 @@ function ddRefreshCurrentPageV642(){
     console.warn("Refresh current page failed", e);
   }
 }
-
-const ddOriginalChangePageV642 = changePage;
-changePage = function(page, event){
-  ddCurrentPageV642 = page;
-
-  ddOriginalChangePageV642(page, event);
-
-  if(!ddInitialDataLoaded){
-    const content = document.getElementById("pageContent");
-    if(content && !content.querySelector(".performance-pill")){
-      content.insertAdjacentHTML("afterbegin", `
-        <div class="performance-pill fast">
-          <span class="performance-dot fast"></span>
-          Abrindo agora. Dados atualizando em segundo plano...
-        </div>
-      `);
-    }
-    ddStartBackgroundLoadV642();
-  }
-};
