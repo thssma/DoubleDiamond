@@ -3,78 +3,121 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DoubleDiamond Role Experience Platform</title>
+  <title>DoubleDiamond — Field Service Platform</title>
   <link rel="icon" href="data:,">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="app">
-    <aside class="sidebar">
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+    <aside class="sidebar v63-sidebar" id="sidebar">
       <div class="brand">
         <div class="brand-icon">💎</div>
         <div>
           <h2>DoubleDiamond</h2>
-          <span>Role Experience Platform</span>
+          <span>Field Service Platform</span>
         </div>
       </div>
 
-      <nav class="nav">
-        <button class="menu-btn active" onclick="changePage('dashboard', event)">📊 Dashboard</button>
-        <button class="menu-btn" onclick="changePage('empresas', event)">🏢 Empresas</button>
-        <button class="menu-btn" onclick="changePage('integrationHub', event)">🔌 Integrações</button>
-        <button class="menu-btn" onclick="changePage('aiFoundation', event)">🤖 AI Foundation</button>
-        <button class="menu-btn" onclick="changePage('executiveDashboard', event)">📈 Executivo</button>
-        <button class="menu-btn" onclick="changePage('kpiCenter', event)">🎯 KPIs</button>
-        <button class="menu-btn" onclick="changePage('automationCenter', event)">⚙️ Automações</button>
-        <button class="menu-btn" onclick="changePage('reportCenter', event)">📑 Relatórios</button>
-        <button class="menu-btn" onclick="changePage('mobileReady', event)">📱 Mobile Ready</button>
-        <button class="menu-btn" onclick="changePage('fieldDashboard', event)">🌱 Campo</button>
-        <button class="menu-btn" onclick="changePage('pwaCenter', event)">📲 PWA</button>
-        <button class="menu-btn" onclick="changePage('routePlanning', event)">🗺️ Rotas</button>
-        <button class="menu-btn" onclick="changePage('weatherCenter', event)">🌦️ Clima</button>
-        <button class="menu-btn" onclick="changePage('mobileWorkforce', event)">👷 Mobile Workforce</button>
-        <button class="menu-btn" onclick="changePage('workOrders', event)">🧾 Ordens Serviço</button>
-        <button class="menu-btn" onclick="changePage('biDashboard', event)">📊 BI Dashboard</button>
-        <button class="menu-btn" onclick="changePage('analyticsCenter', event)">📈 Analytics</button>
-        <button class="menu-btn" onclick="changePage('forecastEngine', event)">🔮 Forecast</button>
-        <button class="menu-btn" onclick="changePage('profitabilityEngine', event)">💰 Profitability</button>
-        <button class="menu-btn" onclick="changePage('executiveIntelligence', event)">🧠 Executive IQ</button>
-        <button class="menu-btn" onclick="changePage('mapsReal', event)">🗺️ Google Maps Real</button>
-        <button class="menu-btn" onclick="changePage('whatsappReal', event)">🟢 WhatsApp Real</button>
-        <button class="menu-btn" onclick="changePage('gmailReal', event)">📧 Gmail Real</button>
-        <button class="menu-btn" onclick="changePage('pushReal', event)">🔔 Push Real</button>
-        <button class="menu-btn" onclick="changePage('automationFlowsReal', event)">⚡ Flows Reais</button>
-        <button class="menu-btn" onclick="changePage('architectureHardening', event)">🧱 Architecture</button>
-        <button class="menu-btn" onclick="changePage('aiReadiness', event)">🤖 AI Ready</button>
-        <button class="menu-btn" onclick="changePage('aiLeadScoring', event)">🎯 AI Leads</button>
-        <button class="menu-btn" onclick="changePage('aiQuoteGenerator', event)">🧾 AI Quotes</button>
-        <button class="menu-btn" onclick="changePage('aiProjectRisk', event)">⚠️ AI Project Risk</button>
-        <button class="menu-btn" onclick="changePage('aiFinancialAdvisor', event)">💰 AI Finance</button>
-        <button class="menu-btn" onclick="changePage('aiWorkforcePlanner', event)">👷 AI Workforce</button>
-        <button class="menu-btn" onclick="changePage('aiRouteOptimization', event)">🗺️ AI Routes</button>
-        <button class="menu-btn" onclick="changePage('aiWeatherImpact', event)">🌦️ AI Weather</button>
-        <button class="menu-btn" onclick="changePage('aiExecutiveReports', event)">📑 AI Reports</button>
-        <button class="menu-btn" onclick="changePage('aiAutomationRecommendations', event)">⚡ AI Automations</button>
-        <button class="menu-btn" onclick="changePage('aiOperationsCommand', event)">🧠 AI Command</button>
-        <button class="menu-btn" onclick="changePage('roleExperience', event)">🧭 Role Experience</button>
-        <button class="menu-btn" onclick="changePage('ownerHome', event)">👑 Dono</button>
-        <button class="menu-btn" onclick="changePage('employeeHome', event)">👷 Funcionário</button>
-        <button class="menu-btn" onclick="changePage('clientHome', event)">🤝 Cliente</button>
-        <button class="menu-btn" onclick="changePage('configuracoes', event)">⚙️ Configurações</button>
+      <nav class="nav v63-nav">
+
+        <button class="menu-btn active" onclick="changePage('dashboard', event)">🏠 <span>Home</span></button>
+
+        <div class="nav-group" data-open="true">
+          <button class="nav-group-head" onclick="this.parentElement.classList.toggle('is-open')">
+            <span>👷 Operations</span><span class="chev">▾</span>
+          </button>
+          <div class="nav-group-body">
+            <button class="menu-btn" onclick="changePage('workOrders', event)">🧾 <span>Work Orders</span></button>
+            <button class="menu-btn" onclick="changePage('routePlanning', event)">🗺️ <span>Routes</span></button>
+            <button class="menu-btn" onclick="changePage('fieldDashboard', event)">🌱 <span>Field</span></button>
+            <button class="menu-btn" onclick="changePage('mobileWorkforce', event)">👷 <span>Workforce</span></button>
+            <button class="menu-btn" onclick="changePage('weatherCenter', event)">🌦️ <span>Weather</span></button>
+            <button class="menu-btn" onclick="changePage('mobileReady', event)">📱 <span>Mobile Ready</span></button>
+            <button class="menu-btn" onclick="changePage('pwaCenter', event)">📲 <span>PWA</span></button>
+          </div>
+        </div>
+
+        <div class="nav-group" data-open="true">
+          <button class="nav-group-head" onclick="this.parentElement.classList.toggle('is-open')">
+            <span>🤝 Clients</span><span class="chev">▾</span>
+          </button>
+          <div class="nav-group-body">
+            <button class="menu-btn" onclick="changePage('empresas', event)">🏢 <span>CRM · Companies</span></button>
+            <button class="menu-btn" onclick="changePage('clientHome', event)">🤝 <span>Client Portal</span></button>
+            <button class="menu-btn" onclick="changePage('reportCenter', event)">📑 <span>Reports</span></button>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-group-head" onclick="this.parentElement.classList.toggle('is-open')">
+            <span>💰 Finance</span><span class="chev">▾</span>
+          </button>
+          <div class="nav-group-body">
+            <button class="menu-btn" onclick="changePage('profitabilityEngine', event)">💰 <span>Profitability</span></button>
+            <button class="menu-btn" onclick="changePage('biDashboard', event)">📊 <span>BI Dashboard</span></button>
+            <button class="menu-btn" onclick="changePage('forecastEngine', event)">🔮 <span>Forecast</span></button>
+            <button class="menu-btn" onclick="changePage('analyticsCenter', event)">📈 <span>Analytics</span></button>
+            <button class="menu-btn" onclick="changePage('kpiCenter', event)">🎯 <span>KPIs</span></button>
+            <button class="menu-btn" onclick="changePage('executiveDashboard', event)">📈 <span>Executive</span></button>
+            <button class="menu-btn" onclick="changePage('executiveIntelligence', event)">🧠 <span>Executive IQ</span></button>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-group-head" onclick="this.parentElement.classList.toggle('is-open')">
+            <span>🤖 Intelligence</span><span class="chev">▾</span>
+          </button>
+          <div class="nav-group-body">
+            <button class="menu-btn" onclick="changePage('aiFoundation', event)">🤖 <span>AI Foundation</span></button>
+            <button class="menu-btn" onclick="changePage('aiOperationsCommand', event)">🧠 <span>AI Command</span></button>
+            <button class="menu-btn" onclick="changePage('aiLeadScoring', event)">🎯 <span>AI Leads</span></button>
+            <button class="menu-btn" onclick="changePage('aiQuoteGenerator', event)">🧾 <span>AI Quotes</span></button>
+            <button class="menu-btn" onclick="changePage('aiProjectRisk', event)">⚠️ <span>AI Project Risk</span></button>
+            <button class="menu-btn" onclick="changePage('aiFinancialAdvisor', event)">💰 <span>AI Finance</span></button>
+            <button class="menu-btn" onclick="changePage('aiWorkforcePlanner', event)">👷 <span>AI Workforce</span></button>
+            <button class="menu-btn" onclick="changePage('aiRouteOptimization', event)">🗺️ <span>AI Routes</span></button>
+            <button class="menu-btn" onclick="changePage('aiWeatherImpact', event)">🌦️ <span>AI Weather</span></button>
+            <button class="menu-btn" onclick="changePage('aiExecutiveReports', event)">📑 <span>AI Reports</span></button>
+            <button class="menu-btn" onclick="changePage('aiAutomationRecommendations', event)">⚡ <span>AI Automations</span></button>
+            <button class="menu-btn" onclick="changePage('aiReadiness', event)">🤖 <span>AI Ready</span></button>
+            <button class="menu-btn" onclick="changePage('automationCenter', event)">⚙️ <span>Automations</span></button>
+            <button class="menu-btn" onclick="changePage('automationFlowsReal', event)">⚡ <span>Real Flows</span></button>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-group-head" onclick="this.parentElement.classList.toggle('is-open')">
+            <span>⚙️ Administration</span><span class="chev">▾</span>
+          </button>
+          <div class="nav-group-body">
+            <button class="menu-btn" onclick="changePage('integrationHub', event)">🔌 <span>Integrations</span></button>
+            <button class="menu-btn" onclick="changePage('mapsReal', event)">🗺️ <span>Google Maps</span></button>
+            <button class="menu-btn" onclick="changePage('whatsappReal', event)">🟢 <span>WhatsApp</span></button>
+            <button class="menu-btn" onclick="changePage('gmailReal', event)">📧 <span>Gmail</span></button>
+            <button class="menu-btn" onclick="changePage('pushReal', event)">🔔 <span>Push</span></button>
+            <button class="menu-btn" onclick="changePage('architectureHardening', event)">🧱 <span>Architecture</span></button>
+            <button class="menu-btn" onclick="changePage('roleExperience', event)">🧭 <span>Role Experience</span></button>
+            <button class="menu-btn" onclick="changePage('ownerHome', event)">👑 <span>Owner View</span></button>
+            <button class="menu-btn" onclick="changePage('employeeHome', event)">👷 <span>Employee View</span></button>
+            <button class="menu-btn" onclick="changePage('configuracoes', event)">⚙️ <span>Settings</span></button>
+          </div>
+        </div>
+
       </nav>
     </aside>
 
     <main class="main">
-      <header class="topbar">
+      <header class="topbar v63-topbar">
         <div>
           <p class="eyebrow">DoubleDiamond Platform</p>
-          <h1 id="pageTitle">Role Experience Platform</h1>
-          <p class="subtitle">1 aplicativo com experiências diferentes para dono, funcionário e cliente.</p>
+          <h1 id="pageTitle">Home</h1>
+          <p class="subtitle">Professional landscaping &amp; field service operations.</p>
         </div>
         <div class="top-actions">
-          <span class="badge">V61</span>
-          <span class="badge success">Foundation</span>
+          <span class="badge">V63</span>
+          <span class="badge success">Premium</span>
         </div>
       </header>
 
@@ -87,6 +130,11 @@
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./service-worker.js').catch(() => {});
 }
+// Auto-close mobile nav when picking an item
+document.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.menu-btn');
+  if(btn && document.body.classList.contains('nav-open')) document.body.classList.remove('nav-open');
+});
 </script>
 </body>
 </html>

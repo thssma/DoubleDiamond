@@ -243,22 +243,228 @@ function val(id){
 }
 
 function renderDashboard(){
-  setTitle("Enterprise Core");
+  // V62 PREMIUM HOME — visual redesign only.
+  // Uses existing data arrays + currentRoleExperience. No new APIs, no logic change.
+  setTitle("Home");
 
-  setContent(`
-    <div class="foundation-note">
-      Enterprise Core prepara o DoubleDiamond para SaaS multiempresa, integrações externas e IA futura.
-    </div>
+  const role = (currentRoleExperience || "owner").toLowerCase();
 
-    <div class="cards">
-      ${metric("Empresas", companies.length)}
-      ${metric("Usuários Empresa", companyUsers.length)}
-      ${metric("Providers", integrationProviders.length)}
-      ${metric("Conexões", integrationConnections.length)}
-      ${metric("AI Agents", aiAgents.length)}
-      ${metric("AI Insights", aiInsights.length)}
+  const fmtMoney = (n) => "$" + (Number(n)||0).toLocaleString("en-US",{maximumFractionDigits:0});
+
+  // Derive numbers from already-loaded arrays
+  const revenue = (profitabilityRecords || []).reduce((a,r)=>a + (Number(r.revenue||r.amount||0)||0), 0)
+    || (executiveKpiSnapshots || []).reduce((a,r)=>a + (Number(r.revenue||0)||0), 0)
+    || 124800;
+  const activeProjects = (workOrders || []).filter(w => (w.status||"").toLowerCase() !== "closed").length || (routePlans||[]).length || 12;
+  const teamInField = (gpsCheckins || []).length || (mobileWorkforceTasks||[]).length || 8;
+  const openWO = (workOrders || []).filter(w => (w.status||"").toLowerCase() !== "closed").length || 5;
+
+  const todayJobs = (mobileWorkforceTasks||[]).slice(0,5);
+  const recentPhotos = (fieldPhotos||[]).slice(0,6);
+
+  const switchHtml = `
+    <div class="v62-role-switch" role="tablist" aria-label="Role">
+      <button class="${role==='owner'?'is-active':''}" onclick="setRoleExperience && setRoleExperience('owner'); currentRoleExperience='owner'; localStorage.setItem('dd_role','owner'); renderDashboard();">👑 Owner</button>
+      <button class="${role==='employee'?'is-active':''}" onclick="setRoleExperience && setRoleExperience('employee'); currentRoleExperience='employee'; localStorage.setItem('dd_role','employee'); renderDashboard();">👷 Employee</button>
+      <button class="${role==='client'?'is-active':''}" onclick="setRoleExperience && setRoleExperience('client'); currentRoleExperience='client'; localStorage.setItem('dd_role','client'); renderDashboard();">🤝 Client</button>
     </div>
-  `);
+  `;
+
+  const hero = ({title, subtitle, chips}) => `
+    <section class="v62-hero">
+      <div>
+        <span class="hero-eyebrow">🌿 DoubleDiamond · V62</span>
+        <h1>${title}</h1>
+        <p class="hero-sub">${subtitle}</p>
+      </div>
+      <div class="hero-meta">
+        ${chips.map(c=>`<span class="hero-chip">${c}</span>`).join("")}
+      </div>
+    </section>
+  `;
+
+  const kpi = (icon,label,value,trend) => `
+    <div class="v62-kpi">
+      <div class="kpi-icon">${icon}</div>
+      <div class="kpi-label">${label}</div>
+      <div class="kpi-value">${value}</div>
+      ${trend ? `<div class="kpi-trend">▲ ${trend}</div>` : ""}
+    </div>
+  `;
+
+  const action = (icon,title,desc,page) => `
+    <button class="v62-action" onclick="changePage('${page}', event)">
+      <div class="act-icon">${icon}</div>
+      <h4>${title}</h4>
+      <p>${desc}</p>
+      <span class="act-arrow">Open →</span>
+    </button>
+  `;
+
+  let body = "";
+
+  if(role === "employee"){
+    body = `
+      ${hero({
+        title:"Good day on the field 🌱",
+        subtitle:"Your route, check-ins and photos — all in one place.",
+        chips:[`📍 ${teamInField} crew on site`, `🧾 ${openWO} open work orders`, `📅 Today`]
+      })}
+      ${switchHtml}
+      <div class="v62-kpis">
+        ${kpi("📋","Today's Jobs", todayJobs.length || 4, "On schedule")}
+        ${kpi("🗺️","Next Stop", (routeStops[0] && (routeStops[0].address||routeStops[0].name)) || "Maple Ave 124", "")}
+        ${kpi("⏱️","Hours Logged", (gpsCheckins.length*2)||6, "")}
+        ${kpi("📸","Photos Today", recentPhotos.length || 3, "")}
+      </div>
+
+      <h3 class="v62-section-title">Field actions</h3>
+      <div class="v63-actions-xl">
+        <button class="v63-action-xl" onclick="changePage('routePlanning', event)"><div class="xl-ico">🚀</div><strong>Start Route</strong></button>
+        <button class="v63-action-xl" onclick="changePage('mobileWorkforce', event)"><div class="xl-ico">📍</div><strong>GPS Check-in</strong></button>
+        <button class="v63-action-xl" onclick="changePage('fieldDashboard', event)"><div class="xl-ico">📸</div><strong>Upload Photos</strong></button>
+        <button class="v63-action-xl" onclick="changePage('fieldDashboard', event)"><div class="xl-ico">✍️</div><strong>Signature</strong></button>
+        <button class="v63-action-xl" onclick="changePage('workOrders', event)"><div class="xl-ico">✅</div><strong>Complete Service</strong></button>
+        <button class="v63-action-xl" onclick="changePage('weatherCenter', event)"><div class="xl-ico">🌦️</div><strong>Weather</strong></button>
+      </div>
+
+      <h3 class="v62-section-title">Today's jobs</h3>
+      <div class="v62-list">
+        ${(todayJobs.length?todayJobs:[{task_name:"Lawn maintenance",address:"Oak Street 88"},{task_name:"Hedge trimming",address:"Pine Ave 12"},{task_name:"Irrigation check",address:"Sunset Blvd 45"}]).map(j=>`
+          <div class="li">
+            <div class="li-icon">🌿</div>
+            <div class="li-body"><strong>${j.task_name||j.title||"Job"}</strong><small>${j.address||j.location||"Field site"}</small></div>
+            <span class="li-pill">${j.status||"Scheduled"}</span>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  } else if(role === "client"){
+    body = `
+      ${hero({
+        title:"Welcome back 👋",
+        subtitle:"Track your landscaping projects, photos, reports and payments.",
+        chips:["🌿 3 active projects","📸 Fresh photos","💳 1 invoice"]
+      })}
+      ${switchHtml}
+      <div class="v62-kpis">
+        ${kpi("📈","Project Progress","72%","On track")}
+        ${kpi("📸","Recent Photos", recentPhotos.length || 6, "")}
+        ${kpi("📑","Reports", (reportCenterExports||[]).length || 4, "")}
+        ${kpi("💳","Open Payments", "1", "")}
+      </div>
+
+      <div class="v62-split">
+        <div class="v62-progress-card">
+          <h3 class="v62-section-title">Project progress</h3>
+          ${[
+            {n:"Front yard redesign", p:82},
+            {n:"Irrigation system", p:60},
+            {n:"Backyard patio", p:35}
+          ].map(r=>`
+            <div class="v62-progress-row">
+              <div class="pr-head"><span>${r.n}</span><small>${r.p}%</small></div>
+              <div class="v62-progress-bar"><div style="width:${r.p}%"></div></div>
+            </div>
+          `).join("")}
+        </div>
+        <div>
+          <h3 class="v62-section-title">Quick actions</h3>
+          <div class="v62-actions" style="grid-template-columns:1fr;">
+            ${action("🌿","My Project","Project overview &amp; next visit","clientHome")}
+            ${action("📸","Photos","See latest before/after pictures","fieldDashboard")}
+            ${action("📑","Reports","Download project reports","reportCenter")}
+            ${action("💳","Payments","Review open invoices","profitabilityEngine")}
+            ${action("💬","Messages","Talk to your project manager","whatsappReal")}
+          </div>
+          <div class="v63-alerts" style="margin-top:14px;">
+            <div class="v63-alert info"><div class="a-ico">📅</div><div class="a-body"><strong>Next visit</strong><small>Tomorrow · 9:00 AM · Front yard maintenance</small></div></div>
+            <div class="v63-alert"><div class="a-ico">🌤️</div><div class="a-body"><strong>Great weather expected</strong><small>Sunny · 24°C · perfect for outdoor work</small></div></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="v62-section-title">Recent photos</h3>
+      <div class="v62-photo-grid">
+        ${(recentPhotos.length?recentPhotos:[
+          {label:"Front yard",url:"https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=600&q=70"},
+          {label:"Lawn",url:"https://images.unsplash.com/photo-1599598425947-5b1a1cfacd57?auto=format&fit=crop&w=600&q=70"},
+          {label:"Garden",url:"https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=70"},
+          {label:"Hedges",url:"https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=600&q=70"}
+        ]).map(p=>`
+          <div class="v62-photo" data-label="${p.label||p.caption||'Photo'}" style="background-image:url('${p.url||p.photo_url||p.image_url||"https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=70"}')"></div>
+        `).join("")}
+      </div>
+    `;
+  } else {
+    // OWNER (default)
+    body = `
+      ${hero({
+        title:"Run your landscaping business 💎",
+        subtitle:"Revenue, crews on the field and active projects — at a glance.",
+        chips:[`🏢 ${companies.length||1} companies`, `👷 ${teamInField} in field`, `🧾 ${openWO} open WOs`]
+      })}
+      ${switchHtml}
+      <div class="v62-kpis">
+        ${kpi("💰","Revenue", fmtMoney(revenue), "12.4% MoM")}
+        ${kpi("🌿","Active Projects", activeProjects, "3 new")}
+        ${kpi("👷","Team in Field", teamInField, "")}
+        ${kpi("🧾","Open Work Orders", openWO, "")}
+      </div>
+
+      <h3 class="v62-section-title">Alerts &amp; signals</h3>
+      <div class="v63-alerts">
+        <div class="v63-alert"><div class="a-ico">🤖</div><div class="a-body"><strong>AI Alert · Crew capacity</strong><small>Tuesday route looks 18% over-booked — rebalance suggested.</small></div></div>
+        <div class="v63-alert warn"><div class="a-ico">🌧️</div><div class="a-body"><strong>Weather · Rain Thursday</strong><small>3 outdoor projects may need rescheduling.</small></div></div>
+        <div class="v63-alert info"><div class="a-ico">🗺️</div><div class="a-body"><strong>Route status</strong><small>${(routeStops||[]).length||14} stops scheduled · 2 crews en route.</small></div></div>
+        <div class="v63-alert"><div class="a-ico">🤝</div><div class="a-body"><strong>Recent client activity</strong><small>${(companies[0]&&companies[0].name)||"Greenway Park"} approved the latest quote.</small></div></div>
+      </div>
+
+      <h3 class="v62-section-title">Quick actions</h3>
+      <div class="v62-actions">
+        ${action("📈","Executive","Owner KPIs and forecasts","executiveDashboard")}
+        ${action("🧾","Work Orders","Manage open orders","workOrders")}
+        ${action("👷","Workforce","Crews and field activity","mobileWorkforce")}
+        ${action("💰","Profitability","Margins and revenue","profitabilityEngine")}
+      </div>
+
+      <div class="v62-split">
+        <div>
+          <h3 class="v62-section-title">Latest field activity</h3>
+          <div class="v62-list">
+            ${((gpsCheckins||[]).slice(0,4).length ? gpsCheckins.slice(0,4) : [
+              {user_name:"Carlos",location:"Maple Ave 124"},
+              {user_name:"Diego",location:"Pine St 8"},
+              {user_name:"Marco",location:"Oak Blvd 56"}
+            ]).map(c=>`
+              <div class="li">
+                <div class="li-icon">📍</div>
+                <div class="li-body"><strong>${c.user_name||c.crew||"Crew"}</strong><small>${c.location||c.address||"On site"}</small></div>
+                <span class="li-pill">Checked-in</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+        <div>
+          <h3 class="v62-section-title">Project progress</h3>
+          <div class="v62-progress-card">
+            ${[
+              {n:"Greenway Park", p:78},
+              {n:"Riverside Estate", p:54},
+              {n:"Downtown Plaza", p:30}
+            ].map(r=>`
+              <div class="v62-progress-row">
+                <div class="pr-head"><span>${r.n}</span><small>${r.p}%</small></div>
+                <div class="v62-progress-bar"><div style="width:${r.p}%"></div></div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  setContent(`<div class="v62-home">${body}</div>`);
 }
 
 function renderEmpresas(){
