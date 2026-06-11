@@ -985,3 +985,17 @@ body{ background:linear-gradient(180deg,#fbf8f1 0%, #eef2f7 100%); }
 .v67-chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .v67-chip{background:#f1f5f9;color:#334155;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900}
 @media(max-width:850px){.v67-compare-wrap{grid-template-columns:1fr}.v67-lightbox-photo{min-height:320px}}
+
+/* V68 FIELD PHOTO UPLOAD */
+.v68-upload-card{background:linear-gradient(135deg,#ffffff,#ecfdf5);border:1px solid #bbf7d0;border-radius:28px;padding:22px;box-shadow:0 18px 42px rgba(15,23,42,.08);margin-bottom:22px}
+.v68-upload-card h2{font-size:24px;margin-bottom:8px}
+.v68-upload-card p{color:#64748b;margin-bottom:16px}
+.v68-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.v68-upload-card input,.v68-upload-card select,.v68-upload-card textarea{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:14px;background:#fff}
+.v68-upload-card textarea{min-height:90px;margin-top:12px}
+.v68-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.v68-photo-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:16px}
+.v68-mini-photo{background:#fff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden}
+.v68-mini-img{height:140px;background:linear-gradient(135deg,#dcfce7,#fef3c7);background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:12px;font-weight:900;color:#14532d}
+.v68-mini-body{padding:12px}
+.v68-mini-body small{color:#64748b}

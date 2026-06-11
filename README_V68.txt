@@ -1,0 +1,1 @@
+V68 Field Photo Upload\n\nAdiciona upload por URL para field_photos usando colunas reais. Sem SQL novo e sem tabelas novas.\n
