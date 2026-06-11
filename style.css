@@ -892,3 +892,7 @@ body{ background:linear-gradient(180deg,#fbf8f1 0%, #eef2f7 100%); }
 .v64-mobile-shell{max-width:430px;background:#0f172a;border-radius:34px;padding:14px;box-shadow:0 20px 55px rgba(15,23,42,.25)}.v64-mobile-screen{background:#f8fafc;border-radius:26px;padding:18px}
 .v64-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}.v64-action-card{cursor:pointer;min-height:112px}.v64-action-card strong{display:block;margin-top:8px;font-size:16px}
 @media(max-width:850px){.v64-hero h2{font-size:32px}.v64-action-grid{grid-template-columns:1fr}}
+
+/* V64.1 PERFORMANCE FIX */
+.performance-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#ecfdf5;color:#166534;font-size:12px;font-weight:900;margin-bottom:12px}
+.performance-dot{width:8px;height:8px;border-radius:999px;background:#22c55e;box-shadow:0 0 0 6px rgba(34,197,94,.14)}

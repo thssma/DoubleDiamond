@@ -74,8 +74,16 @@ const headers = {
 };
 
 window.onload = async () => {
-  await loadData();
   renderDashboard();
+
+  setTimeout(async () => {
+    try{
+      await loadData();
+      renderDashboard();
+    }catch(e){
+      console.warn("Background data load failed", e);
+    }
+  }, 50);
 };
 
 async function apiGet(table){
@@ -4650,3 +4658,40 @@ function renderClientHome(){
     <div class="v64-feed-card"><h2>Acesso rápido</h2><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('workOrders')">🧾<strong>Ordens</strong><small>Acompanhar serviços</small></div><div class="v64-action-card" onclick="changePage('reportCenter')">📑<strong>Relatórios</strong><small>${reportsCount} disponíveis</small></div><div class="v64-action-card" onclick="changePage('billingDashboard')">💳<strong>Pagamentos</strong><small>Ver cobranças</small></div><div class="v64-action-card" onclick="changePage('gmailReal')">💬<strong>Mensagens</strong><small>Contato com equipe</small></div></div></div>
     <div class="v64-feed-card"><h2>Fotos recentes</h2>${photos.slice(0,4).map(p=>`<div class="v64-feed-item"><div class="v64-feed-icon">📸</div><div><strong>${p.photo_type||"Foto de campo"}</strong><br><small>${p.project_name||p.photo_url||"Atualização do projeto"}</small></div></div>`).join("")||"<p>Nenhuma foto enviada ainda.</p>"}</div></div>`);
 }
+
+/* V64.1 PERFORMANCE FIX */
+let ddInitialDataLoaded = false;
+
+const ddOriginalLoadDataV641 = loadData;
+loadData = async function(){
+  await ddOriginalLoadDataV641();
+  ddInitialDataLoaded = true;
+};
+
+const ddOriginalRenderDashboardV641 = renderDashboard;
+renderDashboard = function(){
+  ddOriginalRenderDashboardV641();
+
+  const content = document.getElementById("pageContent");
+  if(content && !ddInitialDataLoaded){
+    content.insertAdjacentHTML("afterbegin", `
+      <div class="performance-pill">
+        <span class="performance-dot"></span>
+        Carregando dados em segundo plano...
+      </div>
+    `);
+  }
+};
+
+const ddOriginalChangePageV641 = changePage;
+changePage = async function(page, event){
+  if(!ddInitialDataLoaded){
+    try{
+      await loadData();
+    }catch(e){
+      console.warn("Lazy data load failed", e);
+    }
+  }
+
+  ddOriginalChangePageV641(page, event);
+};
