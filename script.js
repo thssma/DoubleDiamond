@@ -4703,3 +4703,189 @@ function renderClientHome(){
     <div class="v64-feed-card"><h2>Acesso rápido</h2><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('workOrders')">🧾<strong>Ordens</strong><small>Acompanhar serviços</small></div><div class="v64-action-card" onclick="changePage('reportCenter')">📑<strong>Relatórios</strong><small>${reportsCount} disponíveis</small></div><div class="v64-action-card" onclick="changePage('billingDashboard')">💳<strong>Pagamentos</strong><small>Ver cobranças</small></div><div class="v64-action-card" onclick="changePage('gmailReal')">💬<strong>Mensagens</strong><small>Contato com equipe</small></div></div></div>
     <div class="v64-feed-card"><h2>Fotos recentes</h2>${photos.slice(0,4).map(p=>`<div class="v64-feed-item"><div class="v64-feed-icon">📸</div><div><strong>${p.photo_type||"Foto de campo"}</strong><br><small>${p.project_name||p.photo_url||"Atualização do projeto"}</small></div></div>`).join("")||"<p>Nenhuma foto enviada ainda.</p>"}</div></div>`);
 }
+
+/* V64.2 INSTANT NAVIGATION */
+let ddInitialDataLoaded = false;
+let ddDataLoadingV642 = false;
+let ddCurrentPageV642 = "dashboard";
+
+const ddOriginalLoadDataV642 = loadData;
+loadData = async function(){
+  await ddOriginalLoadDataV642();
+  ddInitialDataLoaded = true;
+};
+
+function ddStartBackgroundLoadV642(){
+  if(ddInitialDataLoaded || ddDataLoadingV642) return;
+  ddDataLoadingV642 = true;
+
+  setTimeout(async () => {
+    try{
+      await loadData();
+      ddDataLoadingV642 = false;
+      ddRefreshCurrentPageV642();
+    }catch(e){
+      ddDataLoadingV642 = false;
+      console.warn("Background data load failed", e);
+    }
+  }, 30);
+}
+
+function ddRefreshCurrentPageV642(){
+  if(ddCurrentPageV642 === "dashboard") return renderDashboard();
+  if(ddCurrentPageV642 === "ownerHome") return renderOwnerHome();
+  if(ddCurrentPageV642 === "employeeHome") return renderEmployeeHome();
+  if(ddCurrentPageV642 === "clientHome") return renderClientHome();
+
+  try{
+    ddOriginalChangePageV642(ddCurrentPageV642, null);
+  }catch(e){
+    console.warn("Refresh current page failed", e);
+  }
+}
+
+const ddOriginalChangePageV642 = changePage;
+changePage = function(page, event){
+  ddCurrentPageV642 = page;
+
+  ddOriginalChangePageV642(page, event);
+
+  if(!ddInitialDataLoaded){
+    const content = document.getElementById("pageContent");
+    if(content && !content.querySelector(".performance-pill")){
+      content.insertAdjacentHTML("afterbegin", `
+        <div class="performance-pill fast">
+          <span class="performance-dot fast"></span>
+          Abrindo agora. Dados atualizando em segundo plano...
+        </div>
+      `);
+    }
+    ddStartBackgroundLoadV642();
+  }
+};
+
+const ddOriginalRenderDashboardV642 = renderDashboard;
+renderDashboard = function(){
+  ddOriginalRenderDashboardV642();
+
+  const content = document.getElementById("pageContent");
+  if(content && !ddInitialDataLoaded && !content.querySelector(".performance-pill")){
+    content.insertAdjacentHTML("afterbegin", `
+      <div class="performance-pill">
+        <span class="performance-dot"></span>
+        Carregando dados em segundo plano...
+      </div>
+    `);
+  }
+};
+
+
+/* V65.1 CLIENT PREMIUM FINAL OVERRIDE */
+function renderClientHome(){
+  setTitle("Meu Projeto");
+
+  const recentPhotosSafe = Array.isArray(fieldPhotos) ? fieldPhotos.slice(0,6) : [];
+  const reportsCount = Array.isArray(reportCenterExports) ? reportCenterExports.length : 0;
+  const projectName = (workOrders && workOrders[0] && (workOrders[0].client_name || workOrders[0].project_name || workOrders[0].service_type)) || "Jardim Residencial";
+  const lastUpdate = new Date().toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
+
+  setContent(`
+    <div class="v651-premium-page">
+      <section class="v651-premium-hero">
+        <div class="v651-hero-top">
+          <div>
+            <div class="v651-eyebrow">Client Portal · V65.1</div>
+            <h2>🏡 Meu Projeto</h2>
+            <p>Acompanhe progresso, próximas visitas, atualizações, equipe, documentos e fotos do projeto.</p>
+          </div>
+          <div class="v651-status-pill">🟢 Dentro do prazo</div>
+        </div>
+        <div class="v651-progress"><span></span></div>
+        <strong>72% concluído</strong>
+        <p style="color:#d1fae5;margin-top:8px;">Última atualização: ${lastUpdate}</p>
+        <div class="v651-hero-actions">
+          <button class="v651-primary" onclick="changePage('reportCenter', event)">Ver Relatórios</button>
+          <button class="v651-secondary" onclick="changePage('whatsappReal', event)">Falar com Equipe</button>
+          <button class="v651-secondary" onclick="changePage('profitabilityEngine', event)">Pagamentos</button>
+        </div>
+      </section>
+
+      <div class="v651-grid">
+        <div class="v651-card"><h3>🚀 Próxima Etapa</h3><p><strong>Instalação de irrigação</strong></p><small>Responsável: Equipe Verde</small></div>
+        <div class="v651-card"><h3>📅 Próxima Visita</h3><p><strong>12/06 às 08:00</strong></p><small>Irrigação e preparação do terreno</small></div>
+        <div class="v651-card"><h3>📊 Status do Projeto</h3><p><strong>${projectName}</strong></p><small>Projeto em andamento</small></div>
+        <div class="v651-card"><h3>📑 Relatórios</h3><p><strong>${reportsCount}</strong> disponíveis</p><small>Documentos preparados para o cliente</small></div>
+      </div>
+
+      <div class="v651-grid">
+        <div class="v651-card">
+          <h3>📍 Timeline do Projeto</h3>
+          <div class="v651-timeline">
+            <div class="v651-step"><div class="v651-dot">✓</div><div><strong>Contrato aprovado</strong><br><small>Projeto confirmado</small></div></div>
+            <div class="v651-step"><div class="v651-dot">✓</div><div><strong>Planejamento</strong><br><small>Escopo e equipe definidos</small></div></div>
+            <div class="v651-step"><div class="v651-dot">✓</div><div><strong>Equipe programada</strong><br><small>Agenda de campo criada</small></div></div>
+            <div class="v651-step"><div class="v651-dot current">⏳</div><div><strong>Execução em andamento</strong><br><small>Instalação e paisagismo</small></div></div>
+            <div class="v651-step"><div class="v651-dot todo">□</div><div><strong>Inspeção final</strong><br><small>Checklist de entrega</small></div></div>
+            <div class="v651-step"><div class="v651-dot todo">□</div><div><strong>Entrega</strong><br><small>Projeto concluído</small></div></div>
+          </div>
+        </div>
+
+        <div class="v651-card">
+          <h3>📰 Atualizações Recentes</h3>
+          <div class="v651-feed-item"><div class="v651-feed-icon">🌱</div><div><strong>Hoje</strong><br><small>Equipe iniciou preparação do terreno</small></div></div>
+          <div class="v651-feed-item"><div class="v651-feed-icon">🚚</div><div><strong>Ontem</strong><br><small>Materiais entregues no local</small></div></div>
+          <div class="v651-feed-item"><div class="v651-feed-icon">✅</div><div><strong>05/06</strong><br><small>Projeto aprovado pelo cliente</small></div></div>
+        </div>
+      </div>
+
+      <div class="v651-grid">
+        <div class="v651-card">
+          <h3>🖼️ Before / During / After</h3>
+          <div class="v651-photo-grid">
+            <div class="v651-photo-card">Antes<br><small>Área original</small></div>
+            <div class="v651-photo-card">Durante<br><small>Execução atual</small></div>
+            <div class="v651-photo-card">Depois<br><small>Entrega final</small></div>
+          </div>
+        </div>
+
+        <div class="v651-card">
+          <h3>👷 Equipe Responsável</h3>
+          <div class="v651-team">
+            <div class="v651-person"><div class="v651-avatar">SV</div><div><strong>Supervisor</strong><br><small>Coordenação do projeto</small></div></div>
+            <div class="v651-person"><div class="v651-avatar">PS</div><div><strong>Paisagista</strong><br><small>Execução e acabamento</small></div></div>
+            <div class="v651-person"><div class="v651-avatar">IR</div><div><strong>Técnico de Irrigação</strong><br><small>Sistema de água</small></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v651-grid">
+        <div class="v651-card">
+          <h3>💰 Resumo Financeiro</h3>
+          <div class="v651-grid">
+            <div><strong>Total</strong><br><small>R$ 18.000,00</small></div>
+            <div><strong>Pago</strong><br><small>R$ 15.000,00</small></div>
+            <div><strong>Pendente</strong><br><small>R$ 3.000,00</small></div>
+          </div>
+        </div>
+        <div class="v651-card">
+          <h3>📄 Documentos</h3>
+          <div class="v651-docs">
+            <div class="v651-doc">📄 Contrato</div>
+            <div class="v651-doc">📄 Orçamento</div>
+            <div class="v651-doc">📄 Relatórios</div>
+            <div class="v651-doc">📄 Garantia</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v651-card">
+        <h3>📸 Fotos recentes</h3>
+        ${
+          recentPhotosSafe.length
+            ? `<div class="v651-photo-grid">${recentPhotosSafe.map(p => `<div class="v651-photo-card">${p.photo_type || p.label || "Foto"}<br><small>${p.created_at ? new Date(p.created_at).toLocaleDateString("pt-BR") : "Atualização do projeto"}</small></div>`).join("")}</div>`
+            : `<p>Nenhuma foto enviada ainda.</p>`
+        }
+      </div>
+    </div>
+  `);
+}

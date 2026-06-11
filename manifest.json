@@ -1,10 +1,10 @@
 {
   "name": "DoubleDiamond Command Center",
-  "short_name": "DD V65",
+  "short_name": "DD V65.1",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#14532d",
-  "description": "V65 Complete Client Experience",
+  "description": "DoubleDiamond V65.1 Client Premium Final",
   "icons": []
 }
