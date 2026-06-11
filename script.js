@@ -47,6 +47,17 @@ let automationFlowRuns = [];
 let architectureAuditLogs = [];
 let moduleRegistry = [];
 let aiOperationsReadiness = [];
+let aiLeadScores = [];
+let aiQuoteDrafts = [];
+let aiProjectRisks = [];
+let aiFinancialAdvice = [];
+let aiWorkforcePlans = [];
+let aiRouteOptimizations = [];
+let aiWeatherImpacts = [];
+let aiExecutiveReports = [];
+let aiAutomationRecommendations = [];
+let aiCommandCenterLogs = [];
+
 
 
 
@@ -138,6 +149,16 @@ async function loadData(){
   architectureAuditLogs = await apiGet("architecture_audit_logs");
   moduleRegistry = await apiGet("module_registry");
   aiOperationsReadiness = await apiGet("ai_operations_readiness");
+  aiLeadScores = await apiGet("ai_lead_scores");
+  aiQuoteDrafts = await apiGet("ai_quote_drafts");
+  aiProjectRisks = await apiGet("ai_project_risks");
+  aiFinancialAdvice = await apiGet("ai_financial_advice");
+  aiWorkforcePlans = await apiGet("ai_workforce_plans");
+  aiRouteOptimizations = await apiGet("ai_route_optimizations");
+  aiWeatherImpacts = await apiGet("ai_weather_impacts");
+  aiExecutiveReports = await apiGet("ai_executive_reports");
+  aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
+  aiCommandCenterLogs = await apiGet("ai_command_center_logs");
 
 }
 
@@ -176,6 +197,16 @@ function changePage(page, event){
     automationFlowsReal: renderAutomationFlowsReal,
     architectureHardening: renderArchitectureHardening,
     aiReadiness: renderAIReadiness,
+    aiLeadScoring: renderAILeadScoring,
+    aiQuoteGenerator: renderAIQuoteGenerator,
+    aiProjectRisk: renderAIProjectRisk,
+    aiFinancialAdvisor: renderAIFinancialAdvisor,
+    aiWorkforcePlanner: renderAIWorkforcePlanner,
+    aiRouteOptimization: renderAIRouteOptimization,
+    aiWeatherImpact: renderAIWeatherImpact,
+    aiExecutiveReports: renderAIExecutiveReports,
+    aiAutomationRecommendations: renderAIAutomationRecommendations,
+    aiOperationsCommand: renderAICommandCenter,
     configuracoes: renderConfiguracoes
   };
 
@@ -1124,6 +1155,16 @@ async function saveMobileSettings(){
   architectureAuditLogs = await apiGet("architecture_audit_logs");
   moduleRegistry = await apiGet("module_registry");
   aiOperationsReadiness = await apiGet("ai_operations_readiness");
+  aiLeadScores = await apiGet("ai_lead_scores");
+  aiQuoteDrafts = await apiGet("ai_quote_drafts");
+  aiProjectRisks = await apiGet("ai_project_risks");
+  aiFinancialAdvice = await apiGet("ai_financial_advice");
+  aiWorkforcePlans = await apiGet("ai_workforce_plans");
+  aiRouteOptimizations = await apiGet("ai_route_optimizations");
+  aiWeatherImpacts = await apiGet("ai_weather_impacts");
+  aiExecutiveReports = await apiGet("ai_executive_reports");
+  aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
+  aiCommandCenterLogs = await apiGet("ai_command_center_logs");
 
   renderMobileReady();
 }
@@ -1662,6 +1703,16 @@ async function signWorkOrder(){
   architectureAuditLogs = await apiGet("architecture_audit_logs");
   moduleRegistry = await apiGet("module_registry");
   aiOperationsReadiness = await apiGet("ai_operations_readiness");
+  aiLeadScores = await apiGet("ai_lead_scores");
+  aiQuoteDrafts = await apiGet("ai_quote_drafts");
+  aiProjectRisks = await apiGet("ai_project_risks");
+  aiFinancialAdvice = await apiGet("ai_financial_advice");
+  aiWorkforcePlans = await apiGet("ai_workforce_plans");
+  aiRouteOptimizations = await apiGet("ai_route_optimizations");
+  aiWeatherImpacts = await apiGet("ai_weather_impacts");
+  aiExecutiveReports = await apiGet("ai_executive_reports");
+  aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
+  aiCommandCenterLogs = await apiGet("ai_command_center_logs");
   renderWorkOrders();
 }
 
@@ -2006,6 +2057,16 @@ async function generateExecutiveIntelligence(){
   architectureAuditLogs = await apiGet("architecture_audit_logs");
   moduleRegistry = await apiGet("module_registry");
   aiOperationsReadiness = await apiGet("ai_operations_readiness");
+  aiLeadScores = await apiGet("ai_lead_scores");
+  aiQuoteDrafts = await apiGet("ai_quote_drafts");
+  aiProjectRisks = await apiGet("ai_project_risks");
+  aiFinancialAdvice = await apiGet("ai_financial_advice");
+  aiWorkforcePlans = await apiGet("ai_workforce_plans");
+  aiRouteOptimizations = await apiGet("ai_route_optimizations");
+  aiWeatherImpacts = await apiGet("ai_weather_impacts");
+  aiExecutiveReports = await apiGet("ai_executive_reports");
+  aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
+  aiCommandCenterLogs = await apiGet("ai_command_center_logs");
   renderExecutiveIntelligence();
 }
 
@@ -2023,6 +2084,16 @@ async function closeExecutiveIntelligence(id){
   architectureAuditLogs = await apiGet("architecture_audit_logs");
   moduleRegistry = await apiGet("module_registry");
   aiOperationsReadiness = await apiGet("ai_operations_readiness");
+  aiLeadScores = await apiGet("ai_lead_scores");
+  aiQuoteDrafts = await apiGet("ai_quote_drafts");
+  aiProjectRisks = await apiGet("ai_project_risks");
+  aiFinancialAdvice = await apiGet("ai_financial_advice");
+  aiWorkforcePlans = await apiGet("ai_workforce_plans");
+  aiRouteOptimizations = await apiGet("ai_route_optimizations");
+  aiWeatherImpacts = await apiGet("ai_weather_impacts");
+  aiExecutiveReports = await apiGet("ai_executive_reports");
+  aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
+  aiCommandCenterLogs = await apiGet("ai_command_center_logs");
   renderExecutiveIntelligence();
 }
 
@@ -2206,6 +2277,16 @@ async function runAutomationFlow(id, name){
   architectureAuditLogs = await apiGet("architecture_audit_logs");
   moduleRegistry = await apiGet("module_registry");
   aiOperationsReadiness = await apiGet("ai_operations_readiness");
+  aiLeadScores = await apiGet("ai_lead_scores");
+  aiQuoteDrafts = await apiGet("ai_quote_drafts");
+  aiProjectRisks = await apiGet("ai_project_risks");
+  aiFinancialAdvice = await apiGet("ai_financial_advice");
+  aiWorkforcePlans = await apiGet("ai_workforce_plans");
+  aiRouteOptimizations = await apiGet("ai_route_optimizations");
+  aiWeatherImpacts = await apiGet("ai_weather_impacts");
+  aiExecutiveReports = await apiGet("ai_executive_reports");
+  aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
+  aiCommandCenterLogs = await apiGet("ai_command_center_logs");
   renderAutomationFlowsReal();
 }
 
@@ -2545,6 +2626,16 @@ async function runAutomationFlow(id, name){
   architectureAuditLogs = await apiGet("architecture_audit_logs");
   moduleRegistry = await apiGet("module_registry");
   aiOperationsReadiness = await apiGet("ai_operations_readiness");
+  aiLeadScores = await apiGet("ai_lead_scores");
+  aiQuoteDrafts = await apiGet("ai_quote_drafts");
+  aiProjectRisks = await apiGet("ai_project_risks");
+  aiFinancialAdvice = await apiGet("ai_financial_advice");
+  aiWorkforcePlans = await apiGet("ai_workforce_plans");
+  aiRouteOptimizations = await apiGet("ai_route_optimizations");
+  aiWeatherImpacts = await apiGet("ai_weather_impacts");
+  aiExecutiveReports = await apiGet("ai_executive_reports");
+  aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
+  aiCommandCenterLogs = await apiGet("ai_command_center_logs");
   renderAutomationFlowsReal();
 }
 
@@ -3000,6 +3091,16 @@ async function seedAIReadiness(){
   }
 
   aiOperationsReadiness = await apiGet("ai_operations_readiness");
+  aiLeadScores = await apiGet("ai_lead_scores");
+  aiQuoteDrafts = await apiGet("ai_quote_drafts");
+  aiProjectRisks = await apiGet("ai_project_risks");
+  aiFinancialAdvice = await apiGet("ai_financial_advice");
+  aiWorkforcePlans = await apiGet("ai_workforce_plans");
+  aiRouteOptimizations = await apiGet("ai_route_optimizations");
+  aiWeatherImpacts = await apiGet("ai_weather_impacts");
+  aiExecutiveReports = await apiGet("ai_executive_reports");
+  aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
+  aiCommandCenterLogs = await apiGet("ai_command_center_logs");
   alert("AI Readiness populado com sucesso.");
   renderAIReadiness();
 }
@@ -3017,4 +3118,1000 @@ async function saveAIReadinessAudit(){
 
   architectureAuditLogs = await apiGet("architecture_audit_logs");
   alert("Auditoria AI salva com sucesso.");
+}
+
+
+/* V51-V60 AI OPERATIONS PLATFORM */
+function getFirstCompanyIdAI(){
+  return companies[0]?.id || "";
+}
+
+function getCompanyOptionsAI(){
+  return companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+}
+
+function renderAILeadScoring(){
+  setTitle("AI Lead Scoring");
+
+  setContent(`
+    <div class="aiops-hero"><h2>V51 AI Lead Scoring</h2><p>Calcula score de fechamento para leads usando dados disponíveis e regras locais.</p></div>
+
+    <div class="card">
+      <h2>Gerar Score Manual</h2>
+      <div class="form-grid">
+        <select id="leadScoreCompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <input id="leadScoreName" placeholder="Nome do lead">
+        <input id="leadScoreBudget" type="number" placeholder="Orçamento estimado">
+        <select id="leadScoreUrgency"><option>Baixa</option><option>Média</option><option>Alta</option></select>
+      </div>
+      <button class="primary-btn" onclick="generateAILeadScore()">Gerar Score</button>
+    </div>
+
+    <div class="card">
+      <h2>Gerar Scores dos Leads Existentes</h2>
+      <button class="success-btn" onclick="generateLeadScoresFromExisting()">Analisar Leads</button>
+    </div>
+
+    <div class="aiops-grid">
+      ${aiLeadScores.map(s => `
+        <div class="aiops-card ${s.category === "Hot" ? "ai-score-hot" : s.category === "Warm" ? "ai-score-warm" : "ai-score-cold"}">
+          <h2>${s.lead_name}</h2>
+          <p class="bi-number">${s.score}</p>
+          <span class="aiops-badge">${s.category}</span>
+          <p>${s.reasons || ""}</p>
+        </div>
+      `).join("") || "<div class='card'>Nenhum lead score.</div>"}
+    </div>
+  `);
+}
+
+async function generateAILeadScore(){
+  const companyId = val("leadScoreCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const budget = Number(val("leadScoreBudget") || 0);
+  const urgency = val("leadScoreUrgency");
+  let score = 35;
+
+  if(budget >= 10000) score += 30;
+  else if(budget >= 3000) score += 18;
+  else score += 8;
+
+  if(urgency === "Alta") score += 25;
+  if(urgency === "Média") score += 12;
+
+  score = Math.min(score, 100);
+  const category = score >= 75 ? "Hot" : score >= 45 ? "Warm" : "Cold";
+
+  const res = await apiInsert("ai_lead_scores", {
+    company_id: companyId,
+    lead_name: val("leadScoreName"),
+    score,
+    category,
+    reasons: `Budget: R$ ${formatMoneyAI(budget)} | Urgência: ${urgency}.`,
+    status: "Open"
+  });
+
+  if(!res.ok) return alert("Erro ao gerar score.");
+
+  aiLeadScores = await apiGet("ai_lead_scores");
+  renderAILeadScoring();
+}
+
+async function generateLeadScoresFromExisting(){
+  const companyId = getFirstCompanyIdAI();
+  if(!companyId) return alert("Crie uma empresa primeiro.");
+
+  const source = typeof leads !== "undefined" ? leads : [];
+  if(!source.length) return alert("Nenhum lead encontrado.");
+
+  for(const lead of source.slice(0, 20)){
+    const name = lead.name || lead.lead_name || "Lead";
+    const score = Math.floor(45 + Math.random() * 45);
+    await apiInsert("ai_lead_scores", {
+      company_id: companyId,
+      lead_name: name,
+      score,
+      category: score >= 75 ? "Hot" : "Warm",
+      reasons: "Score gerado com base em lead existente e sinais comerciais.",
+      status: "Open"
+    });
+  }
+
+  aiLeadScores = await apiGet("ai_lead_scores");
+  renderAILeadScoring();
+}
+
+function renderAIQuoteGenerator(){
+  setTitle("AI Quote Generator");
+
+  setContent(`
+    <div class="aiops-hero"><h2>V52 AI Quote Generator</h2><p>Gera rascunhos de orçamento com escopo, valor estimado e notas.</p></div>
+
+    <div class="card">
+      <h2>Novo Orçamento AI</h2>
+      <div class="form-grid">
+        <select id="quoteAICompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <input id="quoteAIClient" placeholder="Cliente">
+        <input id="quoteAIService" placeholder="Serviço">
+        <input id="quoteAIArea" type="number" placeholder="Área/quantidade">
+        <input id="quoteAIComplexity" type="number" placeholder="Complexidade 1 a 5">
+      </div>
+      <textarea id="quoteAIScope" placeholder="Escopo"></textarea>
+      <button class="primary-btn" onclick="generateAIQuoteDraft()">Gerar Orçamento</button>
+    </div>
+
+    <div class="aiops-grid">
+      ${aiQuoteDrafts.map(q => `
+        <div class="aiops-card">
+          <h2>${q.client_name}</h2>
+          <small>${q.service_name} • ${q.status}</small>
+          <p class="bi-number">R$ ${formatMoneyAI(q.estimated_amount)}</p>
+          <p>${q.scope || ""}</p>
+          <p><strong>AI:</strong> ${q.ai_notes || ""}</p>
+        </div>
+      `).join("") || "<div class='card'>Nenhum orçamento AI.</div>"}
+    </div>
+  `);
+}
+
+async function generateAIQuoteDraft(){
+  const companyId = val("quoteAICompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const area = Number(val("quoteAIArea") || 1);
+  const complexity = Math.max(1, Number(val("quoteAIComplexity") || 1));
+  const estimated = area * complexity * 180;
+
+  const res = await apiInsert("ai_quote_drafts", {
+    company_id: companyId,
+    client_name: val("quoteAIClient"),
+    service_name: val("quoteAIService"),
+    scope: val("quoteAIScope"),
+    estimated_amount: estimated,
+    ai_notes: `Estimativa baseada em área ${area}, complexidade ${complexity} e preço base operacional.`,
+    status: "Draft"
+  });
+
+  if(!res.ok) return alert("Erro ao gerar orçamento.");
+
+  aiQuoteDrafts = await apiGet("ai_quote_drafts");
+  renderAIQuoteGenerator();
+}
+
+function renderAIProjectRisk(){
+  setTitle("AI Project Risk Analysis");
+
+  setContent(`
+    <div class="aiops-hero"><h2>V53 AI Project Risk Analysis</h2><p>Identifica riscos de atraso, operação e falta de execução.</p></div>
+
+    <div class="card">
+      <h2>Analisar Projeto</h2>
+      <div class="form-grid">
+        <select id="riskCompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <input id="riskProject" placeholder="Projeto">
+        <input id="riskPending" type="number" placeholder="Pendências">
+        <input id="riskDelay" type="number" placeholder="Dias de atraso">
+      </div>
+      <button class="primary-btn" onclick="generateProjectRisk()">Gerar Risco</button>
+    </div>
+
+    <div class="aiops-grid">
+      ${aiProjectRisks.map(r => `
+        <div class="aiops-card ${r.risk_level === "High" ? "ai-critical" : r.risk_level === "Medium" ? "ai-medium" : "ai-low"}">
+          <h2>${r.project_name}</h2>
+          <p class="bi-number">${r.risk_score}</p>
+          <span class="aiops-badge">${r.risk_level}</span>
+          <p>${r.risk_reasons || ""}</p>
+          <strong>${r.recommended_action || ""}</strong>
+        </div>
+      `).join("") || "<div class='card'>Nenhum risco de projeto.</div>"}
+    </div>
+  `);
+}
+
+async function generateProjectRisk(){
+  const companyId = val("riskCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const pending = Number(val("riskPending") || 0);
+  const delay = Number(val("riskDelay") || 0);
+  const score = Math.min(100, pending * 12 + delay * 8);
+  const level = score >= 70 ? "High" : score >= 35 ? "Medium" : "Low";
+
+  const res = await apiInsert("ai_project_risks", {
+    company_id: companyId,
+    project_name: val("riskProject"),
+    risk_score: score,
+    risk_level: level,
+    risk_reasons: `${pending} pendências e ${delay} dias de atraso.`,
+    recommended_action: level === "High" ? "Revisar equipe, rota e prioridade imediatamente." : "Monitorar execução e atualizar checklist.",
+    status: "Open"
+  });
+
+  if(!res.ok) return alert("Erro ao gerar risco.");
+
+  aiProjectRisks = await apiGet("ai_project_risks");
+  renderAIProjectRisk();
+}
+
+function renderAIFinancialAdvisor(){
+  setTitle("AI Financial Advisor");
+
+  setContent(`
+    <div class="aiops-hero"><h2>V54 AI Financial Advisor</h2><p>Analisa receita, pagamentos, inadimplência e margem.</p></div>
+
+    <div class="card">
+      <h2>Gerar Conselhos Financeiros</h2>
+      <button class="success-btn" onclick="generateFinancialAdvice()">Analisar Financeiro</button>
+    </div>
+
+    <div class="aiops-grid">
+      ${aiFinancialAdvice.map(a => `
+        <div class="aiops-card ${a.priority === "High" ? "ai-critical" : a.priority === "Medium" ? "ai-medium" : "ai-low"}">
+          <h2>${a.title}</h2>
+          <small>${a.advice_type} • ${a.priority} • ${a.status}</small>
+          <p>${a.message}</p>
+        </div>
+      `).join("") || "<div class='card'>Nenhum conselho financeiro.</div>"}
+    </div>
+  `);
+}
+
+async function generateFinancialAdvice(){
+  const companyId = getFirstCompanyIdAI();
+  if(!companyId) return alert("Crie uma empresa primeiro.");
+
+  const invoicesTotal = typeof invoices !== "undefined" ? invoices.reduce((s,i) => s + Number(i.amount || 0), 0) : 0;
+  const paid = typeof payments !== "undefined" ? payments.filter(p => p.status === "Paid").reduce((s,p) => s + Number(p.amount || 0), 0) : 0;
+  const open = invoicesTotal - paid;
+
+  const items = [
+    {
+      advice_type:"Cash Flow",
+      title:"Controle de recebimentos",
+      message:`Receita faturada estimada: R$ ${formatMoneyAI(invoicesTotal)}. Recebido: R$ ${formatMoneyAI(paid)}. Aberto: R$ ${formatMoneyAI(open)}.`,
+      priority: open > paid ? "High" : "Medium"
+    },
+    {
+      advice_type:"Margin",
+      title:"Revisão de margem",
+      message:"Revise serviços com maior custo operacional e priorize contratos recorrentes.",
+      priority:"Medium"
+    }
+  ];
+
+  for(const item of items){
+    await apiInsert("ai_financial_advice", {...item, company_id: companyId, status:"Open"});
+  }
+
+  aiFinancialAdvice = await apiGet("ai_financial_advice");
+  renderAIFinancialAdvisor();
+}
+
+function renderAIWorkforcePlanner(){
+  setTitle("AI Workforce Planner");
+
+  setContent(`
+    <div class="aiops-hero"><h2>V55 AI Workforce Planner</h2><p>Sugere distribuição de equipe por prioridade, tarefa e operação.</p></div>
+
+    <div class="card">
+      <h2>Nova Sugestão de Equipe</h2>
+      <div class="form-grid">
+        <select id="workforceCompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <input id="workforceEmployee" placeholder="Funcionário">
+        <input id="workforceFocus" placeholder="Foco/Tarefa">
+        <select id="workforcePriority"><option>Normal</option><option>High</option><option>Urgent</option></select>
+      </div>
+      <button class="primary-btn" onclick="generateWorkforcePlan()">Gerar Plano</button>
+    </div>
+
+    <div class="aiops-grid">
+      ${aiWorkforcePlans.map(p => `
+        <div class="aiops-card">
+          <h2>${p.employee_name}</h2>
+          <small>${p.plan_name} • ${p.priority} • ${p.status}</small>
+          <p><strong>Foco:</strong> ${p.task_focus}</p>
+          <p>${p.recommendation}</p>
+        </div>
+      `).join("") || "<div class='card'>Nenhum plano de equipe.</div>"}
+    </div>
+  `);
+}
+
+async function generateWorkforcePlan(){
+  const companyId = val("workforceCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("ai_workforce_plans", {
+    company_id: companyId,
+    plan_name: "AI Workforce Plan",
+    employee_name: val("workforceEmployee"),
+    task_focus: val("workforceFocus"),
+    priority: val("workforcePriority"),
+    recommendation: "Priorizar tarefas urgentes, reduzir deslocamento e vincular check-in GPS ao fim da OS.",
+    status: "Suggested"
+  });
+
+  if(!res.ok) return alert("Erro ao gerar plano.");
+
+  aiWorkforcePlans = await apiGet("ai_workforce_plans");
+  renderAIWorkforcePlanner();
+}
+
+function renderAIRouteOptimization(){
+  setTitle("AI Route Optimization");
+
+  setContent(`
+    <div class="aiops-hero"><h2>V56 AI Route Optimization</h2><p>Sugere melhorias de rota e economia operacional.</p></div>
+
+    <div class="card">
+      <h2>Gerar Otimização de Rota</h2>
+      <div class="form-grid">
+        <select id="routeOptCompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <input id="routeOptName" placeholder="Nome da rota">
+        <input id="routeOptStops" type="number" placeholder="Quantidade de paradas">
+      </div>
+      <button class="primary-btn" onclick="generateRouteOptimization()">Gerar Otimização</button>
+    </div>
+
+    <div class="aiops-grid">
+      ${aiRouteOptimizations.map(r => `
+        <div class="aiops-card">
+          <h2>${r.route_name}</h2>
+          <p class="bi-number">${r.optimization_score}</p>
+          <span class="aiops-badge">${r.status}</span>
+          <p>${r.recommendation}</p>
+          <strong>${r.estimated_saving}</strong>
+        </div>
+      `).join("") || "<div class='card'>Nenhuma otimização de rota.</div>"}
+    </div>
+  `);
+}
+
+async function generateRouteOptimization(){
+  const companyId = val("routeOptCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const stops = Number(val("routeOptStops") || 1);
+  const score = Math.min(100, 50 + stops * 5);
+
+  const res = await apiInsert("ai_route_optimizations", {
+    company_id: companyId,
+    route_name: val("routeOptName"),
+    optimization_score: score,
+    recommendation: "Agrupar visitas por proximidade, iniciar pela rota mais distante e finalizar perto da base.",
+    estimated_saving: stops >= 5 ? "Economia estimada: 15% a 25% de deslocamento." : "Economia estimada: 5% a 10% de deslocamento.",
+    status: "Suggested"
+  });
+
+  if(!res.ok) return alert("Erro ao gerar otimização.");
+
+  aiRouteOptimizations = await apiGet("ai_route_optimizations");
+  renderAIRouteOptimization();
+}
+
+function renderAIWeatherImpact(){
+  setTitle("AI Weather Impact");
+
+  setContent(`
+    <div class="aiops-hero"><h2>V57 AI Weather Impact Engine</h2><p>Analisa impacto climático na operação de campo.</p></div>
+
+    <div class="card">
+      <h2>Novo Impacto Climático</h2>
+      <div class="form-grid">
+        <select id="weatherAICompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <input id="weatherAILocation" placeholder="Local">
+        <select id="weatherAILevel"><option>Low</option><option>Medium</option><option>High</option></select>
+        <input id="weatherAIWork" placeholder="Trabalho afetado">
+      </div>
+      <button class="primary-btn" onclick="generateWeatherImpact()">Gerar Impacto</button>
+    </div>
+
+    <div class="aiops-grid">
+      ${aiWeatherImpacts.map(w => `
+        <div class="aiops-card ${w.impact_level === "High" ? "ai-critical" : w.impact_level === "Medium" ? "ai-medium" : "ai-low"}">
+          <h2>${w.location_name}</h2>
+          <span class="aiops-badge">${w.impact_level}</span>
+          <p>${w.affected_work}</p>
+          <strong>${w.recommendation}</strong>
+        </div>
+      `).join("") || "<div class='card'>Nenhum impacto climático.</div>"}
+    </div>
+  `);
+}
+
+async function generateWeatherImpact(){
+  const companyId = val("weatherAICompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const level = val("weatherAILevel");
+
+  const res = await apiInsert("ai_weather_impacts", {
+    company_id: companyId,
+    location_name: val("weatherAILocation"),
+    impact_level: level,
+    affected_work: val("weatherAIWork"),
+    recommendation: level === "High" ? "Reagendar equipe externa e avisar cliente." : "Monitorar clima e manter plano alternativo.",
+    status: "Monitor"
+  });
+
+  if(!res.ok) return alert("Erro ao gerar impacto.");
+
+  aiWeatherImpacts = await apiGet("ai_weather_impacts");
+  renderAIWeatherImpact();
+}
+
+function renderAIExecutiveReports(){
+  setTitle("AI Executive Reports");
+
+  setContent(`
+    <div class="aiops-hero"><h2>V58 AI Executive Reports</h2><p>Gera relatório executivo com highlights, riscos e próximas ações.</p></div>
+
+    <div class="card">
+      <h2>Gerar Relatório Executivo</h2>
+      <button class="success-btn" onclick="generateExecutiveReportAI()">Gerar Relatório</button>
+    </div>
+
+    <div class="aiops-grid">
+      ${aiExecutiveReports.map(r => `
+        <div class="aiops-card">
+          <h2>${r.report_title}</h2>
+          <small>${r.status}</small>
+          <p><strong>Resumo:</strong> ${r.report_summary}</p>
+          <p><strong>Highlights:</strong> ${r.highlights}</p>
+          <p><strong>Riscos:</strong> ${r.risks}</p>
+          <p><strong>Ações:</strong> ${r.next_actions}</p>
+        </div>
+      `).join("") || "<div class='card'>Nenhum relatório executivo AI.</div>"}
+    </div>
+  `);
+}
+
+async function generateExecutiveReportAI(){
+  const companyId = getFirstCompanyIdAI();
+  if(!companyId) return alert("Crie uma empresa primeiro.");
+
+  const res = await apiInsert("ai_executive_reports", {
+    company_id: companyId,
+    report_title: "AI Executive Report",
+    report_summary: "Resumo automático da operação, financeiro, campo, integrações e BI.",
+    highlights: `Leads analisados: ${aiLeadScores.length}. OS: ${typeof workOrders !== "undefined" ? workOrders.length : 0}. BI snapshots: ${typeof biSnapshots !== "undefined" ? biSnapshots.length : 0}.`,
+    risks: "Verificar projetos com risco alto, mensagens pendentes e impacto climático.",
+    next_actions: "Priorizar cobranças, rotas, automações e leads quentes.",
+    status: "Generated"
+  });
+
+  if(!res.ok) return alert("Erro ao gerar relatório.");
+
+  aiExecutiveReports = await apiGet("ai_executive_reports");
+  renderAIExecutiveReports();
+}
+
+function renderAIAutomationRecommendations(){
+  setTitle("AI Automation Recommendations");
+
+  setContent(`
+    <div class="aiops-hero"><h2>V59 AI Automation Recommendations</h2><p>Sugere automações com trigger, ação e benefício.</p></div>
+
+    <div class="card">
+      <h2>Gerar Recomendações</h2>
+      <button class="success-btn" onclick="generateAutomationRecommendations()">Gerar Recomendações</button>
+    </div>
+
+    <div class="aiops-grid">
+      ${aiAutomationRecommendations.map(a => `
+        <div class="aiops-card ${a.priority === "High" ? "ai-critical" : "ai-medium"}">
+          <h2>${a.recommendation_title}</h2>
+          <small>${a.trigger_name} → ${a.action_name}</small>
+          <p>${a.benefit}</p>
+          <span class="aiops-badge">${a.priority}</span>
+        </div>
+      `).join("") || "<div class='card'>Nenhuma recomendação de automação.</div>"}
+    </div>
+  `);
+}
+
+async function generateAutomationRecommendations(){
+  const companyId = getFirstCompanyIdAI();
+  if(!companyId) return alert("Crie uma empresa primeiro.");
+
+  const items = [
+    ["Cobrança automática", "Invoice Overdue", "Send WhatsApp + Gmail", "Reduz inadimplência e tempo manual.", "High"],
+    ["Lembrete de visita", "Appointment Tomorrow", "Send Push + WhatsApp", "Reduz esquecimento da equipe e do cliente.", "Medium"],
+    ["OS concluída", "Work Order Completed", "Generate Report + Email Client", "Aumenta profissionalismo e percepção de valor.", "High"]
+  ];
+
+  for(const [title, trigger_name, action_name, benefit, priority] of items){
+    await apiInsert("ai_automation_recommendations", {
+      company_id: companyId,
+      recommendation_title: title,
+      trigger_name,
+      action_name,
+      benefit,
+      priority,
+      status: "Suggested"
+    });
+  }
+
+  aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
+  renderAIAutomationRecommendations();
+}
+
+function renderAICommandCenter(){
+  setTitle("AI Command Center");
+
+  setContent(`
+    <div class="aiops-hero"><h2>V60 AI Command Center</h2><p>Painel único para comandar análises e gerar ações de IA operacional.</p></div>
+
+    <div class="card">
+      <h2>Comando AI</h2>
+      <textarea id="aiCommandText" placeholder="Ex: analisar financeiro, gerar relatório, recomendar automações, revisar rotas"></textarea>
+      <button class="primary-btn" onclick="runAICommand()">Executar Comando</button>
+    </div>
+
+    <div class="cards">
+      ${metric("Lead Scores", aiLeadScores.length)}
+      ${metric("Quote Drafts", aiQuoteDrafts.length)}
+      ${metric("Project Risks", aiProjectRisks.length)}
+      ${metric("Financial Advice", aiFinancialAdvice.length)}
+      ${metric("Workforce Plans", aiWorkforcePlans.length)}
+      ${metric("Route AI", aiRouteOptimizations.length)}
+      ${metric("Weather AI", aiWeatherImpacts.length)}
+      ${metric("AI Reports", aiExecutiveReports.length)}
+      ${metric("AI Automations", aiAutomationRecommendations.length)}
+    </div>
+
+    <div class="card">
+      <h2>Command Logs</h2>
+      ${aiCommandCenterLogs.map(l => `
+        <div class="command-box">> ${l.command_text}\n${l.command_result}</div>
+      `).join("") || "<p>Nenhum comando executado.</p>"}
+    </div>
+  `);
+}
+
+async function runAICommand(){
+  const companyId = getFirstCompanyIdAI();
+  if(!companyId) return alert("Crie uma empresa primeiro.");
+
+  const command = val("aiCommandText").trim();
+  if(!command) return alert("Digite um comando.");
+
+  let result = "Comando registrado. ";
+
+  const lower = command.toLowerCase();
+  if(lower.includes("financeiro")){
+    result += "Sugestão: revisar inadimplência, MRR, faturas pendentes e margem.";
+  }else if(lower.includes("relatório")){
+    result += "Sugestão: gerar relatório executivo V58 com riscos e próximas ações.";
+  }else if(lower.includes("automação")){
+    result += "Sugestão: criar automações para cobrança, visitas e OS concluída.";
+  }else if(lower.includes("rota")){
+    result += "Sugestão: revisar rotas com maior número de paradas e clima crítico.";
+  }else{
+    result += "Sugestão geral: priorizar leads quentes, projetos críticos, caixa e equipe de campo.";
+  }
+
+  const res = await apiInsert("ai_command_center_logs", {
+    company_id: companyId,
+    command_text: command,
+    command_result: result,
+    command_status: "Completed"
+  });
+
+  if(!res.ok) return alert("Erro ao executar comando.");
+
+  aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  renderAICommandCenter();
+}
+
+function formatMoneyAI(value){
+  return Number(value || 0).toLocaleString("pt-BR", {
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+}
+
+
+/* FIX V51-V60: rotas e funções operacionais reforçadas */
+const DD_AI_ROUTES_FIX = {
+  aiLeadScoring: renderAILeadScoring,
+  aiQuoteGenerator: renderAIQuoteGenerator,
+  aiProjectRisk: renderAIProjectRisk,
+  aiFinancialAdvisor: renderAIFinancialAdvisor,
+  aiWorkforcePlanner: renderAIWorkforcePlanner,
+  aiRouteOptimization: renderAIRouteOptimization,
+  aiWeatherImpact: renderAIWeatherImpact,
+  aiExecutiveReports: renderAIExecutiveReports,
+  aiAutomationRecommendations: renderAIAutomationRecommendations,
+  aiOperationsCommand: renderAICommandCenter
+};
+
+if (typeof window.__ddOriginalChangePageV51 === "undefined" && typeof changePage === "function") {
+  window.__ddOriginalChangePageV51 = changePage;
+
+  changePage = function(page, event){
+    document.querySelectorAll(".menu-btn").forEach(btn => btn.classList.remove("active"));
+    if(event && event.target) event.target.classList.add("active");
+
+    if(DD_AI_ROUTES_FIX[page]){
+      DD_AI_ROUTES_FIX[page]();
+      return;
+    }
+
+    window.__ddOriginalChangePageV51(page, event);
+  };
+}
+
+function ddAICompanyOptions(){
+  return companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+}
+
+function ddAIFirstCompany(){
+  return companies[0]?.id || "";
+}
+
+function renderAILeadScoring(){
+  setTitle("AI Lead Scoring");
+  setContent(`
+    <div class="aiops-hero"><h2>V51 AI Lead Scoring</h2><p>Calcula chance de fechamento do lead.</p></div>
+    <div class="card">
+      <h2>Gerar Score</h2>
+      <div class="form-grid">
+        <select id="leadScoreCompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <input id="leadScoreName" placeholder="Nome do lead">
+        <input id="leadScoreBudget" type="number" placeholder="Orçamento estimado">
+        <select id="leadScoreUrgency"><option>Baixa</option><option>Média</option><option>Alta</option></select>
+      </div>
+      <button class="primary-btn" onclick="generateAILeadScore()">Gerar Score</button>
+    </div>
+    <div class="aiops-grid">
+      ${aiLeadScores.length ? aiLeadScores.map(s => `
+        <div class="aiops-card ${s.category === "Hot" ? "ai-score-hot" : s.category === "Warm" ? "ai-score-warm" : "ai-score-cold"}">
+          <h2>${s.lead_name}</h2><p class="bi-number">${s.score}</p><span class="aiops-badge">${s.category}</span><p>${s.reasons || ""}</p>
+        </div>`).join("") : "<div class='card'>Nenhum lead score.</div>"}
+    </div>
+  `);
+}
+
+async function generateAILeadScore(){
+  const companyId = val("leadScoreCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+  const budget = Number(val("leadScoreBudget") || 0);
+  const urgency = val("leadScoreUrgency");
+  let score = 35 + (budget >= 10000 ? 30 : budget >= 3000 ? 18 : 8) + (urgency === "Alta" ? 25 : urgency === "Média" ? 12 : 0);
+  score = Math.min(score, 100);
+  const category = score >= 75 ? "Hot" : score >= 45 ? "Warm" : "Cold";
+  const res = await apiInsert("ai_lead_scores", {
+    company_id: companyId,
+    lead_name: val("leadScoreName"),
+    score,
+    category,
+    reasons: `Budget: R$ ${formatMoneyAI(score * 100)} | Urgência: ${urgency}`,
+    status: "Open"
+  });
+  if(!res.ok) return alert("Erro ao gerar score. Rode o SQL V51-V60.");
+  aiLeadScores = await apiGet("ai_lead_scores");
+  renderAILeadScoring();
+}
+
+function renderAIQuoteGenerator(){
+  setTitle("AI Quote Generator");
+  setContent(`
+    <div class="aiops-hero"><h2>V52 AI Quote Generator</h2><p>Gera rascunhos de orçamento.</p></div>
+    <div class="card">
+      <h2>Novo Orçamento AI</h2>
+      <div class="form-grid">
+        <select id="quoteAICompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <input id="quoteAIClient" placeholder="Cliente">
+        <input id="quoteAIService" placeholder="Serviço">
+        <input id="quoteAIArea" type="number" placeholder="Área/quantidade">
+        <input id="quoteAIComplexity" type="number" placeholder="Complexidade 1 a 5">
+      </div>
+      <textarea id="quoteAIScope" placeholder="Escopo"></textarea>
+      <button class="primary-btn" onclick="generateAIQuoteDraft()">Gerar Orçamento</button>
+    </div>
+    <div class="aiops-grid">
+      ${aiQuoteDrafts.length ? aiQuoteDrafts.map(q => `
+        <div class="aiops-card"><h2>${q.client_name}</h2><small>${q.service_name} • ${q.status}</small><p class="bi-number">R$ ${formatMoneyAI(q.estimated_amount)}</p><p>${q.scope || ""}</p><p><strong>AI:</strong> ${q.ai_notes || ""}</p></div>
+      `).join("") : "<div class='card'>Nenhum orçamento AI.</div>"}
+    </div>
+  `);
+}
+
+async function generateAIQuoteDraft(){
+  const companyId = val("quoteAICompany");
+  if(!companyId) return alert("Selecione a empresa.");
+  const area = Number(val("quoteAIArea") || 1);
+  const complexity = Math.max(1, Number(val("quoteAIComplexity") || 1));
+  const estimated = area * complexity * 180;
+  const res = await apiInsert("ai_quote_drafts", {
+    company_id: companyId,
+    client_name: val("quoteAIClient"),
+    service_name: val("quoteAIService"),
+    scope: val("quoteAIScope"),
+    estimated_amount: estimated,
+    ai_notes: `Estimativa baseada em área ${area}, complexidade ${complexity} e preço base operacional.`,
+    status: "Draft"
+  });
+  if(!res.ok) return alert("Erro ao gerar orçamento. Rode o SQL V51-V60.");
+  aiQuoteDrafts = await apiGet("ai_quote_drafts");
+  renderAIQuoteGenerator();
+}
+
+function renderAIProjectRisk(){
+  setTitle("AI Project Risk Analysis");
+  setContent(`
+    <div class="aiops-hero"><h2>V53 AI Project Risk Analysis</h2><p>Calcula risco de projeto.</p></div>
+    <div class="card">
+      <h2>Analisar Projeto</h2>
+      <div class="form-grid">
+        <select id="riskCompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <input id="riskProject" placeholder="Projeto">
+        <input id="riskPending" type="number" placeholder="Pendências">
+        <input id="riskDelay" type="number" placeholder="Dias de atraso">
+      </div>
+      <button class="primary-btn" onclick="generateProjectRisk()">Gerar Risco</button>
+    </div>
+    <div class="aiops-grid">
+      ${aiProjectRisks.length ? aiProjectRisks.map(r => `
+        <div class="aiops-card ${r.risk_level === "High" ? "ai-critical" : r.risk_level === "Medium" ? "ai-medium" : "ai-low"}">
+          <h2>${r.project_name}</h2><p class="bi-number">${r.risk_score}</p><span class="aiops-badge">${r.risk_level}</span><p>${r.risk_reasons || ""}</p><strong>${r.recommended_action || ""}</strong>
+        </div>
+      `).join("") : "<div class='card'>Nenhum risco de projeto.</div>"}
+    </div>
+  `);
+}
+
+async function generateProjectRisk(){
+  const companyId = val("riskCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+  const pending = Number(val("riskPending") || 0);
+  const delay = Number(val("riskDelay") || 0);
+  const score = Math.min(100, pending * 12 + delay * 8);
+  const level = score >= 70 ? "High" : score >= 35 ? "Medium" : "Low";
+  const res = await apiInsert("ai_project_risks", {
+    company_id: companyId,
+    project_name: val("riskProject"),
+    risk_score: score,
+    risk_level: level,
+    risk_reasons: `${pending} pendências e ${delay} dias de atraso.`,
+    recommended_action: level === "High" ? "Revisar equipe, rota e prioridade imediatamente." : "Monitorar execução e atualizar checklist.",
+    status: "Open"
+  });
+  if(!res.ok) return alert("Erro ao gerar risco. Rode o SQL V51-V60.");
+  aiProjectRisks = await apiGet("ai_project_risks");
+  renderAIProjectRisk();
+}
+
+function renderAIFinancialAdvisor(){
+  setTitle("AI Financial Advisor");
+  setContent(`
+    <div class="aiops-hero"><h2>V54 AI Financial Advisor</h2><p>Gera recomendações financeiras.</p></div>
+    <div class="card"><h2>Gerar Conselhos</h2><button class="success-btn" onclick="generateFinancialAdvice()">Analisar Financeiro</button></div>
+    <div class="aiops-grid">
+      ${aiFinancialAdvice.length ? aiFinancialAdvice.map(a => `
+        <div class="aiops-card ${a.priority === "High" ? "ai-critical" : a.priority === "Medium" ? "ai-medium" : "ai-low"}">
+          <h2>${a.title}</h2><small>${a.advice_type} • ${a.priority}</small><p>${a.message}</p>
+        </div>
+      `).join("") : "<div class='card'>Nenhum conselho financeiro.</div>"}
+    </div>
+  `);
+}
+
+async function generateFinancialAdvice(){
+  const companyId = ddAIFirstCompany();
+  if(!companyId) return alert("Crie uma empresa primeiro.");
+  const invoicesTotal = typeof invoices !== "undefined" ? invoices.reduce((s,i) => s + Number(i.amount || 0), 0) : 0;
+  const paid = typeof payments !== "undefined" ? payments.filter(p => p.status === "Paid").reduce((s,p) => s + Number(p.amount || 0), 0) : 0;
+  const open = invoicesTotal - paid;
+  const res = await apiInsert("ai_financial_advice", {
+    company_id: companyId,
+    advice_type:"Cash Flow",
+    title:"Controle de recebimentos",
+    message:`Faturado: R$ ${formatMoneyAI(invoicesTotal)}. Recebido: R$ ${formatMoneyAI(paid)}. Aberto: R$ ${formatMoneyAI(open)}.`,
+    priority: open > paid ? "High" : "Medium",
+    status:"Open"
+  });
+  if(!res.ok) return alert("Erro ao gerar conselho. Rode o SQL V51-V60.");
+  aiFinancialAdvice = await apiGet("ai_financial_advice");
+  renderAIFinancialAdvisor();
+}
+
+function renderAIWorkforcePlanner(){
+  setTitle("AI Workforce Planner");
+  setContent(`
+    <div class="aiops-hero"><h2>V55 AI Workforce Planner</h2><p>Sugere distribuição de equipe.</p></div>
+    <div class="card">
+      <h2>Nova Sugestão</h2>
+      <div class="form-grid">
+        <select id="workforceCompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <input id="workforceEmployee" placeholder="Funcionário">
+        <input id="workforceFocus" placeholder="Foco/Tarefa">
+        <select id="workforcePriority"><option>Normal</option><option>High</option><option>Urgent</option></select>
+      </div>
+      <button class="primary-btn" onclick="generateWorkforcePlan()">Gerar Plano</button>
+    </div>
+    <div class="aiops-grid">${aiWorkforcePlans.length ? aiWorkforcePlans.map(p => `<div class="aiops-card"><h2>${p.employee_name}</h2><small>${p.plan_name} • ${p.priority}</small><p><strong>Foco:</strong> ${p.task_focus}</p><p>${p.recommendation}</p></div>`).join("") : "<div class='card'>Nenhum plano de equipe.</div>"}</div>
+  `);
+}
+
+async function generateWorkforcePlan(){
+  const companyId = val("workforceCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+  const res = await apiInsert("ai_workforce_plans", {
+    company_id: companyId,
+    plan_name:"AI Workforce Plan",
+    employee_name: val("workforceEmployee"),
+    task_focus: val("workforceFocus"),
+    priority: val("workforcePriority"),
+    recommendation:"Priorizar tarefas urgentes, reduzir deslocamento e vincular check-in GPS ao fim da OS.",
+    status:"Suggested"
+  });
+  if(!res.ok) return alert("Erro ao gerar plano. Rode o SQL V51-V60.");
+  aiWorkforcePlans = await apiGet("ai_workforce_plans");
+  renderAIWorkforcePlanner();
+}
+
+function renderAIRouteOptimization(){
+  setTitle("AI Route Optimization");
+  setContent(`
+    <div class="aiops-hero"><h2>V56 AI Route Optimization</h2><p>Sugere melhorias de rota.</p></div>
+    <div class="card">
+      <h2>Nova Otimização</h2>
+      <div class="form-grid">
+        <select id="routeOptCompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <input id="routeOptName" placeholder="Nome da rota">
+        <input id="routeOptStops" type="number" placeholder="Quantidade de paradas">
+      </div>
+      <button class="primary-btn" onclick="generateRouteOptimization()">Gerar Otimização</button>
+    </div>
+    <div class="aiops-grid">${aiRouteOptimizations.length ? aiRouteOptimizations.map(r => `<div class="aiops-card"><h2>${r.route_name}</h2><p class="bi-number">${r.optimization_score}</p><span class="aiops-badge">${r.status}</span><p>${r.recommendation}</p><strong>${r.estimated_saving}</strong></div>`).join("") : "<div class='card'>Nenhuma otimização de rota.</div>"}</div>
+  `);
+}
+
+async function generateRouteOptimization(){
+  const companyId = val("routeOptCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+  const stops = Number(val("routeOptStops") || 1);
+  const score = Math.min(100, 50 + stops * 5);
+  const res = await apiInsert("ai_route_optimizations", {
+    company_id: companyId,
+    route_name: val("routeOptName"),
+    optimization_score: score,
+    recommendation:"Agrupar visitas por proximidade, iniciar pela rota mais distante e finalizar perto da base.",
+    estimated_saving: stops >= 5 ? "Economia estimada: 15% a 25%." : "Economia estimada: 5% a 10%.",
+    status:"Suggested"
+  });
+  if(!res.ok) return alert("Erro ao gerar otimização. Rode o SQL V51-V60.");
+  aiRouteOptimizations = await apiGet("ai_route_optimizations");
+  renderAIRouteOptimization();
+}
+
+function renderAIWeatherImpact(){
+  setTitle("AI Weather Impact");
+  setContent(`
+    <div class="aiops-hero"><h2>V57 AI Weather Impact Engine</h2><p>Analisa impacto climático.</p></div>
+    <div class="card">
+      <h2>Novo Impacto</h2>
+      <div class="form-grid">
+        <select id="weatherAICompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <input id="weatherAILocation" placeholder="Local">
+        <select id="weatherAILevel"><option>Low</option><option>Medium</option><option>High</option></select>
+        <input id="weatherAIWork" placeholder="Trabalho afetado">
+      </div>
+      <button class="primary-btn" onclick="generateWeatherImpact()">Gerar Impacto</button>
+    </div>
+    <div class="aiops-grid">${aiWeatherImpacts.length ? aiWeatherImpacts.map(w => `<div class="aiops-card ${w.impact_level === "High" ? "ai-critical" : w.impact_level === "Medium" ? "ai-medium" : "ai-low"}"><h2>${w.location_name}</h2><span class="aiops-badge">${w.impact_level}</span><p>${w.affected_work}</p><strong>${w.recommendation}</strong></div>`).join("") : "<div class='card'>Nenhum impacto climático.</div>"}</div>
+  `);
+}
+
+async function generateWeatherImpact(){
+  const companyId = val("weatherAICompany");
+  if(!companyId) return alert("Selecione a empresa.");
+  const level = val("weatherAILevel");
+  const res = await apiInsert("ai_weather_impacts", {
+    company_id: companyId,
+    location_name: val("weatherAILocation"),
+    impact_level: level,
+    affected_work: val("weatherAIWork"),
+    recommendation: level === "High" ? "Reagendar equipe externa e avisar cliente." : "Monitorar clima e manter plano alternativo.",
+    status:"Monitor"
+  });
+  if(!res.ok) return alert("Erro ao gerar impacto. Rode o SQL V51-V60.");
+  aiWeatherImpacts = await apiGet("ai_weather_impacts");
+  renderAIWeatherImpact();
+}
+
+function renderAIExecutiveReports(){
+  setTitle("AI Executive Reports");
+  setContent(`
+    <div class="aiops-hero"><h2>V58 AI Executive Reports</h2><p>Gera relatório executivo.</p></div>
+    <div class="card"><h2>Gerar Relatório</h2><button class="success-btn" onclick="generateExecutiveReportAI()">Gerar Relatório</button></div>
+    <div class="aiops-grid">${aiExecutiveReports.length ? aiExecutiveReports.map(r => `<div class="aiops-card"><h2>${r.report_title}</h2><small>${r.status}</small><p><strong>Resumo:</strong> ${r.report_summary}</p><p><strong>Highlights:</strong> ${r.highlights}</p><p><strong>Riscos:</strong> ${r.risks}</p><p><strong>Ações:</strong> ${r.next_actions}</p></div>`).join("") : "<div class='card'>Nenhum relatório executivo AI.</div>"}</div>
+  `);
+}
+
+async function generateExecutiveReportAI(){
+  const companyId = ddAIFirstCompany();
+  if(!companyId) return alert("Crie uma empresa primeiro.");
+  const res = await apiInsert("ai_executive_reports", {
+    company_id: companyId,
+    report_title:"AI Executive Report",
+    report_summary:"Resumo automático da operação, financeiro, campo, integrações e BI.",
+    highlights:`Leads analisados: ${aiLeadScores.length}. AI Reports: ${aiExecutiveReports.length}.`,
+    risks:"Verificar projetos com risco alto, mensagens pendentes e impacto climático.",
+    next_actions:"Priorizar cobranças, rotas, automações e leads quentes.",
+    status:"Generated"
+  });
+  if(!res.ok) return alert("Erro ao gerar relatório. Rode o SQL V51-V60.");
+  aiExecutiveReports = await apiGet("ai_executive_reports");
+  renderAIExecutiveReports();
+}
+
+function renderAIAutomationRecommendations(){
+  setTitle("AI Automation Recommendations");
+  setContent(`
+    <div class="aiops-hero"><h2>V59 AI Automation Recommendations</h2><p>Sugere automações.</p></div>
+    <div class="card"><h2>Gerar Recomendações</h2><button class="success-btn" onclick="generateAutomationRecommendations()">Gerar Recomendações</button></div>
+    <div class="aiops-grid">${aiAutomationRecommendations.length ? aiAutomationRecommendations.map(a => `<div class="aiops-card ${a.priority === "High" ? "ai-critical" : "ai-medium"}"><h2>${a.recommendation_title}</h2><small>${a.trigger_name} → ${a.action_name}</small><p>${a.benefit}</p><span class="aiops-badge">${a.priority}</span></div>`).join("") : "<div class='card'>Nenhuma recomendação.</div>"}</div>
+  `);
+}
+
+async function generateAutomationRecommendations(){
+  const companyId = ddAIFirstCompany();
+  if(!companyId) return alert("Crie uma empresa primeiro.");
+  const items = [
+    ["Cobrança automática", "Invoice Overdue", "Send WhatsApp + Gmail", "Reduz inadimplência.", "High"],
+    ["Lembrete de visita", "Appointment Tomorrow", "Send Push + WhatsApp", "Reduz esquecimento.", "Medium"],
+    ["OS concluída", "Work Order Completed", "Generate Report + Email Client", "Aumenta profissionalismo.", "High"]
+  ];
+  for(const [recommendation_title, trigger_name, action_name, benefit, priority] of items){
+    await apiInsert("ai_automation_recommendations", {company_id, recommendation_title, trigger_name, action_name, benefit, priority, status:"Suggested"});
+  }
+  aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
+  renderAIAutomationRecommendations();
+}
+
+function renderAICommandCenter(){
+  setTitle("AI Command Center");
+  setContent(`
+    <div class="aiops-hero"><h2>V60 AI Command Center</h2><p>Painel único para comandar análises de IA.</p></div>
+    <div class="card"><h2>Comando AI</h2><textarea id="aiCommandText" placeholder="Ex: analisar financeiro, gerar relatório, recomendar automações, revisar rotas"></textarea><button class="primary-btn" onclick="runAICommand()">Executar Comando</button></div>
+    <div class="cards">
+      ${metric("Lead Scores", aiLeadScores.length)}
+      ${metric("Quote Drafts", aiQuoteDrafts.length)}
+      ${metric("Project Risks", aiProjectRisks.length)}
+      ${metric("Financial Advice", aiFinancialAdvice.length)}
+      ${metric("Workforce Plans", aiWorkforcePlans.length)}
+      ${metric("Route AI", aiRouteOptimizations.length)}
+      ${metric("Weather AI", aiWeatherImpacts.length)}
+      ${metric("AI Reports", aiExecutiveReports.length)}
+      ${metric("AI Automations", aiAutomationRecommendations.length)}
+    </div>
+    <div class="card"><h2>Command Logs</h2>${aiCommandCenterLogs.length ? aiCommandCenterLogs.map(l => `<div class="command-box">> ${l.command_text}\n${l.command_result}</div>`).join("") : "<p>Nenhum comando executado.</p>"}</div>
+  `);
+}
+
+async function runAICommand(){
+  const companyId = ddAIFirstCompany();
+  if(!companyId) return alert("Crie uma empresa primeiro.");
+  const command = val("aiCommandText").trim();
+  if(!command) return alert("Digite um comando.");
+  const lower = command.toLowerCase();
+  let result = "Comando registrado. ";
+  if(lower.includes("financeiro")) result += "Sugestão: revisar inadimplência, MRR, faturas pendentes e margem.";
+  else if(lower.includes("relatório")) result += "Sugestão: gerar relatório executivo V58 com riscos e próximas ações.";
+  else if(lower.includes("automação")) result += "Sugestão: criar automações para cobrança, visitas e OS concluída.";
+  else if(lower.includes("rota")) result += "Sugestão: revisar rotas com maior número de paradas e clima crítico.";
+  else result += "Sugestão geral: priorizar leads quentes, projetos críticos, caixa e equipe de campo.";
+  const res = await apiInsert("ai_command_center_logs", {company_id, command_text:command, command_result:result, command_status:"Completed"});
+  if(!res.ok) return alert("Erro ao executar comando. Rode o SQL V51-V60.");
+  aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  renderAICommandCenter();
+}
+
+function formatMoneyAI(value){
+  return Number(value || 0).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
 }

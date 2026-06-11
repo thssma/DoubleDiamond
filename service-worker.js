@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-v50-1-functional-fix-20260610';
+const CACHE_NAME = 'doublediamond-v51-v60-functional-fix-20260610';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -23,13 +23,9 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const req = event.request;
-
   if (req.mode === 'navigate' || req.destination === 'document') {
     event.respondWith(fetch(req).catch(() => caches.match(req)));
     return;
   }
-
-  event.respondWith(
-    caches.match(req).then(cached => cached || fetch(req))
-  );
+  event.respondWith(caches.match(req).then(cached => cached || fetch(req)));
 });
