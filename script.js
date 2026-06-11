@@ -33,6 +33,7 @@ let fieldPhotos = [];
 let fieldSignatures = [];
 let workOrders = [];
 let workOrderLogs = [];
+let projectTimeline = [];
 let biSnapshots = [];
 let analyticsRankings = [];
 let forecastScenarios = [];
@@ -141,6 +142,7 @@ async function loadData(){
   fieldSignatures = await apiGet("field_signatures");
   workOrders = await apiGet("work_orders");
   workOrderLogs = await apiGet("work_order_logs");
+  projectTimeline = await apiGet("project_timeline");
   biSnapshots = await apiGet("bi_snapshots");
   analyticsRankings = await apiGet("analytics_rankings");
   forecastScenarios = await apiGet("forecast_scenarios");
@@ -1412,6 +1414,7 @@ async function saveMobileSettings(){
   fieldSignatures = await apiGet("field_signatures");
   workOrders = await apiGet("work_orders");
   workOrderLogs = await apiGet("work_order_logs");
+  projectTimeline = await apiGet("project_timeline");
   biSnapshots = await apiGet("bi_snapshots");
   analyticsRankings = await apiGet("analytics_rankings");
   forecastScenarios = await apiGet("forecast_scenarios");
@@ -1963,6 +1966,7 @@ async function signWorkOrder(){
 
   fieldSignatures = await apiGet("field_signatures");
   workOrderLogs = await apiGet("work_order_logs");
+  projectTimeline = await apiGet("project_timeline");
   biSnapshots = await apiGet("bi_snapshots");
   analyticsRankings = await apiGet("analytics_rankings");
   forecastScenarios = await apiGet("forecast_scenarios");
@@ -5076,4 +5080,112 @@ renderClientHome = function(){
   ddV68OldRenderClientHome();
   const eyebrow = document.querySelector(".v651-eyebrow");
   if(eyebrow) eyebrow.textContent = "Client Portal · V68.1";
+};
+
+
+/* V69 REAL PROJECT TIMELINE */
+function ddV69TimelineItems(){
+  const rows = Array.isArray(projectTimeline) ? projectTimeline.slice() : [];
+  const normalized = rows.map(function(row, index){
+    return {
+      event: row.event || row.title || row.status || ("Evento " + (index + 1)),
+      project_id: row.project_id || "",
+      created_at: row.created_at || "",
+      isCurrent: index === 0
+    };
+  });
+
+  if(normalized.length){
+    return normalized.sort(function(a,b){
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    });
+  }
+
+  return [
+    {event:"Contrato aprovado",created_at:"",isCurrent:false},
+    {event:"Planejamento iniciado",created_at:"",isCurrent:false},
+    {event:"Equipe programada",created_at:"",isCurrent:false},
+    {event:"Execução em andamento",created_at:"",isCurrent:true},
+    {event:"Inspeção final",created_at:"",isCurrent:false},
+    {event:"Entrega final",created_at:"",isCurrent:false}
+  ];
+}
+
+function ddV69TimelineHtml(){
+  const items = ddV69TimelineItems();
+  const usingReal = Array.isArray(projectTimeline) && projectTimeline.length > 0;
+
+  return [
+    '<div class="v69-real-timeline-card">',
+      '<div class="v69-timeline-head">',
+        '<div>',
+          '<h3>📍 Timeline Real do Projeto</h3>',
+          '<small>Eventos carregados da tabela project_timeline.</small>',
+        '</div>',
+        '<span class="v69-source-pill">' + (usingReal ? 'Supabase conectado' : 'Modo exemplo') + '</span>',
+      '</div>',
+      items.length ? items.map(function(item, index){
+        const date = item.created_at ? new Date(item.created_at).toLocaleString("pt-BR") : "Aguardando data";
+        const dotClass = item.isCurrent || index === 0 && usingReal ? "v69-event-dot current" : "v69-event-dot";
+        const icon = item.isCurrent || index === 0 && usingReal ? "⏳" : "✓";
+        return '<div class="v69-event">' +
+          '<div class="' + dotClass + '">' + icon + '</div>' +
+          '<div>' +
+            '<div class="v69-event-title">' + v68SafeText(item.event) + '</div>' +
+            '<small>' + v68SafeText(date) + '</small>' +
+          '</div>' +
+        '</div>';
+      }).join("") : '<div class="v69-empty">Nenhum evento registrado ainda.</div>',
+    '</div>'
+  ].join("");
+}
+
+async function addProjectTimelineEventV69(eventName){
+  const name = eventName || prompt("Digite o evento da timeline:");
+  if(!name) return;
+
+  const projectId = "Jardim Residencial";
+
+  const res = await apiInsert("project_timeline", {
+    project_id: projectId,
+    event: name
+  });
+
+  if(!res.ok){
+    return alert("Erro ao salvar evento. Verifique RLS/permissão da tabela project_timeline.");
+  }
+
+  projectTimeline = await apiGet("project_timeline");
+  alert("Evento salvo na timeline.");
+  renderClientHome();
+}
+
+const ddV69OldRenderClientHome = renderClientHome;
+renderClientHome = function(){
+  ddV69OldRenderClientHome();
+
+  const eyebrow = document.querySelector(".v651-eyebrow");
+  if(eyebrow) eyebrow.textContent = "Client Portal · V69.0";
+
+  const oldTimeline = Array.from(document.querySelectorAll(".v651-card,.v69-real-timeline-card")).find(function(card){
+    return card.textContent.includes("Timeline do Projeto") || card.textContent.includes("Timeline Real do Projeto");
+  });
+
+  if(oldTimeline){
+    oldTimeline.outerHTML = ddV69TimelineHtml();
+  }else{
+    const gallery = Array.from(document.querySelectorAll(".v651-card")).find(function(card){
+      return card.textContent.includes("Galeria") || card.textContent.includes("Evolução");
+    });
+    if(gallery){
+      gallery.insertAdjacentHTML("afterend", ddV69TimelineHtml());
+    }
+  }
+
+  const timelineCard = document.querySelector(".v69-real-timeline-card");
+  if(timelineCard && !timelineCard.querySelector(".v69-add-action")){
+    timelineCard.insertAdjacentHTML("beforeend",
+      '<div class="v68-actions v69-add-action"><button class="secondary-btn" onclick="addProjectTimelineEventV69()">Adicionar Evento</button></div>'
+    );
+  }
 };
