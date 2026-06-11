@@ -4763,18 +4763,3 @@ changePage = function(page, event){
     ddStartBackgroundLoadV642();
   }
 };
-
-const ddOriginalRenderDashboardV642 = renderDashboard;
-renderDashboard = function(){
-  ddOriginalRenderDashboardV642();
-
-  const content = document.getElementById("pageContent");
-  if(content && !ddInitialDataLoaded && !content.querySelector(".performance-pill")){
-    content.insertAdjacentHTML("afterbegin", `
-      <div class="performance-pill">
-        <span class="performance-dot"></span>
-        Carregando dados em segundo plano...
-      </div>
-    `);
-  }
-};
