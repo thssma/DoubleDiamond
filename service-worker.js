@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-v65-1-client-premium-final-20260611';
+const CACHE_NAME = 'doublediamond-v66-project-gallery-20260611';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
