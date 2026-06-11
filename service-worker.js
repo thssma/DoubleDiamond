@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-v51-v60-functional-fix-20260610';
+const CACHE_NAME = 'doublediamond-v61-role-experience-20260610';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

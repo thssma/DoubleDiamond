@@ -1,10 +1,10 @@
 {
-  "name": "DoubleDiamond Field Operations",
-  "short_name": "DD Field",
+  "name": "DoubleDiamond Role Experience",
+  "short_name": "DD Role",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#16a34a",
-  "description": "DoubleDiamond Architecture Hardening V50.1",
+  "description": "DoubleDiamond V61 Role Based Experience",
   "icons": []
 }

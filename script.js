@@ -57,6 +57,11 @@ let aiWeatherImpacts = [];
 let aiExecutiveReports = [];
 let aiAutomationRecommendations = [];
 let aiCommandCenterLogs = [];
+let userProfiles = [];
+let roleExperienceSettings = [];
+let roleActivityLogs = [];
+let currentRoleExperience = localStorage.getItem("dd_role") || "owner";
+
 
 
 
@@ -159,6 +164,9 @@ async function loadData(){
   aiExecutiveReports = await apiGet("ai_executive_reports");
   aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
   aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  userProfiles = await apiGet("user_profiles");
+  roleExperienceSettings = await apiGet("role_experience_settings");
+  roleActivityLogs = await apiGet("role_activity_logs");
 
 }
 
@@ -207,6 +215,10 @@ function changePage(page, event){
     aiExecutiveReports: renderAIExecutiveReports,
     aiAutomationRecommendations: renderAIAutomationRecommendations,
     aiOperationsCommand: renderAICommandCenter,
+    roleExperience: renderRoleExperience,
+    ownerHome: renderOwnerHome,
+    employeeHome: renderEmployeeHome,
+    clientHome: renderClientHome,
     configuracoes: renderConfiguracoes
   };
 
@@ -1165,6 +1177,9 @@ async function saveMobileSettings(){
   aiExecutiveReports = await apiGet("ai_executive_reports");
   aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
   aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  userProfiles = await apiGet("user_profiles");
+  roleExperienceSettings = await apiGet("role_experience_settings");
+  roleActivityLogs = await apiGet("role_activity_logs");
 
   renderMobileReady();
 }
@@ -1713,6 +1728,9 @@ async function signWorkOrder(){
   aiExecutiveReports = await apiGet("ai_executive_reports");
   aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
   aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  userProfiles = await apiGet("user_profiles");
+  roleExperienceSettings = await apiGet("role_experience_settings");
+  roleActivityLogs = await apiGet("role_activity_logs");
   renderWorkOrders();
 }
 
@@ -2067,6 +2085,9 @@ async function generateExecutiveIntelligence(){
   aiExecutiveReports = await apiGet("ai_executive_reports");
   aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
   aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  userProfiles = await apiGet("user_profiles");
+  roleExperienceSettings = await apiGet("role_experience_settings");
+  roleActivityLogs = await apiGet("role_activity_logs");
   renderExecutiveIntelligence();
 }
 
@@ -2094,6 +2115,9 @@ async function closeExecutiveIntelligence(id){
   aiExecutiveReports = await apiGet("ai_executive_reports");
   aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
   aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  userProfiles = await apiGet("user_profiles");
+  roleExperienceSettings = await apiGet("role_experience_settings");
+  roleActivityLogs = await apiGet("role_activity_logs");
   renderExecutiveIntelligence();
 }
 
@@ -2287,6 +2311,9 @@ async function runAutomationFlow(id, name){
   aiExecutiveReports = await apiGet("ai_executive_reports");
   aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
   aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  userProfiles = await apiGet("user_profiles");
+  roleExperienceSettings = await apiGet("role_experience_settings");
+  roleActivityLogs = await apiGet("role_activity_logs");
   renderAutomationFlowsReal();
 }
 
@@ -2636,6 +2663,9 @@ async function runAutomationFlow(id, name){
   aiExecutiveReports = await apiGet("ai_executive_reports");
   aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
   aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  userProfiles = await apiGet("user_profiles");
+  roleExperienceSettings = await apiGet("role_experience_settings");
+  roleActivityLogs = await apiGet("role_activity_logs");
   renderAutomationFlowsReal();
 }
 
@@ -3101,6 +3131,9 @@ async function seedAIReadiness(){
   aiExecutiveReports = await apiGet("ai_executive_reports");
   aiAutomationRecommendations = await apiGet("ai_automation_recommendations");
   aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  userProfiles = await apiGet("user_profiles");
+  roleExperienceSettings = await apiGet("role_experience_settings");
+  roleActivityLogs = await apiGet("role_activity_logs");
   alert("AI Readiness populado com sucesso.");
   renderAIReadiness();
 }
@@ -3703,6 +3736,9 @@ async function runAICommand(){
   if(!res.ok) return alert("Erro ao executar comando.");
 
   aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  userProfiles = await apiGet("user_profiles");
+  roleExperienceSettings = await apiGet("role_experience_settings");
+  roleActivityLogs = await apiGet("role_activity_logs");
   renderAICommandCenter();
 }
 
@@ -4109,9 +4145,214 @@ async function runAICommand(){
   const res = await apiInsert("ai_command_center_logs", {company_id, command_text:command, command_result:result, command_status:"Completed"});
   if(!res.ok) return alert("Erro ao executar comando. Rode o SQL V51-V60.");
   aiCommandCenterLogs = await apiGet("ai_command_center_logs");
+  userProfiles = await apiGet("user_profiles");
+  roleExperienceSettings = await apiGet("role_experience_settings");
+  roleActivityLogs = await apiGet("role_activity_logs");
   renderAICommandCenter();
 }
 
 function formatMoneyAI(value){
   return Number(value || 0).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+
+/* V61 ROLE BASED EXPERIENCE */
+const DD_ROLE_ROUTES = {
+  roleExperience: renderRoleExperience,
+  ownerHome: renderOwnerHome,
+  employeeHome: renderEmployeeHome,
+  clientHome: renderClientHome
+};
+
+if (typeof window.__ddOriginalChangePageV61 === "undefined" && typeof changePage === "function") {
+  window.__ddOriginalChangePageV61 = changePage;
+  changePage = function(page, event){
+    document.querySelectorAll(".menu-btn").forEach(btn => btn.classList.remove("active"));
+    if(event && event.target) event.target.classList.add("active");
+
+    if(DD_ROLE_ROUTES[page]){
+      DD_ROLE_ROUTES[page]();
+      return;
+    }
+
+    window.__ddOriginalChangePageV61(page, event);
+  };
+}
+
+function setRoleExperience(role){
+  currentRoleExperience = role;
+  localStorage.setItem("dd_role", role);
+  if(role === "owner") renderOwnerHome();
+  if(role === "employee") renderEmployeeHome();
+  if(role === "client") renderClientHome();
+}
+
+function renderRoleExperience(){
+  setTitle("Role Experience");
+
+  setContent(`
+    <div class="role-hero">
+      <h2>DoubleDiamond</h2>
+      <p>1 aplicativo. 3 experiências: dono, funcionário e cliente.</p>
+    </div>
+
+    <div class="role-grid">
+      <div class="role-card" onclick="setRoleExperience('owner')">
+        <span class="role-badge">GESTOR</span>
+        <h2>👑 Business Command Center</h2>
+        <p>Financeiro, BI, equipe, clientes, integrações, automações e IA.</p>
+      </div>
+
+      <div class="role-card" onclick="setRoleExperience('employee')">
+        <span class="role-badge">CAMPO</span>
+        <h2>👷 Meu Trabalho Hoje</h2>
+        <p>Ordens, rotas, check-in, fotos, clima e execução em campo.</p>
+      </div>
+
+      <div class="role-card" onclick="setRoleExperience('client')">
+        <span class="role-badge">CLIENTE</span>
+        <h2>🤝 Meu Projeto</h2>
+        <p>Projetos, fotos, relatórios, pagamentos e comunicação.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Criar usuário de teste</h2>
+      <div class="form-grid">
+        <select id="roleUserCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="roleUserName" placeholder="Nome">
+        <input id="roleUserEmail" placeholder="Email">
+        <select id="roleUserRole"><option value="owner">owner</option><option value="employee">employee</option><option value="client">client</option></select>
+      </div>
+      <button class="primary-btn" onclick="createRoleUser()">Salvar Perfil</button>
+    </div>
+
+    <div class="role-grid">
+      ${userProfiles.map(u => `
+        <div class="role-card">
+          <h2>${u.user_name}</h2>
+          <span class="role-badge">${u.role}</span>
+          <p>${u.user_email || ""}</p>
+        </div>
+      `).join("") || "<div class='card'>Nenhum perfil criado.</div>"}
+    </div>
+  `);
+}
+
+async function createRoleUser(){
+  const companyId = val("roleUserCompany");
+  if(!companyId) return alert("Selecione a empresa.");
+
+  const res = await apiInsert("user_profiles", {
+    company_id: companyId,
+    user_name: val("roleUserName"),
+    user_email: val("roleUserEmail"),
+    role: val("roleUserRole"),
+    status: "Active"
+  });
+
+  if(!res.ok) return alert("Erro ao criar perfil. Rode o SQL V61.");
+
+  userProfiles = await apiGet("user_profiles");
+  renderRoleExperience();
+}
+
+function renderOwnerHome(){
+  setTitle("Business Command Center");
+
+  const revenue = typeof invoices !== "undefined" ? invoices.reduce((s,i) => s + Number(i.amount || 0), 0) : 0;
+  const activeProjects = typeof workOrders !== "undefined" ? workOrders.length : 0;
+  const alerts = (typeof weatherAlerts !== "undefined" ? weatherAlerts.length : 0) + (typeof aiProjectRisks !== "undefined" ? aiProjectRisks.length : 0);
+
+  setContent(`
+    <div class="role-hero">
+      <h2>👑 Business Command Center</h2>
+      <p>Como está sua empresa hoje?</p>
+    </div>
+
+    <div class="cards">
+      ${metric("Receita", "R$ " + Number(revenue || 0).toLocaleString("pt-BR"))}
+      ${metric("Ordens/Projetos", activeProjects)}
+      ${metric("Equipe/Campo", typeof gpsCheckins !== "undefined" ? gpsCheckins.length : 0)}
+      ${metric("Alertas", alerts)}
+      ${metric("AI Insights", typeof aiCommandCenterLogs !== "undefined" ? aiCommandCenterLogs.length : 0)}
+    </div>
+
+    <div class="role-action-grid">
+      <button class="role-action" onclick="changePage('workOrders')">🧾 Ordens de Serviço</button>
+      <button class="role-action" onclick="changePage('billingDashboard')">💰 Financeiro</button>
+      <button class="role-action" onclick="changePage('biDashboard')">📊 BI</button>
+      <button class="role-action" onclick="changePage('aiOperationsCommand')">🧠 AI Command</button>
+      <button class="role-action" onclick="changePage('mapsReal')">🗺️ Rotas</button>
+      <button class="role-action" onclick="changePage('whatsappReal')">🟢 WhatsApp</button>
+    </div>
+  `);
+}
+
+function renderEmployeeHome(){
+  setTitle("Meu Trabalho Hoje");
+
+  const nextWO = typeof workOrders !== "undefined" && workOrders.length ? workOrders[0] : null;
+
+  setContent(`
+    <div class="role-hero">
+      <h2>👷 Meu Trabalho Hoje</h2>
+      <p>O que precisa ser feito agora.</p>
+    </div>
+
+    <div class="role-mobile-card">
+      <h2>Próxima Ordem</h2>
+      <p>${nextWO ? nextWO.client_name || "Cliente" : "Nenhuma ordem encontrada"}</p>
+      <p>${nextWO ? nextWO.service_type || "Serviço" : "Crie uma ordem para aparecer aqui."}</p>
+      <button class="primary-btn" onclick="changePage('workOrders')">Abrir OS</button>
+    </div>
+
+    <div class="role-action-grid">
+      <button class="role-action" onclick="changePage('routePlanning')">🗺️ Iniciar Rota</button>
+      <button class="role-action" onclick="changePage('mobileWorkforce')">📍 Check-in</button>
+      <button class="role-action" onclick="changePage('mobileWorkforce')">📷 Enviar Foto</button>
+      <button class="role-action" onclick="changePage('workOrders')">✅ Finalizar Serviço</button>
+      <button class="role-action" onclick="changePage('weatherCenter')">🌦️ Clima</button>
+      <button class="role-action" onclick="changePage('fieldDashboard')">🌱 Campo</button>
+    </div>
+
+    <div class="card">
+      <h2>Tarefas do dia</h2>
+      ${typeof mobileWorkforceTasks !== "undefined" && mobileWorkforceTasks.length ? mobileWorkforceTasks.slice(0,5).map(t => `
+        <div class="role-today"><strong>${t.task_title}</strong><br><small>${t.employee_name || ""} • ${t.task_status || ""}</small></div>
+      `).join("") : "<p>Nenhuma tarefa cadastrada.</p>"}
+    </div>
+  `);
+}
+
+function renderClientHome(){
+  setTitle("Meu Projeto");
+
+  const latestPhoto = typeof fieldPhotos !== "undefined" && fieldPhotos.length ? fieldPhotos[0] : null;
+
+  setContent(`
+    <div class="role-hero">
+      <h2>🤝 Meu Projeto</h2>
+      <p>Acompanhe seu projeto sem complicação.</p>
+    </div>
+
+    <div class="role-mobile-card">
+      <h2>Status</h2>
+      <p>Em andamento</p>
+      <p>Próxima atualização disponível no relatório.</p>
+      <button class="primary-btn" onclick="changePage('workOrders')">Ver Ordens</button>
+    </div>
+
+    <div class="role-action-grid">
+      <button class="role-action" onclick="changePage('workOrders')">🧾 Minhas Ordens</button>
+      <button class="role-action" onclick="changePage('reportCenter')">📑 Relatórios</button>
+      <button class="role-action" onclick="changePage('billingDashboard')">💳 Pagamentos</button>
+      <button class="role-action" onclick="changePage('gmailReal')">💬 Mensagem</button>
+    </div>
+
+    <div class="card">
+      <h2>Fotos recentes</h2>
+      ${latestPhoto ? `<p>${latestPhoto.project_name || "Projeto"} • ${latestPhoto.photo_type || "Foto"}</p><small>${latestPhoto.photo_url || ""}</small>` : "<p>Nenhuma foto cadastrada ainda.</p>"}
+    </div>
+  `);
 }
