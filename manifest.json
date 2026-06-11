@@ -1,10 +1,10 @@
 {
-  "name": "DoubleDiamond Role Experience",
-  "short_name": "DD Role",
+  "name": "DoubleDiamond Command Center",
+  "short_name": "DD V64",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#16a34a",
-  "description": "DoubleDiamond V63 Premium Home",
+  "background_color": "#f8fafc",
+  "theme_color": "#14532d",
+  "description": "DoubleDiamond V64 Home Command Center",
   "icons": []
 }

@@ -4562,3 +4562,91 @@ function renderClientHome(){
     </div>
   `);
 }
+
+
+/* V64 HOME COMMAND CENTER */
+function ddMoneyV64(value){return Number(value||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});}
+function ddInvoiceTotalV64(){return typeof invoices!=="undefined"?invoices.reduce((s,i)=>s+Number(i.amount||0),0):0;}
+function ddPaidTotalV64(){return typeof payments!=="undefined"?payments.filter(p=>p.status==="Paid").reduce((s,p)=>s+Number(p.amount||0),0):0;}
+
+function renderDashboard(){
+  setTitle("Home");
+  const revenue=ddInvoiceTotalV64(), paid=ddPaidTotalV64(), openRevenue=Math.max(revenue-paid,0);
+  const projects=typeof workOrders!=="undefined"?workOrders:[];
+  const teams=typeof gpsCheckins!=="undefined"?gpsCheckins.length:0;
+  const weatherCount=typeof weatherAlerts!=="undefined"?weatherAlerts.length:0;
+  const aiAlerts=typeof aiProjectRisks!=="undefined"?aiProjectRisks.length:0;
+  const routes=typeof routePlans!=="undefined"?routePlans.length:0;
+
+  setContent(`
+    <div class="v64-role-tabs">
+      <button class="active" onclick="renderDashboard()">👑 Owner Command</button>
+      <button onclick="renderEmployeeHome()">👷 Employee View</button>
+      <button onclick="renderClientHome()">🤝 Client View</button>
+    </div>
+    <section class="v64-hero">
+      <div class="v64-eyebrow">Professional Field Service Platform</div>
+      <h2>DoubleDiamond Command Center</h2>
+      <p>Visão executiva para paisagismo, irrigação, rotas, equipe de campo, clientes e inteligência operacional.</p>
+      <div class="v64-hero-actions">
+        <button class="v64-primary" onclick="changePage('workOrders')">Nova / Ver Ordem</button>
+        <button class="v64-secondary" onclick="changePage('routePlanning')">Ver Rotas</button>
+        <button class="v64-secondary" onclick="changePage('biDashboard')">Abrir BI</button>
+        <button class="v64-secondary" onclick="changePage('aiOperationsCommand')">AI Command</button>
+      </div>
+    </section>
+    <div class="v64-kpi-grid">
+      <div class="v64-kpi-card"><small>Receita total</small><h3>R$ ${ddMoneyV64(revenue)}</h3><p>Faturamento registrado.</p></div>
+      <div class="v64-kpi-card"><small>Recebido</small><h3>R$ ${ddMoneyV64(paid)}</h3><p>Pagamentos confirmados.</p></div>
+      <div class="v64-kpi-card"><small>Em aberto</small><h3>R$ ${ddMoneyV64(openRevenue)}</h3><p>Potencial de cobrança.</p></div>
+      <div class="v64-kpi-card"><small>Ordens / Projetos</small><h3>${projects.length}</h3><p>Itens operacionais.</p></div>
+      <div class="v64-kpi-card"><small>Equipe em campo</small><h3>${teams}</h3><p>Check-ins registrados.</p></div>
+      <div class="v64-kpi-card"><small>Rotas</small><h3>${routes}</h3><p>Planejamentos ativos.</p></div>
+    </div>
+    <div class="v64-section-title"><h2>Projetos e Ordens Ativas</h2><span>Pipeline operacional</span></div>
+    <div class="v64-grid">
+      ${projects.slice(0,3).map((p,idx)=>{const progress=[82,64,45][idx]||55;return `
+        <div class="v64-project-card">
+          <div class="v64-project-cover">🌿 ${p.client_name||p.project_name||"Projeto de Paisagismo"}</div>
+          <span class="v64-tag">${p.status||"Em andamento"}</span>
+          <h2>${p.service_type||p.work_order_title||"Serviço externo"}</h2>
+          <div class="v64-progress"><span style="width:${progress}%"></span></div>
+          <p>${progress}% concluído • Próxima atualização em campo</p>
+          <button class="secondary-btn" onclick="changePage('workOrders')">Abrir</button>
+        </div>`}).join("")||`
+        <div class="v64-project-card"><div class="v64-project-cover">🌿 Primeiro projeto</div><span class="v64-tag">Pronto para começar</span><h2>Cadastre uma ordem de serviço</h2><div class="v64-progress"><span style="width:18%"></span></div><p>Use Work Orders para alimentar a Home.</p><button class="secondary-btn" onclick="changePage('workOrders')">Criar / Abrir OS</button></div>`}
+    </div>
+    <div class="v64-section-title"><h2>Atividade de Hoje</h2><span>Feed operacional</span></div>
+    <div class="v64-grid">
+      <div class="v64-feed-card">
+        ${[["📍","Equipe pronta para rota","Abra Rotas para organizar deslocamentos."],["🧾","Ordens em acompanhamento",projects.length+" ordens/projetos disponíveis."],["🌦","Clima monitorado",weatherCount?weatherCount+" alertas encontrados.":"Sem alerta crítico."],["🧠","IA operacional",aiAlerts?aiAlerts+" riscos/projeções cadastrados.":"Sem risco AI crítico."]].map(i=>`
+          <div class="v64-feed-item"><div class="v64-feed-icon">${i[0]}</div><div><strong>${i[1]}</strong><br><small>${i[2]}</small></div></div>`).join("")}
+      </div>
+      <div class="v64-alert-card">
+        <h2>Alertas Inteligentes</h2><p>Acompanhe problemas antes que virem retrabalho.</p>
+        <div class="v64-feed-item"><div class="v64-feed-icon">⚠️</div><div><strong>Projetos atrasados</strong><br><small>${aiAlerts||0} riscos registrados.</small></div></div>
+        <div class="v64-feed-item"><div class="v64-feed-icon">🌧️</div><div><strong>Clima</strong><br><small>${weatherCount||0} alertas climáticos.</small></div></div>
+        <div class="v64-feed-item"><div class="v64-feed-icon">💬</div><div><strong>Comunicação</strong><br><small>WhatsApp/Gmail prontos para filas reais.</small></div></div>
+      </div>
+    </div>`);
+}
+
+function renderEmployeeHome(){
+  setTitle("Meu Trabalho Hoje");
+  const jobs=typeof workOrders!=="undefined"?workOrders:[], nextJob=jobs[0];
+  setContent(`
+    <section class="v64-hero"><div class="v64-eyebrow">Employee Mobile Workspace</div><h2>👷 Meu Trabalho Hoje</h2><p>Rotas, check-in, fotos, assinatura e conclusão de serviços em uma tela simples.</p><div class="v64-hero-actions"><button class="v64-primary" onclick="changePage('routePlanning')">Iniciar Rota</button><button class="v64-secondary" onclick="changePage('mobileWorkforce')">Check-in</button></div></section>
+    <div class="v64-grid"><div class="v64-mobile-shell"><div class="v64-mobile-screen"><span class="v64-tag">Próxima Ordem</span><h2>${nextJob?(nextJob.client_name||"Cliente"):"Nenhuma ordem para hoje"}</h2><p>${nextJob?(nextJob.service_type||"Serviço em campo"):"Cadastre uma OS para aparecer aqui."}</p><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('routePlanning')">🗺️<strong>Rota</strong><small>Abrir planejamento</small></div><div class="v64-action-card" onclick="changePage('mobileWorkforce')">📍<strong>Check-in</strong><small>Registrar presença</small></div><div class="v64-action-card" onclick="changePage('mobileWorkforce')">📷<strong>Fotos</strong><small>Enviar campo</small></div><div class="v64-action-card" onclick="changePage('workOrders')">✅<strong>Finalizar</strong><small>Concluir OS</small></div></div></div></div>
+    <div class="v64-feed-card"><h2>Tarefas do dia</h2>${jobs.slice(0,5).map(j=>`<div class="v64-feed-item"><div class="v64-feed-icon">🧾</div><div><strong>${j.client_name||"Cliente"}</strong><br><small>${j.service_type||j.status||"Serviço"}</small></div></div>`).join("")||"<p>Nenhuma tarefa cadastrada.</p>"}</div></div>`);
+}
+
+function renderClientHome(){
+  setTitle("Meu Projeto");
+  const photos=typeof fieldPhotos!=="undefined"?fieldPhotos:[], reportsCount=typeof reportCenterExports!=="undefined"?reportCenterExports.length:0;
+  const paid=ddPaidTotalV64(), revenue=ddInvoiceTotalV64(), progress=revenue?Math.min(100,Math.round((paid/revenue)*100)):72;
+  setContent(`
+    <section class="v64-hero"><div class="v64-eyebrow">Client Portal</div><h2>🤝 Meu Projeto</h2><p>Acompanhe progresso, fotos, relatórios, pagamentos e mensagens da equipe.</p><div class="v64-hero-actions"><button class="v64-primary" onclick="changePage('reportCenter')">Ver Relatórios</button><button class="v64-secondary" onclick="changePage('gmailReal')">Falar com Equipe</button></div></section>
+    <div class="v64-grid"><div class="v64-project-card"><div class="v64-project-cover">🏡 Projeto em andamento</div><span class="v64-tag">Status do projeto</span><h2>Progresso geral</h2><div class="v64-progress"><span style="width:${progress}%"></span></div><p>${progress}% concluído • Próxima visita em planejamento</p></div>
+    <div class="v64-feed-card"><h2>Acesso rápido</h2><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('workOrders')">🧾<strong>Ordens</strong><small>Acompanhar serviços</small></div><div class="v64-action-card" onclick="changePage('reportCenter')">📑<strong>Relatórios</strong><small>${reportsCount} disponíveis</small></div><div class="v64-action-card" onclick="changePage('billingDashboard')">💳<strong>Pagamentos</strong><small>Ver cobranças</small></div><div class="v64-action-card" onclick="changePage('gmailReal')">💬<strong>Mensagens</strong><small>Contato com equipe</small></div></div></div>
+    <div class="v64-feed-card"><h2>Fotos recentes</h2>${photos.slice(0,4).map(p=>`<div class="v64-feed-item"><div class="v64-feed-icon">📸</div><div><strong>${p.photo_type||"Foto de campo"}</strong><br><small>${p.project_name||p.photo_url||"Atualização do projeto"}</small></div></div>`).join("")||"<p>Nenhuma foto enviada ainda.</p>"}</div></div>`);
+}
