@@ -4985,8 +4985,8 @@ renderClientHome = function(){
     btn.onclick = () => ddV67RenderGallery(tab);
   });
 };
-\n
-/* V68 FIELD PHOTO UPLOAD */
+
+/* V68.1 FIELD PHOTO UPLOAD SYNTAX FIX */
 async function addFieldPhotoV68(){
   const projectName = val("v68ProjectName") || "Jardim Residencial";
   const employeeName = val("v68EmployeeName") || "Equipe Verde";
@@ -4994,7 +4994,7 @@ async function addFieldPhotoV68(){
   const photoUrl = val("v68PhotoUrl");
   const notes = val("v68Notes") || "";
 
-  if(!photoUrl.trim()){
+  if(!photoUrl || !photoUrl.trim()){
     return alert("Cole a URL da foto.");
   }
 
@@ -5016,48 +5016,41 @@ async function addFieldPhotoV68(){
   renderFieldDashboard();
 }
 
+function v68SafeText(value){
+  return String(value || "").replace(/[&<>"']/g, function(m){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m];
+  });
+}
+
 function v68UploadBlock(){
   const photos = Array.isArray(fieldPhotos) ? fieldPhotos.slice(0,6) : [];
+  const photoHtml = photos.length ? photos.map(function(p){
+    const bg = p.photo_url ? "background-image:linear-gradient(0deg,rgba(0,0,0,.25),rgba(0,0,0,.02)),url('" + v68SafeText(p.photo_url) + "');color:white;" : "";
+    return '<div class="v68-mini-photo">' +
+      '<div class="v68-mini-img" style="' + bg + '">' + v68SafeText(p.photo_type || "Foto") + '</div>' +
+      '<div class="v68-mini-body">' +
+      '<strong>' + v68SafeText(p.project_name || "Projeto") + '</strong><br>' +
+      '<small>' + v68SafeText(p.employee_name || "Equipe") + ' • ' + (p.created_at ? new Date(p.created_at).toLocaleDateString("pt-BR") : "") + '</small>' +
+      '<p>' + v68SafeText(p.notes || "") + '</p>' +
+      '</div></div>';
+  }).join("") : "<p>Nenhuma foto cadastrada ainda.</p>";
 
-  return `
-    <div class="v68-upload-card">
-      <h2>📸 Upload de Foto de Campo</h2>
-      <p>Salva diretamente na tabela <strong>field_photos</strong> usando as colunas reais do banco.</p>
-
-      <div class="v68-form-grid">
-        <input id="v68ProjectName" placeholder="Projeto" value="Jardim Residencial">
-        <input id="v68EmployeeName" placeholder="Funcionário / Equipe" value="Equipe Verde">
-        <select id="v68PhotoType">
-          <option>Antes</option>
-          <option selected>Durante</option>
-          <option>Depois</option>
-        </select>
-        <input id="v68PhotoUrl" placeholder="URL da foto">
-      </div>
-
-      <textarea id="v68Notes" placeholder="Observação da foto"></textarea>
-
-      <div class="v68-actions">
-        <button class="primary-btn" onclick="addFieldPhotoV68()">Salvar Foto</button>
-        <button class="secondary-btn" onclick="changePage('clientHome', event)">Ver no Portal Cliente</button>
-      </div>
-
-      <div class="v68-photo-list">
-        ${photos.length ? photos.map(p => `
-          <div class="v68-mini-photo">
-            <div class="v68-mini-img" style="${p.photo_url ? `background-image:linear-gradient(0deg,rgba(0,0,0,.25),rgba(0,0,0,.02)),url('${p.photo_url}');color:white;` : ""}">
-              ${p.photo_type || "Foto"}
-            </div>
-            <div class="v68-mini-body">
-              <strong>${p.project_name || "Projeto"}</strong><br>
-              <small>${p.employee_name || "Equipe"} • ${p.created_at ? new Date(p.created_at).toLocaleDateString("pt-BR") : ""}</small>
-              <p>${p.notes || ""}</p>
-            </div>
-          </div>
-        `).join("") : "<p>Nenhuma foto cadastrada ainda.</p>"}
-      </div>
-    </div>
-  `;
+  return '<div class="v68-upload-card">' +
+    '<h2>📸 Upload de Foto de Campo</h2>' +
+    '<p>Salva diretamente na tabela <strong>field_photos</strong> usando as colunas reais do banco.</p>' +
+    '<div class="v68-form-grid">' +
+      '<input id="v68ProjectName" placeholder="Projeto" value="Jardim Residencial">' +
+      '<input id="v68EmployeeName" placeholder="Funcionário / Equipe" value="Equipe Verde">' +
+      '<select id="v68PhotoType"><option>Antes</option><option selected>Durante</option><option>Depois</option></select>' +
+      '<input id="v68PhotoUrl" placeholder="URL da foto">' +
+    '</div>' +
+    '<textarea id="v68Notes" placeholder="Observação da foto"></textarea>' +
+    '<div class="v68-actions">' +
+      '<button class="primary-btn" onclick="addFieldPhotoV68()">Salvar Foto</button>' +
+      '<button class="secondary-btn" onclick="changePage(\'clientHome\', event)">Ver no Portal Cliente</button>' +
+    '</div>' +
+    '<div class="v68-photo-list">' + photoHtml + '</div>' +
+  '</div>';
 }
 
 const ddV68OldRenderFieldDashboard = renderFieldDashboard;
@@ -5082,5 +5075,5 @@ const ddV68OldRenderClientHome = renderClientHome;
 renderClientHome = function(){
   ddV68OldRenderClientHome();
   const eyebrow = document.querySelector(".v651-eyebrow");
-  if(eyebrow) eyebrow.textContent = "Client Portal · V68.0";
+  if(eyebrow) eyebrow.textContent = "Client Portal · V68.1";
 };

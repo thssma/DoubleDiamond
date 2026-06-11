@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-v68-field-photo-upload-20260611';
+const CACHE_NAME = 'doublediamond-v68-1-field-photo-upload-fix-20260611';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
