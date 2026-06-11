@@ -4847,7 +4847,7 @@ function renderClientHome(){
 }
 
 
-/* V67 REAL GALLERY + LIGHTBOX FINAL OVERRIDE */
+/* V67 REAL GALLERY FINAL OVERRIDE */
 function ddV67NormalizePhoto(p, idx){
   const categories = ["Antes","Durante","Depois"];
   const rawCat = String(p.category || p.photo_type || p.label || categories[idx % 3] || "Durante");
@@ -4922,7 +4922,7 @@ function ddV67OpenLightbox(title,date,by,desc,url,category){
 }
 
 function ddV67RenderGallery(category="Todos"){
-  const area = document.getElementById("v67GalleryArea");
+  const area = document.getElementById("v66GalleryArea") || document.getElementById("v67GalleryArea");
   if(!area) return;
 
   const items = ddV67GalleryItems(category);
@@ -4957,117 +4957,31 @@ function ddV67ComparisonHtml(){
   `;
 }
 
-function renderClientHome(){
-  setTitle("Meu Projeto");
+const ddV67PreviousRenderClientHome = renderClientHome;
+renderClientHome = function(){
+  ddV67PreviousRenderClientHome();
 
-  const photosAll = ddV67GalleryItems("Todos");
-  const reportsCount = Array.isArray(reportCenterExports) ? reportCenterExports.length : 0;
-  const visitsCompleted = Array.isArray(workOrderLogs) ? workOrderLogs.length : 3;
-  const projectName = (workOrders && workOrders[0] && (workOrders[0].client_name || workOrders[0].project_name || workOrders[0].service_type)) || "Jardim Residencial";
-  const lastUpdate = new Date().toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
+  const heroEyebrow = document.querySelector(".v651-eyebrow");
+  if(heroEyebrow) heroEyebrow.textContent = "Client Portal · V67.0";
 
-  setContent(`
-    <div class="v651-premium-page">
-      <section class="v651-premium-hero">
-        <div class="v651-hero-top">
-          <div>
-            <div class="v651-eyebrow">Client Portal · V67.0</div>
-            <h2>🏡 Meu Projeto</h2>
-            <p>Acompanhe progresso, galeria real antes/durante/depois, próximas visitas, equipe, documentos e atualizações.</p>
-          </div>
-          <div class="v651-status-pill">🟢 Dentro do prazo</div>
-        </div>
-        <div class="v651-progress"><span></span></div>
-        <strong>72% concluído</strong>
-        <p style="color:#d1fae5;margin-top:8px;">Última atualização: ${lastUpdate}</p>
-        <div class="v651-hero-actions">
-          <button class="v651-primary" onclick="changePage('reportCenter', event)">Ver Relatórios</button>
-          <button class="v651-secondary" onclick="changePage('whatsappReal', event)">Falar com Equipe</button>
-          <button class="v651-secondary" onclick="changePage('profitabilityEngine', event)">Pagamentos</button>
-        </div>
-      </section>
+  const galleryCard = Array.from(document.querySelectorAll(".v651-card")).find(card => card.textContent.includes("Evolução do Projeto"));
+  if(galleryCard){
+    const title = galleryCard.querySelector("h3");
+    if(title) title.textContent = "🏡 Galeria Real do Projeto";
+    const oldArea = galleryCard.querySelector("#v66GalleryArea");
+    if(oldArea){
+      oldArea.id = "v67GalleryArea";
+      ddV67RenderGallery("Todos");
+    }
+  }
 
-      <div class="v66-kpis">
-        <div class="v66-kpi">📸 Total Photos<strong>${photosAll.length}</strong></div>
-        <div class="v66-kpi">📅 Last Update<strong>${lastUpdate}</strong></div>
-        <div class="v66-kpi">👷 Visits Completed<strong>${visitsCompleted || 3}</strong></div>
-        <div class="v66-kpi">📈 Progress<strong>72%</strong></div>
-      </div>
+  const comparisonCard = Array.from(document.querySelectorAll(".v651-card")).find(card => card.textContent.includes("Comparação Antes"));
+  if(comparisonCard){
+    comparisonCard.innerHTML = `<h3>🆚 Comparação Antes / Depois</h3>${ddV67ComparisonHtml()}`;
+  }
 
-      <div class="v651-grid">
-        <div class="v651-card"><h3>🚀 Próxima Etapa</h3><p><strong>Instalação de irrigação</strong></p><small>Responsável: Equipe Verde</small></div>
-        <div class="v651-card"><h3>📅 Próxima Visita</h3><p><strong>12/06 às 08:00</strong></p><small>Irrigação e preparação do terreno</small></div>
-        <div class="v651-card"><h3>📊 Status do Projeto</h3><p><strong>${projectName}</strong></p><small>Projeto em andamento</small></div>
-        <div class="v651-card"><h3>📑 Relatórios</h3><p><strong>${reportsCount}</strong> disponíveis</p><small>Documentos preparados para o cliente</small></div>
-      </div>
-
-      <div class="v651-card">
-        <div class="v67-real-gallery-header">
-          <h3>🏡 Galeria Real do Projeto</h3>
-          <span class="v67-upload-note">Antes / Durante / Depois</span>
-        </div>
-        <div class="v66-tabs">
-          <button class="v66-tab active" data-tab="Todos" onclick="ddV67RenderGallery('Todos')">Todos</button>
-          <button class="v66-tab" data-tab="Antes" onclick="ddV67RenderGallery('Antes')">Antes</button>
-          <button class="v66-tab" data-tab="Durante" onclick="ddV67RenderGallery('Durante')">Durante</button>
-          <button class="v66-tab" data-tab="Depois" onclick="ddV67RenderGallery('Depois')">Depois</button>
-        </div>
-        <div id="v67GalleryArea" class="v66-gallery-grid"></div>
-      </div>
-
-      <div class="v651-card">
-        <h3>🆚 Comparação Antes / Depois</h3>
-        ${ddV67ComparisonHtml()}
-      </div>
-
-      <div class="v651-grid">
-        <div class="v651-card">
-          <h3>📍 Timeline do Projeto</h3>
-          <div class="v651-timeline">
-            <div class="v651-step"><div class="v651-dot">✓</div><div><strong>Contrato aprovado</strong><br><small>Projeto confirmado</small></div></div>
-            <div class="v651-step"><div class="v651-dot">✓</div><div><strong>Planejamento</strong><br><small>Escopo e equipe definidos</small></div></div>
-            <div class="v651-step"><div class="v651-dot current">⏳</div><div><strong>Execução em andamento</strong><br><small>Instalação e paisagismo</small></div></div>
-            <div class="v651-step"><div class="v651-dot todo">□</div><div><strong>Entrega</strong><br><small>Projeto concluído</small></div></div>
-          </div>
-        </div>
-
-        <div class="v651-card">
-          <h3>📰 Atualizações Recentes</h3>
-          <div class="v651-feed-item"><div class="v651-feed-icon">🌱</div><div><strong>Hoje</strong><br><small>Equipe iniciou preparação do terreno</small></div></div>
-          <div class="v651-feed-item"><div class="v651-feed-icon">🚚</div><div><strong>Ontem</strong><br><small>Materiais entregues no local</small></div></div>
-        </div>
-      </div>
-
-      <div class="v651-grid">
-        <div class="v651-card">
-          <h3>👷 Equipe Responsável</h3>
-          <div class="v651-team">
-            <div class="v651-person"><div class="v651-avatar">SV</div><div><strong>Supervisor</strong><br><small>Coordenação do projeto</small></div></div>
-            <div class="v651-person"><div class="v651-avatar">PS</div><div><strong>Paisagista</strong><br><small>Execução e acabamento</small></div></div>
-          </div>
-        </div>
-
-        <div class="v651-card">
-          <h3>💰 Resumo Financeiro</h3>
-          <div class="v651-grid">
-            <div><strong>Total</strong><br><small>R$ 18.000,00</small></div>
-            <div><strong>Pago</strong><br><small>R$ 15.000,00</small></div>
-            <div><strong>Pendente</strong><br><small>R$ 3.000,00</small></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="v651-card">
-        <h3>📄 Documentos</h3>
-        <div class="v651-docs">
-          <div class="v651-doc">📄 Contrato</div>
-          <div class="v651-doc">📄 Orçamento</div>
-          <div class="v651-doc">📄 Relatórios</div>
-          <div class="v651-doc">📄 Garantia</div>
-        </div>
-      </div>
-    </div>
-  `);
-
-  setTimeout(() => ddV67RenderGallery("Todos"), 0);
-}
+  document.querySelectorAll(".v66-tab").forEach(btn => {
+    const tab = btn.dataset.tab || btn.textContent.trim();
+    btn.onclick = () => ddV67RenderGallery(tab);
+  });
+};

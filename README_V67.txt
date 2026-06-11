@@ -1,3 +1,3 @@
-V67 Real Gallery + Lightbox
+V67 Real Gallery Final
 
-Melhora a galeria real do Client Portal, adiciona lightbox, comparação Antes/Depois e usa fieldPhotos quando houver fotos reais. Sem SQL, sem Supabase novo, sem novas tabelas.
+Adiciona lightbox real, comparação Antes/Depois e usa fieldPhotos quando houver fotos. Sem SQL, sem Supabase novo, sem novas tabelas.
