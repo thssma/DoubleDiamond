@@ -1,10 +1,10 @@
 {
   "name": "DoubleDiamond Command Center",
-  "short_name": "DD V66",
+  "short_name": "DD V66.1",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#14532d",
-  "description": "DoubleDiamond V66 Project Gallery",
+  "description": "DoubleDiamond V66.1 Visual Fix",
   "icons": []
 }
