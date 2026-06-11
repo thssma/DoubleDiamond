@@ -405,7 +405,38 @@ function renderDashboard(){
 <div class="v65-box"><h3>Depois</h3><p>Evolução mais recente</p></div>
 </div>
 
+
+<div class="v651-hero">
+<h2>🏡 Meu Projeto</h2>
+<p>72% concluído • 🟢 Dentro do prazo</p>
+<p>Próxima etapa: Instalação de irrigação</p>
+<p>Próxima visita: 12/06 • 08:00</p>
+</div>
+
+<div class="v651-grid">
+<div class="v651-card"><h3>🚀 Próxima Etapa</h3><p>Instalação de irrigação</p></div>
+<div class="v651-card"><h3>📅 Próxima Visita</h3><p>12/06 às 08:00</p></div>
+<div class="v651-card"><h3>🟢 Status</h3><p>Dentro do prazo</p></div>
+</div>
+
+<div class="v651-card">
+<h3>📰 Atualizações Recentes</h3>
+<div class="v651-feed-item">Hoje • Equipe iniciou preparação do terreno</div>
+<div class="v651-feed-item">Ontem • Materiais entregues</div>
+<div class="v651-feed-item">05/06 • Projeto aprovado</div>
+</div>
+
+<div class="v651-card">
+<h3>👷 Equipe Responsável</h3>
+<div class="v651-team">
+<span class="v651-avatar">Supervisor</span>
+<span class="v651-avatar">Paisagista</span>
+<span class="v651-avatar">Técnico</span>
+</div>
+</div>
+
 <h3 class="v62-section-title">Recent photos</h3>
+
 
       <div class="v62-photo-grid">
         ${(recentPhotos.length?recentPhotos:[

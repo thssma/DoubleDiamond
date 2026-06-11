@@ -909,3 +909,11 @@ body{ background:linear-gradient(180deg,#fbf8f1 0%, #eef2f7 100%); }
 .v65-gallery{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .v65-box{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:14px}
 .v65-finance{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* V65.1 CLIENT PREMIUM */
+.v651-hero{background:linear-gradient(135deg,#0f172a,#14532d);color:#fff;padding:24px;border-radius:24px;margin:18px 0}
+.v651-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:16px 0}
+.v651-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:16px}
+.v651-feed-item{padding:10px 0;border-bottom:1px solid #e5e7eb}
+.v651-team{display:flex;gap:10px;flex-wrap:wrap}
+.v651-avatar{background:#dbeafe;padding:10px 14px;border-radius:999px}
