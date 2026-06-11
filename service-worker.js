@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-v66-1-visual-fix-20260611';
+const CACHE_NAME = 'doublediamond-v67-real-gallery-lightbox-20260611';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

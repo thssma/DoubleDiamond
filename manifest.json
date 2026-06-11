@@ -1,10 +1,10 @@
 {
   "name": "DoubleDiamond Command Center",
-  "short_name": "DD V66.1",
+  "short_name": "DD V67",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#14532d",
-  "description": "DoubleDiamond V66.1 Visual Fix",
+  "description": "DoubleDiamond V67 Real Gallery Lightbox",
   "icons": []
 }
