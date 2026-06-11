@@ -385,7 +385,28 @@ function renderDashboard(){
         </div>
       </div>
 
-      <h3 class="v62-section-title">Recent photos</h3>
+      
+<div class="v65-timeline">
+<h3>📍 Timeline do Projeto</h3>
+<div class="v65-step"><span class="v65-done">✓</span><div>Orçamento aprovado</div></div>
+<div class="v65-step"><span class="v65-done">✓</span><div>Projeto criado</div></div>
+<div class="v65-step"><span class="v65-done">✓</span><div>Equipe programada</div></div>
+<div class="v65-step"><span class="v65-current">⏳</span><div>Execução em andamento</div></div>
+<div class="v65-step"><span>⬜</span><div>Entrega final</div></div>
+</div>
+
+<div class="v65-finance">
+<div class="v65-box"><h3>💰 Pago</h3><p>R$ ${formatMoneyExecutive ? formatMoneyExecutive(15000) : "15.000"}</p></div>
+<div class="v65-box"><h3>📄 Pendente</h3><p>R$ ${formatMoneyExecutive ? formatMoneyExecutive(3000) : "3.000"}</p></div>
+</div>
+
+<div class="v65-gallery">
+<div class="v65-box"><h3>Antes</h3><p>Área original do projeto</p></div>
+<div class="v65-box"><h3>Depois</h3><p>Evolução mais recente</p></div>
+</div>
+
+<h3 class="v62-section-title">Recent photos</h3>
+
       <div class="v62-photo-grid">
         ${(recentPhotos.length?recentPhotos:[
           {label:"Front yard",url:"https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=600&q=70"},

@@ -900,3 +900,12 @@ body{ background:linear-gradient(180deg,#fbf8f1 0%, #eef2f7 100%); }
 /* V64.2 INSTANT NAVIGATION */
 .performance-pill.fast{background:#eff6ff;color:#1d4ed8}
 .performance-dot.fast{background:#2563eb;box-shadow:0 0 0 6px rgba(37,99,235,.12)}
+
+/* V65 CLIENT EXPERIENCE */
+.v65-timeline{background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:18px;margin:18px 0}
+.v65-step{display:flex;gap:12px;padding:10px 0}
+.v65-done{color:#16a34a;font-weight:700}
+.v65-current{color:#f59e0b;font-weight:700}
+.v65-gallery{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.v65-box{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:14px}
+.v65-finance{display:grid;grid-template-columns:1fr 1fr;gap:12px}
