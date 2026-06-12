@@ -1,10 +1,10 @@
 {
   "name": "DoubleDiamond Command Center",
-  "short_name": "DD S2",
+  "short_name": "DD S3",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#14532d",
-  "description": "DoubleDiamond Sprint 2 Approvals Signatures Reports",
+  "description": "DoubleDiamond Sprint 3 Notifications Automations AI",
   "icons": []
 }

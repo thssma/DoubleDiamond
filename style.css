@@ -1078,3 +1078,10 @@ body{ background:linear-gradient(180deg,#fbf8f1 0%, #eef2f7 100%); }
 .s2-signature{border:2px dashed #94a3b8;border-radius:18px;padding:16px;background:#f8fafc;margin-top:12px}
 .s2-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px}
 .s2-kpi{background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:14px}
+
+/* SPRINT 3 NOTIFICATIONS AUTOMATIONS AI */
+.s3-section{background:#fff;border:1px solid #e2e8f0;border-radius:26px;padding:20px;box-shadow:0 18px 42px rgba(15,23,42,.08);margin:18px 0}
+.s3-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
+.s3-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:14px}
+.s3-card strong{display:block;margin-bottom:6px}
+.s3-card small{color:#64748b}

@@ -5395,3 +5395,87 @@ renderClientHome = function(){
     content.insertAdjacentHTML("beforeend", s2ApprovalHtml());
   }
 };
+
+
+/* SPRINT 3 NOTIFICATIONS AUTOMATIONS AI */
+async function s3CreateNotification(){
+  const res = await apiInsert("push_notification_queue", {
+    company_id: "demo-company",
+    title: "Atualização do Projeto",
+    body: "Nova atualização disponível no Client Portal.",
+    status: "Pending"
+  });
+
+  if(!res.ok){
+    return alert("Não foi possível criar notificação. Verifique RLS/colunas de push_notification_queue.");
+  }
+
+  pushNotificationQueue = await apiGet("push_notification_queue");
+  alert("Notificação criada.");
+  renderExecutiveDashboard();
+}
+
+async function s3CreateAutomationRun(){
+  const res = await apiInsert("automation_flow_runs", {
+    company_id: "demo-company",
+    flow_name: "Atualização automática do cliente",
+    run_status: "Simulated",
+    result_message: "Fluxo criado pelo Sprint 3"
+  });
+
+  if(!res.ok){
+    return alert("Não foi possível criar automação. Verifique RLS/colunas de automation_flow_runs.");
+  }
+
+  automationFlowRuns = await apiGet("automation_flow_runs");
+  alert("Automação registrada.");
+  renderExecutiveDashboard();
+}
+
+async function s3CreateAIInsight(){
+  const res = await apiInsert("ai_insights", {
+    agent_name: "Operations Advisor",
+    insight_type: "Operations",
+    title: "Projeto com nova atividade",
+    message: "Cliente recebeu atualização com fotos, timeline e próxima etapa.",
+    priority: "Medium",
+    status: "Open"
+  });
+
+  if(!res.ok){
+    return alert("Não foi possível criar insight. Verifique RLS/colunas de ai_insights.");
+  }
+
+  aiInsights = await apiGet("ai_insights");
+  alert("Insight criado.");
+  renderExecutiveDashboard();
+}
+
+function s3CommandCenterHtml(){
+  return `
+    <div class="s3-section">
+      <h2>🤖 Sprint 3 · Notificações, Automações e IA</h2>
+      <div class="s3-grid">
+        <div class="s3-card"><strong>🔔 Notificações</strong><small>${Array.isArray(pushNotificationQueue) ? pushNotificationQueue.length : 0} registros</small><br><button class="primary-btn" onclick="s3CreateNotification()">Criar Notificação</button></div>
+        <div class="s3-card"><strong>⚡ Automações</strong><small>${Array.isArray(automationFlowRuns) ? automationFlowRuns.length : 0} execuções</small><br><button class="secondary-btn" onclick="s3CreateAutomationRun()">Simular Automação</button></div>
+        <div class="s3-card"><strong>🧠 AI Insights</strong><small>${Array.isArray(aiInsights) ? aiInsights.length : 0} insights</small><br><button class="success-btn" onclick="s3CreateAIInsight()">Gerar Insight</button></div>
+      </div>
+    </div>
+  `;
+}
+
+const s3OldRenderExecutiveDashboard = renderExecutiveDashboard;
+renderExecutiveDashboard = function(){
+  s3OldRenderExecutiveDashboard();
+  const content = document.getElementById("pageContent");
+  if(content && !content.querySelector(".s3-section")){
+    content.insertAdjacentHTML("afterbegin", s3CommandCenterHtml());
+  }
+};
+
+const s3OldRenderClientHome = renderClientHome;
+renderClientHome = function(){
+  s3OldRenderClientHome();
+  const eyebrow = document.querySelector(".v651-eyebrow");
+  if(eyebrow) eyebrow.textContent = "Client Portal · Sprint 3";
+};
