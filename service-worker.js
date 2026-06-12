@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-v69-real-project-timeline-20260611';
+const CACHE_NAME = 'doublediamond-sprint1-core-real-ops-20260611';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

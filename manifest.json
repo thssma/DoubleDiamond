@@ -1,10 +1,10 @@
 {
   "name": "DoubleDiamond Command Center",
-  "short_name": "DD V75",
+  "short_name": "DD S1",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#14532d",
-  "description": "DoubleDiamond V70-V75 Bundle",
+  "description": "DoubleDiamond Sprint 1 Core Real Ops",
   "icons": []
 }

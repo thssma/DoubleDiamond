@@ -2,6 +2,7 @@ const SUPABASE_URL = "https://phpphqcxzwpuiglkqkls.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBocHBocWN4endwdWlnbGtxa2xzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNDE0NTAsImV4cCI6MjA5NjYxNzQ1MH0.z0F0KAHCWKdRTyg5JeNDzAWEbIdFEknT_kmx4QyMz3I";
 
 let companies = [];
+let projects = [];
 let companyUsers = [];
 let integrationProviders = [];
 let integrationConnections = [];
@@ -29,6 +30,7 @@ let routeStops = [];
 let weatherAlerts = [];
 let mobileWorkforceTasks = [];
 let gpsCheckins = [];
+let teamCheckins = [];
 let fieldPhotos = [];
 let fieldSignatures = [];
 let workOrders = [];
@@ -111,6 +113,7 @@ async function apiDelete(table, id){
 
 async function loadData(){
   companies = await apiGet("companies");
+  projects = await apiGet("projects");
   companyUsers = await apiGet("company_users");
   integrationProviders = await apiGet("integration_providers");
   integrationConnections = await apiGet("integration_connections");
@@ -138,6 +141,7 @@ async function loadData(){
   weatherAlerts = await apiGet("weather_alerts");
   mobileWorkforceTasks = await apiGet("mobile_workforce_tasks");
   gpsCheckins = await apiGet("gps_checkins");
+  teamCheckins = await apiGet("team_checkins");
   fieldPhotos = await apiGet("field_photos");
   fieldSignatures = await apiGet("field_signatures");
   workOrders = await apiGet("work_orders");
@@ -585,6 +589,7 @@ async function addCompany(){
   if(!res.ok) return alert("Erro ao criar empresa.");
 
   companies = await apiGet("companies");
+  projects = await apiGet("projects");
   renderEmpresas();
 }
 
@@ -593,6 +598,7 @@ async function removeCompany(id){
   if(!res.ok) return alert("Erro ao remover empresa.");
 
   companies = await apiGet("companies");
+  projects = await apiGet("projects");
   companyUsers = await apiGet("company_users");
   renderEmpresas();
 }
@@ -1410,6 +1416,7 @@ async function saveMobileSettings(){
   weatherAlerts = await apiGet("weather_alerts");
   mobileWorkforceTasks = await apiGet("mobile_workforce_tasks");
   gpsCheckins = await apiGet("gps_checkins");
+  teamCheckins = await apiGet("team_checkins");
   fieldPhotos = await apiGet("field_photos");
   fieldSignatures = await apiGet("field_signatures");
   workOrders = await apiGet("work_orders");
@@ -1835,6 +1842,7 @@ async function addGpsCheckin(){
   if(!res.ok) return alert("Erro ao registrar GPS.");
 
   gpsCheckins = await apiGet("gps_checkins");
+  teamCheckins = await apiGet("team_checkins");
   renderMobileWorkforce();
 }
 
@@ -5191,5 +5199,101 @@ renderClientHome = function(){
 };
 
 
-/* V70-V75 BUNDLE MARKER */
-window.DD_V75_BUNDLE = true;
+/* SPRINT 1 CORE REAL OPS */
+function s1Safe(value){
+  return String(value || "").replace(/[&<>"']/g, function(m){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m];
+  });
+}
+
+function s1Date(value){
+  return value ? new Date(value).toLocaleString("pt-BR") : "Sem data";
+}
+
+function s1RealOpsHtml(){
+  const wo = Array.isArray(workOrders) ? workOrders.slice(0,5) : [];
+  const checks = Array.isArray(teamCheckins) ? teamCheckins.slice(0,5) : [];
+  const photos = Array.isArray(fieldPhotos) ? fieldPhotos : [];
+  const timeline = Array.isArray(projectTimeline) ? projectTimeline : [];
+
+  return `
+    <div class="s1-section">
+      <h2>⚙️ Operação Real</h2>
+      <div class="s1-grid">
+        <div class="s1-card"><h3>🧾 Work Orders</h3><strong>${wo.length}</strong><span class="s1-pill">work_orders</span></div>
+        <div class="s1-card"><h3>👷 Check-ins</h3><strong>${checks.length}</strong><span class="s1-pill">team_checkins</span></div>
+        <div class="s1-card"><h3>📸 Fotos</h3><strong>${photos.length}</strong><span class="s1-pill">field_photos</span></div>
+        <div class="s1-card"><h3>📍 Timeline</h3><strong>${timeline.length}</strong><span class="s1-pill">project_timeline</span></div>
+      </div>
+
+      <div class="s1-grid">
+        <div class="s1-card">
+          <h3>🧾 Ordens Recentes</h3>
+          <div class="s1-list">
+            ${wo.length ? wo.map(w => `
+              <div class="s1-row">
+                <strong>${s1Safe(w.title || w.service_type || w.project_name || "Ordem de Serviço")}</strong>
+                <small>${s1Safe(w.status || "Status não informado")} • ${s1Date(w.created_at)}</small>
+              </div>
+            `).join("") : "<div class='s1-row'>Nenhuma ordem encontrada.</div>"}
+          </div>
+        </div>
+
+        <div class="s1-card">
+          <h3>👷 Equipe em Campo</h3>
+          <div class="s1-list">
+            ${checks.length ? checks.map(c => `
+              <div class="s1-row">
+                <strong>${s1Safe(c.employee_name || c.team_member || c.user_name || "Equipe")}</strong>
+                <small>${s1Safe(c.project_name || c.location || c.status || "Check-in")} • ${s1Date(c.created_at || c.checkin_time)}</small>
+              </div>
+            `).join("") : "<div class='s1-row'>Nenhum check-in encontrado.</div>"}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function s1CreateQuickCheckin(){
+  const res = await apiInsert("team_checkins", {
+    company_id: "demo-company",
+    project_name: "Jardim Residencial",
+    employee_name: "Equipe Verde",
+    status: "Em campo",
+    notes: "Check-in rápido pelo Sprint 1"
+  });
+
+  if(!res.ok){
+    return alert("Não foi possível salvar no team_checkins. A leitura continua funcionando; verifique RLS/colunas.");
+  }
+
+  teamCheckins = await apiGet("team_checkins");
+  renderFieldDashboard();
+}
+
+const s1OldRenderClientHome = renderClientHome;
+renderClientHome = function(){
+  s1OldRenderClientHome();
+  const eyebrow = document.querySelector(".v651-eyebrow");
+  if(eyebrow) eyebrow.textContent = "Client Portal · Sprint 1";
+  const content = document.getElementById("pageContent");
+  if(content && !content.querySelector(".s1-section")){
+    content.insertAdjacentHTML("beforeend", s1RealOpsHtml());
+  }
+};
+
+const s1OldRenderFieldDashboard = renderFieldDashboard;
+renderFieldDashboard = function(){
+  s1OldRenderFieldDashboard();
+  const content = document.getElementById("pageContent");
+  if(content && !content.querySelector(".s1-section")){
+    content.insertAdjacentHTML("afterbegin", `
+      <div class="s1-section">
+        <h2>👷 Sprint 1 · Campo Real</h2>
+        <button class="primary-btn" onclick="s1CreateQuickCheckin()">Criar Check-in Teste</button>
+        ${s1RealOpsHtml()}
+      </div>
+    `);
+  }
+};
