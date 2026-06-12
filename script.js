@@ -5297,3 +5297,101 @@ renderFieldDashboard = function(){
     `);
   }
 };
+
+
+/* SPRINT 2 APPROVAL SIGNATURE REPORTS */
+async function s2ApproveCurrentStep(){
+  const res = await apiInsert("project_timeline", {
+    project_id: "Jardim Residencial",
+    event: "Cliente aprovou etapa pelo portal"
+  });
+
+  if(!res.ok){
+    return alert("Não foi possível salvar aprovação em project_timeline. Verifique RLS/colunas.");
+  }
+
+  projectTimeline = await apiGet("project_timeline");
+  alert("Aprovação registrada na timeline.");
+  renderClientHome();
+}
+
+async function s2SaveSignature(){
+  const signer = val("s2Signer") || "Cliente";
+  const signature = val("s2Signature") || "";
+  if(!signature.trim()) return alert("Digite a assinatura.");
+
+  const res = await apiInsert("field_signatures", {
+    company_id: "demo-company",
+    project_name: "Jardim Residencial",
+    signer_name: signer,
+    signature_data: signature,
+    notes: "Assinatura registrada pelo Sprint 2"
+  });
+
+  if(!res.ok){
+    localStorage.setItem("dd_s2_signature_backup", JSON.stringify({
+      signer,
+      signature,
+      created_at: new Date().toISOString()
+    }));
+    return alert("Não salvou no Supabase. Backup local criado. Verifique RLS/colunas de field_signatures.");
+  }
+
+  fieldSignatures = await apiGet("field_signatures");
+  alert("Assinatura salva.");
+  renderClientHome();
+}
+
+async function s2CreateReportRecord(){
+  const res = await apiInsert("report_center_exports", {
+    company_id: "demo-company",
+    report_name: "Relatório Cliente - Jardim Residencial",
+    report_type: "Cliente",
+    export_format: "PDF",
+    status: "Prepared"
+  });
+
+  if(!res.ok){
+    return alert("Não foi possível criar relatório. Verifique RLS/colunas de report_center_exports.");
+  }
+
+  reportCenterExports = await apiGet("report_center_exports");
+  alert("Relatório preparado.");
+  renderClientHome();
+}
+
+function s2ApprovalHtml(){
+  return `
+    <div class="s2-section">
+      <h2>✅ Sprint 2 · Aprovação, Assinatura e Relatório</h2>
+      <div class="s2-kpis">
+        <div class="s2-kpi"><strong>Assinaturas</strong><br>${Array.isArray(fieldSignatures) ? fieldSignatures.length : 0}</div>
+        <div class="s2-kpi"><strong>Relatórios</strong><br>${Array.isArray(reportCenterExports) ? reportCenterExports.length : 0}</div>
+        <div class="s2-kpi"><strong>Eventos Timeline</strong><br>${Array.isArray(projectTimeline) ? projectTimeline.length : 0}</div>
+      </div>
+
+      <div class="s2-actions">
+        <button class="primary-btn" onclick="s2ApproveCurrentStep()">Aprovar Etapa</button>
+        <button class="secondary-btn" onclick="s2CreateReportRecord()">Gerar Registro de Relatório</button>
+      </div>
+
+      <div class="s2-signature">
+        <h3>✍️ Assinatura Digital Simples</h3>
+        <input id="s2Signer" placeholder="Nome do assinante" value="Cliente">
+        <textarea id="s2Signature" placeholder="Digite a assinatura ou confirmação"></textarea>
+        <button class="success-btn" onclick="s2SaveSignature()">Salvar Assinatura</button>
+      </div>
+    </div>
+  `;
+}
+
+const s2OldRenderClientHome = renderClientHome;
+renderClientHome = function(){
+  s2OldRenderClientHome();
+  const eyebrow = document.querySelector(".v651-eyebrow");
+  if(eyebrow) eyebrow.textContent = "Client Portal · Sprint 2";
+  const content = document.getElementById("pageContent");
+  if(content && !content.querySelector(".s2-section")){
+    content.insertAdjacentHTML("beforeend", s2ApprovalHtml());
+  }
+};

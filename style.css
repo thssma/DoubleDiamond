@@ -1071,3 +1071,10 @@ body{ background:linear-gradient(180deg,#fbf8f1 0%, #eef2f7 100%); }
 .s1-row strong{display:block}
 .s1-row small{color:#64748b}
 .s1-section{background:#fff;border:1px solid #e2e8f0;border-radius:26px;padding:20px;box-shadow:0 18px 42px rgba(15,23,42,.08);margin:18px 0}
+
+/* SPRINT 2 APPROVAL SIGNATURE REPORTS */
+.s2-section{background:#fff;border:1px solid #e2e8f0;border-radius:26px;padding:20px;box-shadow:0 18px 42px rgba(15,23,42,.08);margin:18px 0}
+.s2-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.s2-signature{border:2px dashed #94a3b8;border-radius:18px;padding:16px;background:#f8fafc;margin-top:12px}
+.s2-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px}
+.s2-kpi{background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:14px}

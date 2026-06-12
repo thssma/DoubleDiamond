@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-sprint1-core-real-ops-20260611';
+const CACHE_NAME = 'doublediamond-sprint2-approval-signature-20260611';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
