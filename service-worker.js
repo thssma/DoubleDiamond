@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-sprint3-notifications-ai-20260611';
+const CACHE_NAME = 'doublediamond-sprint3-notifications-ai-20260613-phase1';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
