@@ -5817,7 +5817,7 @@ setTimeout(ddClientLabelPatch,1000);
   }
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runEnglishPatch,200));
-  setInterval(runEnglishPatch,1500);
+  setInterval(runEnglishPatch,15000);
 })();
 
 
@@ -5889,7 +5889,7 @@ setTimeout(ddClientLabelPatch,1000);
     });
   }
 
-  setInterval(run, 1200);
+  setInterval(run, 15000);
   document.addEventListener("DOMContentLoaded",()=>setTimeout(run,250));
 })();
 
@@ -5997,7 +5997,7 @@ setTimeout(ddClientLabelPatch,1000);
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runV3,250));
   setTimeout(runV3,500);
-  setInterval(runV3,1500);
+  setInterval(runV3,15000);
 })();
 
 
@@ -6171,7 +6171,7 @@ setTimeout(ddClientLabelPatch,1000);
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runRoleAccess,300));
   setTimeout(runRoleAccess,800);
-  setInterval(runRoleAccess,1500);
+  setInterval(runRoleAccess,15000);
 })();
 
 
@@ -6341,5 +6341,101 @@ setTimeout(ddClientLabelPatch,1000);
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runV5,300));
   setTimeout(runV5,800);
-  setInterval(runV5,1500);
+  setInterval(runV5,15000);
+})();
+
+
+/* FINAL UNSPLASH 404 FIX */
+(function(){
+  const DD_PROJECT_PHOTO_PLACEHOLDER = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'><defs><linearGradient id='g' x1='0' x2='1'><stop stop-color='#dcfce7'/><stop offset='1' stop-color='#fef3c7'/></linearGradient></defs><rect width='100%' height='100%' fill='url(#g)'/><text x='50%' y='48%' dominant-baseline='middle' text-anchor='middle' fill='#14532d' font-family='Arial' font-size='42' font-weight='700'>Project Photo</text><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' fill='#64748b' font-family='Arial' font-size='24'>Image unavailable</text></svg>"
+  );
+
+  function fixUnsplash404(){
+    document.querySelectorAll(".v66-photo-preview, [style*='unsplash'], img").forEach(el=>{
+      if(el.tagName === "IMG"){
+        const src = el.getAttribute("src") || "";
+        if(src.includes("images.unsplash.com") || src.includes("photo-1599598425947-5b1a1cfacd57")){
+          el.src = DD_PROJECT_PHOTO_PLACEHOLDER;
+        }
+        if(!el.dataset.ddNo404){
+          el.dataset.ddNo404 = "true";
+          el.onerror = function(){
+            this.onerror = null;
+            this.src = DD_PROJECT_PHOTO_PLACEHOLDER;
+          };
+        }
+        return;
+      }
+
+      const bg = el.style && el.style.backgroundImage ? el.style.backgroundImage : "";
+      if(bg.includes("images.unsplash.com") || bg.includes("photo-1599598425947-5b1a1cfacd57")){
+        el.style.backgroundImage = `url("${DD_PROJECT_PHOTO_PLACEHOLDER}")`;
+        el.style.backgroundSize = "cover";
+        el.style.backgroundPosition = "center";
+      }
+    });
+  }
+
+  const oldChangePageNo404 = window.changePage;
+  if(typeof oldChangePageNo404 === "function"){
+    window.changePage = function(){
+      const r = oldChangePageNo404.apply(this, arguments);
+      setTimeout(fixUnsplash404, 50);
+      setTimeout(fixUnsplash404, 300);
+      return r;
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded",()=>setTimeout(fixUnsplash404,200));
+  setTimeout(fixUnsplash404,500);
+  setInterval(fixUnsplash404,15000);
+})();
+
+
+/* FINAL CONSOLE PERFORMANCE FIX */
+(function(){
+  // Debounced safety runner to avoid excessive DOM scans and Chrome [Violation] warnings.
+  let ddPerfTimer = null;
+  window.ddScheduleSafeRefresh = function(fn, delay){
+    clearTimeout(ddPerfTimer);
+    ddPerfTimer = setTimeout(function(){
+      try{ if(typeof fn === "function") fn(); }catch(e){ console.warn("Safe refresh skipped", e); }
+    }, delay || 250);
+  };
+
+  // Reduce browser warning for password inputs when login was rendered outside a form.
+  function wrapLoosePasswordInputs(){
+    document.querySelectorAll("input[type='password']").forEach(input=>{
+      if(input.closest("form")) return;
+      const parent = input.parentElement;
+      if(!parent || parent.dataset.ddPasswordFormFixed === "true") return;
+
+      const form = document.createElement("form");
+      form.setAttribute("autocomplete","on");
+      form.dataset.ddPasswordFormFixed = "true";
+      form.style.display = "contents";
+
+      parent.insertBefore(form, input);
+      form.appendChild(input);
+
+      form.addEventListener("submit", function(e){
+        e.preventDefault();
+        const btn = parent.querySelector("button,[type='button']");
+        if(btn) btn.click();
+      });
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded",()=>setTimeout(wrapLoosePasswordInputs,300));
+  setTimeout(wrapLoosePasswordInputs,1000);
+
+  const oldChangePagePerf = window.changePage;
+  if(typeof oldChangePagePerf === "function"){
+    window.changePage = function(){
+      const r = oldChangePagePerf.apply(this, arguments);
+      setTimeout(wrapLoosePasswordInputs,300);
+      return r;
+    };
+  }
 })();
