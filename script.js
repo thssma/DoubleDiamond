@@ -226,9 +226,25 @@ async function loadData(){
 
 }
 
+function normalizeRoute(page){
+  const aliases = {
+    home: "dashboard",
+    clientPortal: "clientHome",
+    field: "mobileWorkforce",
+    billingDashboard: "profitabilityEngine",
+    saasDashboard: "dashboard",
+    marketplaceDashboard: "integrationHub"
+  };
+  return aliases[page] || page;
+}
+
 function changePage(page, event){
+  page = normalizeRoute(page);
   document.querySelectorAll(".menu-btn").forEach(btn => btn.classList.remove("active"));
-  if(event) event.target.classList.add("active");
+  if(event){
+    const activeBtn = event.target && event.target.closest ? event.target.closest(".menu-btn") : event.target;
+    if(activeBtn) activeBtn.classList.add("active");
+  }
 
   const routes = {
     dashboard: renderDashboard,
@@ -5575,6 +5591,8 @@ renderClientHome = function(){
   function ddShowLogin(){
     const app=document.querySelector(".app");
     if(app) app.style.display="none";
+    const commercialLogin=document.getElementById("dd-commercial-login");
+    if(commercialLogin) commercialLogin.remove();
     let existing=document.getElementById("ddLoginShell");
     if(existing) existing.remove();
     document.body.insertAdjacentHTML("beforeend", `
@@ -5604,6 +5622,7 @@ renderClientHome = function(){
   }
 
   function ddRoleAllowedPage(role, page){
+    page = typeof normalizeRoute === "function" ? normalizeRoute(page) : page;
     const client=["clientHome","reportCenter"];
     const employee=["dashboard","workOrders","routePlanning","fieldDashboard","mobileWorkforce","weatherCenter","mobileReady","pwaCenter","clientHome","reportCenter"];
     if(role==="owner") return true;
@@ -5649,6 +5668,7 @@ renderClientHome = function(){
 
   const ddOriginalChangePageRoleV1 = changePage;
   changePage = function(page, event){
+    page = typeof normalizeRoute === "function" ? normalizeRoute(page) : page;
     const role=ddSessionRole();
     if(!ddRoleAllowedPage(role,page)) page=ddDefaultPage(role);
     if(typeof ddCurrentPageV642!=="undefined" && ddCurrentPageV642 && ddCurrentPageV642!==page){
@@ -6154,7 +6174,7 @@ setTimeout(ddClientLabelPatch,1000);
 
       if(!allowed){
         if(typeof changePage === "function"){
-          changePage("clientPortal");
+          changePage("clientHome");
         }
       }
     }
@@ -6168,7 +6188,7 @@ setTimeout(ddClientLabelPatch,1000);
         currentText.includes("Command Center");
 
       if(blocked && typeof changePage === "function"){
-        changePage("field");
+        changePage("mobileWorkforce");
       }
     }
   }
@@ -6196,7 +6216,7 @@ setTimeout(ddClientLabelPatch,1000);
     const current = normalizeText(document.querySelector("h1")?.textContent || "");
     if(current.includes("Home") || current.includes("Command Center")){
       if(typeof changePage === "function"){
-        changePage("clientPortal");
+        changePage("clientHome");
       }
     }
   }
@@ -6358,9 +6378,9 @@ setTimeout(ddClientLabelPatch,1000);
             ev.preventDefault();
             const role = getRoleV5();
             if(role === "client" && typeof changePage === "function"){
-              changePage("clientPortal");
+              changePage("clientHome");
             }else if(typeof changePage === "function"){
-              changePage("home");
+              changePage("dashboard");
             }else{
               history.back();
             }
@@ -6498,7 +6518,7 @@ setTimeout(ddClientLabelPatch,1000);
   function toast(m){ let x=document.getElementById("dd-toast"); if(!x){x=document.createElement("div");x.id="dd-toast";x.style.cssText="position:fixed;right:22px;bottom:22px;background:#10192e;color:#fff;padding:14px 18px;border-radius:16px;z-index:999999;font-weight:800";document.body.appendChild(x)} x.textContent=m; x.style.display="block"; clearTimeout(x.t); x.t=setTimeout(()=>x.style.display="none",2500); }
 
   function loginScreen(){
-    if(localStorage.getItem("dd_auth_session_v1") || document.getElementById("dd-commercial-login")) return;
+    if(typeof window.ddLoginClient === "function" || localStorage.getItem("dd_auth_session_v1") || document.getElementById("dd-commercial-login") || document.getElementById("ddLoginShell")) return;
     const div=document.createElement("div");
     div.id="dd-commercial-login";
     div.innerHTML=`<div class="dd-login-card">
@@ -6519,7 +6539,7 @@ setTimeout(ddClientLabelPatch,1000);
     document.body.appendChild(div);
     let r="client";
     div.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{div.querySelectorAll("[data-r]").forEach(z=>z.classList.remove("active"));b.classList.add("active");r=b.dataset.r});
-    div.querySelector("#dd-login-form").onsubmit=e=>{e.preventDefault();setRole(r,div.querySelector("#dd-login-name").value.trim()||r,div.querySelector("#dd-login-email").value.trim());div.remove();toast("Logged in as "+r.toUpperCase());setTimeout(()=>{if(r==="client"&&typeof changePage==="function")changePage("clientPortal"); if(r==="employee"&&typeof changePage==="function")changePage("field"); apply();},100)};
+    div.querySelector("#dd-login-form").onsubmit=e=>{e.preventDefault();setRole(r,div.querySelector("#dd-login-name").value.trim()||r,div.querySelector("#dd-login-email").value.trim());div.remove();toast("Logged in as "+r.toUpperCase());setTimeout(()=>{if(r==="client"&&typeof changePage==="function")changePage("clientHome"); if(r==="employee"&&typeof changePage==="function")changePage("mobileWorkforce"); apply();},100)};
     div.querySelector("#dd-forgot-password").onclick=()=>toast((div.querySelector("#dd-login-email").value.trim())?"Password reset instructions prepared.":"Enter your email first.");
   }
 
@@ -6538,7 +6558,13 @@ setTimeout(ddClientLabelPatch,1000);
     const blocked={client:["work orders","routes","field","workforce","weather","mobile ready","pwa","finance","intelligence","administration","command center","owner"],employee:["finance","intelligence","administration","owner"]};
     document.querySelectorAll("a,button,.nav-item,[onclick]").forEach(el=>{
       const t=(el.textContent||"").toLowerCase();
-      if((blocked[r]||[]).some(w=>t.includes(w))){el.style.display="none";el.dataset.ddBlocked="true";}
+      if((blocked[r]||[]).some(w=>t.includes(w))){
+        el.style.display="none";
+        el.dataset.ddBlocked="true";
+      }else if(el.dataset.ddBlocked==="true"){
+        el.style.display="";
+        delete el.dataset.ddBlocked;
+      }
     });
   }
 
