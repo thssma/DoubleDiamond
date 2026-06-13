@@ -1085,3 +1085,18 @@ body{ background:linear-gradient(180deg,#fbf8f1 0%, #eef2f7 100%); }
 .s3-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:14px}
 .s3-card strong{display:block;margin-bottom:6px}
 .s3-card small{color:#64748b}
+
+
+/* ROLE-BASED LOGIN V1 */
+.dd-login-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#071827,#0f3d2e);padding:24px;font-family:Inter,system-ui,Arial,sans-serif;color:#0f172a;position:relative}
+.dd-login-card{width:min(460px,100%);background:#fff;border-radius:28px;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.dd-login-brand{width:58px;height:58px;border-radius:18px;background:#e8fff1;display:grid;place-items:center;font-size:28px;margin-bottom:16px}
+.dd-login-eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:12px;font-weight:900;color:#047857;margin:0 0 8px}
+.dd-login-card h1{margin:0 0 8px;font-size:34px;line-height:1.05;color:#0f172a}
+.dd-login-subtitle{color:#64748b;margin-bottom:20px}.dd-login-card label{font-weight:800;display:block;margin:12px 0 6px}
+.dd-login-card input,.dd-staff-box input,.dd-staff-box select{width:100%;box-sizing:border-box;border:1px solid #d1d5db;border-radius:14px;padding:13px 14px;font-size:15px;margin-bottom:10px;background:#fff}
+.dd-login-primary,.dd-staff-box button{width:100%;border:0;border-radius:16px;padding:14px 16px;background:#16a34a;color:#fff;font-weight:900;font-size:15px;cursor:pointer;margin-top:8px}
+.dd-login-note{display:block;color:#64748b;margin-top:14px;line-height:1.4}.dd-staff-trigger{position:fixed;right:18px;bottom:18px;border:0;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;width:42px;height:42px;cursor:pointer;opacity:.55}
+.dd-staff-box{display:none;position:fixed;right:18px;bottom:72px;width:280px;background:#fff;border-radius:22px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.35)}.dd-staff-box.is-visible{display:block}.dd-staff-box h3{margin:0 0 12px}.dd-staff-box small{color:#64748b;display:block;margin-top:8px}
+.dd-session-pill,.dd-back-btn,.dd-logout-btn{border:1px solid #bbf7d0;background:#dcfce7;color:#166534;border-radius:999px;padding:8px 12px;font-weight:900}.dd-back-btn,.dd-logout-btn{cursor:pointer;background:#fff}.dd-logout-btn{border-color:#fecaca;color:#991b1b}
+@media(max-width:760px){.dd-login-card{padding:22px}.dd-login-card h1{font-size:28px}.dd-session-pill{display:none}.top-actions{gap:6px;flex-wrap:wrap}.dd-back-btn,.dd-logout-btn{padding:7px 10px;font-size:12px}}

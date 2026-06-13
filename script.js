@@ -5479,3 +5479,207 @@ renderClientHome = function(){
   const eyebrow = document.querySelector(".v651-eyebrow");
   if(eyebrow) eyebrow.textContent = "Client Portal · Sprint 3";
 };
+
+
+/* ROLE-BASED LOGIN V1 - CLIENT FIRST, HIDDEN STAFF ACCESS */
+(function(){
+  const SESSION_KEY = "dd_auth_session_v1";
+  const DEFAULT_OWNER_PIN = "owner123";
+  const DEFAULT_EMPLOYEE_PIN = "field123";
+  let ddHistoryV1 = [];
+
+  function ddGetSession(){
+    try{return JSON.parse(localStorage.getItem(SESSION_KEY)||"null");}catch(e){return null;}
+  }
+  function ddSetSession(session){localStorage.setItem(SESSION_KEY, JSON.stringify(session));}
+  function ddClearSession(){localStorage.removeItem(SESSION_KEY);}
+  function ddSessionRole(){return (ddGetSession()||{}).role || "client";}
+
+  function ddLoginClient(){
+    const name=(document.getElementById("ddClientName")||{}).value || "Client";
+    const email=(document.getElementById("ddClientEmail")||{}).value || "client@demo.com";
+    ddSetSession({role:"client", name:name.trim()||"Client", email, logged_at:new Date().toISOString()});
+    ddBootAuthenticated("client");
+  }
+  function ddLoginStaff(){
+    const role=(document.getElementById("ddStaffRole")||{}).value || "employee";
+    const pin=(document.getElementById("ddStaffPin")||{}).value || "";
+    if(role==="owner" && pin!==DEFAULT_OWNER_PIN) return alert("Owner PIN inválido.");
+    if(role==="employee" && pin!==DEFAULT_EMPLOYEE_PIN) return alert("Employee PIN inválido.");
+    ddSetSession({role, name: role==="owner"?"Owner":"Employee", logged_at:new Date().toISOString()});
+    ddBootAuthenticated(role);
+  }
+  function ddLogout(){
+    ddClearSession();
+    localStorage.removeItem("dd_role");
+    ddShowLogin();
+  }
+  function ddRevealStaff(){
+    const box=document.getElementById("ddStaffBox");
+    if(box) box.classList.toggle("is-visible");
+  }
+  window.ddLoginClient=ddLoginClient;
+  window.ddLoginStaff=ddLoginStaff;
+  window.ddLogout=ddLogout;
+  window.ddRevealStaff=ddRevealStaff;
+
+  function ddShowLogin(){
+    const app=document.querySelector(".app");
+    if(app) app.style.display="none";
+    let existing=document.getElementById("ddLoginShell");
+    if(existing) existing.remove();
+    document.body.insertAdjacentHTML("beforeend", `
+      <main id="ddLoginShell" class="dd-login-shell">
+        <section class="dd-login-card">
+          <div class="dd-login-brand">💎</div>
+          <p class="dd-login-eyebrow">DoubleDiamond Client Portal</p>
+          <h1>Access your project</h1>
+          <p class="dd-login-subtitle">Track photos, reports, approvals and project updates.</p>
+          <label>Client name</label>
+          <input id="ddClientName" placeholder="Client name" autocomplete="name">
+          <label>Email</label>
+          <input id="ddClientEmail" placeholder="client@email.com" autocomplete="email">
+          <button class="dd-login-primary" onclick="ddLoginClient()">Enter Client Portal</button>
+          <small class="dd-login-note">Pilot access. Secure Supabase Auth can be connected in the next phase.</small>
+        </section>
+        <button class="dd-staff-trigger" onclick="ddRevealStaff()" title="Staff access">💎</button>
+        <section id="ddStaffBox" class="dd-staff-box">
+          <h3>Staff Access</h3>
+          <select id="ddStaffRole"><option value="employee">Employee</option><option value="owner">Owner</option></select>
+          <input id="ddStaffPin" type="password" placeholder="Access PIN">
+          <button onclick="ddLoginStaff()">Enter Internal App</button>
+          <small>Owner PIN: owner123 · Employee PIN: field123</small>
+        </section>
+      </main>
+    `);
+  }
+
+  function ddRoleAllowedPage(role, page){
+    const client=["clientHome","reportCenter"];
+    const employee=["dashboard","workOrders","routePlanning","fieldDashboard","mobileWorkforce","weatherCenter","mobileReady","pwaCenter","clientHome","reportCenter"];
+    if(role==="owner") return true;
+    if(role==="employee") return employee.includes(page);
+    return client.includes(page);
+  }
+  function ddDefaultPage(role){
+    if(role==="owner") return "dashboard";
+    if(role==="employee") return "mobileWorkforce";
+    return "clientHome";
+  }
+  function ddApplyRoleUI(role){
+    document.body.setAttribute("data-dd-role", role);
+    const top=document.querySelector(".top-actions");
+    if(top && !top.querySelector(".dd-session-pill")){
+      top.insertAdjacentHTML("beforeend", `<button class="dd-back-btn" onclick="ddGoBack()">← Voltar</button><span class="dd-session-pill">${role.toUpperCase()}</span><button class="dd-logout-btn" onclick="ddLogout()">Sair</button>`);
+    }
+    document.querySelectorAll(".menu-btn").forEach(btn=>{
+      const onclick=btn.getAttribute("onclick")||"";
+      const m=onclick.match(/changePage\('([^']+)'/);
+      if(!m) return;
+      const page=m[1];
+      btn.style.display=ddRoleAllowedPage(role,page)?"":"none";
+    });
+    document.querySelectorAll(".nav-group").forEach(group=>{
+      const visible=[...group.querySelectorAll(".menu-btn")].some(b=>b.style.display!=="none");
+      group.style.display=visible?"":"none";
+    });
+  }
+
+  function ddBootAuthenticated(role){
+    const login=document.getElementById("ddLoginShell");
+    if(login) login.remove();
+    const app=document.querySelector(".app");
+    if(app) app.style.display="";
+    currentRoleExperience=role;
+    localStorage.setItem("dd_role", role);
+    ddApplyRoleUI(role);
+    ddCurrentPageV642=ddDefaultPage(role);
+    if(typeof ddStartBackgroundLoadV642==="function") ddStartBackgroundLoadV642();
+    changePage(ddDefaultPage(role), null);
+  }
+
+  const ddOriginalChangePageRoleV1 = changePage;
+  changePage = function(page, event){
+    const role=ddSessionRole();
+    if(!ddRoleAllowedPage(role,page)) page=ddDefaultPage(role);
+    if(typeof ddCurrentPageV642!=="undefined" && ddCurrentPageV642 && ddCurrentPageV642!==page){
+      ddHistoryV1.push(ddCurrentPageV642);
+      if(ddHistoryV1.length>10) ddHistoryV1.shift();
+    }
+    ddOriginalChangePageRoleV1(page,event);
+    ddApplyRoleUI(role);
+  };
+  window.ddGoBack=function(){
+    const role=ddSessionRole();
+    let page=ddHistoryV1.pop() || ddDefaultPage(role);
+    if(!ddRoleAllowedPage(role,page)) page=ddDefaultPage(role);
+    ddOriginalChangePageRoleV1(page,null);
+    ddApplyRoleUI(role);
+  };
+
+  window.onload = async function(){
+    const session=ddGetSession();
+    if(!session){ddShowLogin();return;}
+    ddBootAuthenticated(session.role||"client");
+  };
+})();
+
+/* CLIENT LANGUAGE OVERRIDE - companies table remains the same, UI says Cliente */
+renderEmpresas = function(){
+  setTitle("Clientes");
+  setContent(`
+    <div class="foundation-note">CRM de Clientes: cadastro de clientes/empresas para operações de paisagismo.</div>
+    <div class="card">
+      <h2>Novo Cliente</h2>
+      <div class="form-grid">
+        <input id="companyName" placeholder="Nome do cliente ou empresa">
+        <input id="companyEmail" placeholder="Email do cliente">
+        <input id="companyPhone" placeholder="Telefone">
+        <select id="companyPlan"><option>Starter</option><option>Professional</option><option>Enterprise</option></select>
+        <select id="companyStatus"><option>Active</option><option>Inactive</option><option>Trial</option></select>
+      </div>
+      <button class="primary-btn" onclick="addCompany()">Cadastrar Cliente</button>
+    </div>
+    <div class="card">
+      <h2>Usuário do Cliente</h2>
+      <div class="form-grid">
+        <select id="companyUserCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="companyUserName" placeholder="Nome do usuário">
+        <input id="companyUserEmail" placeholder="Email do usuário">
+        <select id="companyUserRole"><option>Owner</option><option>Manager</option><option>Employee</option><option>Client</option></select>
+      </div>
+      <button class="primary-btn" onclick="addCompanyUser()">Adicionar Usuário</button>
+    </div>
+    <div class="enterprise-grid">
+      ${companies.map(company => {
+        const users = companyUsers.filter(u => u.company_id === company.id);
+        return `<div class="enterprise-card"><h2>${company.name}</h2><small>${company.email || "Sem email"} • ${company.phone || "Sem telefone"}</small><br><span class="status ${company.status === "Active" ? "status-active" : "status-inactive"}">${company.status}</span><p><strong>Plano:</strong> ${company.plan || "Sem plano"}</p><p><strong>Usuários:</strong> ${users.length}</p>${users.map(u => `<div class="soft-box"><strong>${u.user_name}</strong><br><small>${u.user_email || ""} • ${u.role}</small></div>`).join("")}<button class="danger-btn" onclick="removeCompany('${company.id}')">Remover Cliente</button></div>`;
+      }).join("") || "<div class='card'><p>Nenhum cliente cadastrado.</p></div>"}
+    </div>`);
+};
+
+/* ROLE LOGIN V1 - safer schema patches for tested tables */
+async function s2SaveSignature(){
+  const signer = val("s2Signer") || "Cliente";
+  const signature = val("s2Signature") || "";
+  if(!signature.trim()) return alert("Digite a assinatura.");
+  const res = await apiInsert("field_signatures", {company_id:"demo-company", work_order_id:"WO-TEST-001", signer_name:signer, signer_role:"Client", signature_text:signature, status:"Signed"});
+  if(!res.ok) return alert("Não salvou no Supabase. Verifique RLS/colunas de field_signatures.");
+  fieldSignatures = await apiGet("field_signatures");
+  alert("Assinatura salva.");
+  renderClientHome();
+}
+async function s3CreateAutomationRun(){
+  const res = await apiInsert("automation_flow_runs", {flow_name:"Atualização automática do cliente", run_status:"Simulated", result_message:"Fluxo criado pelo Sprint 3"});
+  if(!res.ok) return alert("Não foi possível criar automação. Verifique RLS/colunas de automation_flow_runs.");
+  automationFlowRuns = await apiGet("automation_flow_runs");
+  alert("Automação registrada.");
+  renderExecutiveDashboard();
+}
+async function s3CreateAIInsight(){
+  const res = await apiInsert("ai_insights", {company_id:"demo-company", agent_name:"Operations Advisor", insight_type:"Operations", title:"Projeto com nova atividade", message:"Cliente recebeu atualização com fotos, timeline e próxima etapa.", priority:"Medium", status:"Open"});
+  if(!res.ok) return alert("Não foi possível criar insight. Verifique RLS/colunas de ai_insights.");
+  aiInsights = await apiGet("ai_insights");
+  alert("Insight criado.");
+  renderExecutiveDashboard();
+}
