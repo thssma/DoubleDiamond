@@ -1307,8 +1307,8 @@ function renderReportCenter(){
           <option value="">Client</option>
           ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
         </select>
-        <input id="reportName" placeholder="Nome do relatório">
-        <select id="reportType"><option>Financeiro</option><option>Projetos</option><option>CRM</option><option>Operações</option><option>SaaS</option><option>Marketplace</option></select>
+        <input id="reportName" placeholder="Report name">
+        <select id="reportType"><option>Financial</option><option>Projetos</option><option>CRM</option><option>Operações</option><option>SaaS</option><option>Marketplace</option></select>
         <select id="reportFormat"><option>CSV</option><option>PDF</option><option>Excel</option></select>
       </div>
       <button class="primary-btn" onclick="createReportExport()">Prepare Report</button>
@@ -2306,7 +2306,7 @@ async function generateExecutiveIntelligence(){
   const items = [];
 
   if(m.margin < 25){
-    items.push(["Financeiro", "Margem baixa", "A margem estimada está abaixo de 25%. Revise custos, preço e produtividade.", "Warning"]);
+    items.push(["Financial", "Margem baixa", "A margem estimada está abaixo de 25%. Revise custos, preço e produtividade.", "Warning"]);
   }
 
   if(m.mrr <= 0){
@@ -3646,8 +3646,8 @@ function renderAIFinancialAdvisor(){
     <div class="aiops-hero"><h2>V54 AI Financial Advisor</h2><p>Analisa receita, pagamentos, inadimplência e margem.</p></div>
 
     <div class="card">
-      <h2>Gerar Conselhos Financeiros</h2>
-      <button class="success-btn" onclick="generateFinancialAdvice()">Analisar Financeiro</button>
+      <h2>Gerar Conselhos Financials</h2>
+      <button class="success-btn" onclick="generateFinancialAdvice()">Analisar Financial</button>
     </div>
 
     <div class="aiops-grid">
@@ -4196,7 +4196,7 @@ function renderAIFinancialAdvisor(){
   setTitle("AI Financial Advisor");
   setContent(`
     <div class="aiops-hero"><h2>V54 AI Financial Advisor</h2><p>Gera recomendações financeiras.</p></div>
-    <div class="card"><h2>Gerar Conselhos</h2><button class="success-btn" onclick="generateFinancialAdvice()">Analisar Financeiro</button></div>
+    <div class="card"><h2>Gerar Conselhos</h2><button class="success-btn" onclick="generateFinancialAdvice()">Analisar Financial</button></div>
     <div class="aiops-grid">
       ${aiFinancialAdvice.length ? aiFinancialAdvice.map(a => `
         <div class="aiops-card ${a.priority === "High" ? "ai-critical" : a.priority === "Medium" ? "ai-medium" : "ai-low"}">
@@ -4471,7 +4471,7 @@ function renderRoleExperience(){
       <div class="role-card" onclick="setRoleExperience('owner')">
         <span class="role-badge">GESTOR</span>
         <h2>👑 Business Command Center</h2>
-        <p>Financeiro, BI, equipe, clientes, integrações, automações e IA.</p>
+        <p>Financial, BI, equipe, clientes, integrações, automações e IA.</p>
       </div>
 
       <div class="role-card" onclick="setRoleExperience('employee')">
@@ -4551,7 +4551,7 @@ function renderOwnerHome(){
 
     <div class="role-action-grid">
       <button class="role-action" onclick="changePage('workOrders')">🧾 Work Orders de Serviço</button>
-      <button class="role-action" onclick="changePage('billingDashboard')">💰 Financeiro</button>
+      <button class="role-action" onclick="changePage('billingDashboard')">💰 Financial</button>
       <button class="role-action" onclick="changePage('biDashboard')">📊 BI</button>
       <button class="role-action" onclick="changePage('aiOperationsCommand')">🧠 AI Command</button>
       <button class="role-action" onclick="changePage('mapsReal')">🗺️ Routes</button>
@@ -5829,7 +5829,7 @@ setTimeout(ddClientLabelPatch,1000);
         el.textContent = el.textContent
           .replace(/\bCliente\b/g,"Client")
           .replace(/\bClientes\b/g,"Clients")
-          .replace(/\bRelatorio\b/g,"Report")
+          .replace(/\bReport\b/g,"Report")
           .replace(/\bRelatórios\b/g,"Reports")
           .replace(/\bAssinatura\b/g,"Signature");
       }
@@ -5865,7 +5865,7 @@ setTimeout(ddClientLabelPatch,1000);
       .replace(/Selecione o cliente\./gi,"Select a client.")
       .replace(/Selecione a client\./gi,"Select a client.")
       .replace(/Cliente/g,"Client")
-      .replace(/Relatorio/g,"Report");
+      .replace(/Report/g,"Report");
     return originalAlert2(t);
   };
 
@@ -5891,4 +5891,111 @@ setTimeout(ddClientLabelPatch,1000);
 
   setInterval(run, 1200);
   document.addEventListener("DOMContentLoaded",()=>setTimeout(run,250));
+})();
+
+
+/* CLIENT SESSION REPORT FIX V3 */
+(function(){
+  function getDDSession(){
+    try{
+      return JSON.parse(localStorage.getItem("dd_auth_session_v1") || "{}");
+    }catch(e){
+      return {};
+    }
+  }
+
+  function ensureClientOptionFromSession(){
+    const session = getDDSession();
+    const role = localStorage.getItem("dd_role") || session.role;
+    const clientName = session.name || session.email || "Logged Client";
+    const clientValue = session.email || session.name || "client-session";
+
+    document.querySelectorAll("select").forEach(sel=>{
+      const firstText = (sel.options[0]?.textContent || "").toLowerCase();
+      const looksClient = firstText.includes("client") || firstText.includes("cliente") || firstText.includes("empresa");
+
+      if(looksClient){
+        let existing = [...sel.options].find(o => o.value === clientValue || o.textContent === clientName);
+
+        if(!existing){
+          const opt = document.createElement("option");
+          opt.value = clientValue;
+          opt.textContent = clientName;
+          sel.appendChild(opt);
+          existing = opt;
+        }
+
+        if(role === "client"){
+          sel.value = existing.value;
+          sel.disabled = true;
+          sel.dataset.clientSessionLocked = "true";
+        }else if(!sel.value || sel.selectedIndex === 0){
+          sel.value = existing.value;
+        }
+
+        sel.dispatchEvent(new Event("change", {bubbles:true}));
+      }
+    });
+  }
+
+  function englishCleanupV3(){
+    document.querySelectorAll("body *").forEach(el=>{
+      if(el.childNodes && el.childNodes.length===1 && el.childNodes[0].nodeType===3){
+        el.textContent = el.textContent
+          .replace(/\bCliente\b/g,"Client")
+          .replace(/\bClientes\b/g,"Clients")
+          .replace(/\bRelatorio\b/g,"Report")
+          .replace(/\bReporte\b/g,"Report")
+          .replace(/\bFinanceiro\b/g,"Financial")
+          .replace(/\bNome do relatório\b/g,"Report name");
+      }
+      if(el.placeholder){
+        el.placeholder = el.placeholder
+          .replace(/\bNome do relatório\b/g,"Report name")
+          .replace(/\bCliente\b/g,"Client")
+          .replace(/\bEmpresa\b/g,"Client");
+      }
+    });
+  }
+
+  const originalAlertV3 = window.alert;
+  window.alert = function(msg){
+    const m = String(msg || "");
+    if(m.match(/select a client|selecione/i)){
+      ensureClientOptionFromSession();
+      const hasClient = [...document.querySelectorAll("select")].some(sel=>{
+        const first = (sel.options[0]?.textContent || "").toLowerCase();
+        return first.includes("client") && sel.value && sel.selectedIndex > 0;
+      });
+      if(hasClient){
+        return;
+      }
+    }
+    return originalAlertV3(
+      m.replace(/Selecione a empresa\./gi,"Select a client.")
+       .replace(/Selecione o cliente\./gi,"Select a client.")
+       .replace(/Selecione a client\./gi,"Select a client.")
+       .replace(/Cliente/g,"Client")
+       .replace(/Relatorio/g,"Report")
+       .replace(/Reporte/g,"Report")
+       .replace(/Financeiro/g,"Financial")
+    );
+  };
+
+  document.addEventListener("click", function(e){
+    const text = (e.target?.textContent || "").toLowerCase();
+    if(text.includes("prepare report")){
+      ensureClientOptionFromSession();
+      englishCleanupV3();
+    }
+  }, true);
+
+  function runV3(){
+    ensureClientOptionFromSession();
+    englishCleanupV3();
+  }
+
+  document.addEventListener("DOMContentLoaded",()=>setTimeout(runV3,250));
+  setTimeout(runV3,500);
+  setInterval(runV3,1500);
 })();
