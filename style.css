@@ -1240,3 +1240,12 @@ input,select,textarea{
 body[data-dd-role="client"] .owner-only,
 body[data-dd-role="client"] .employee-only{display:none!important;}
 body[data-dd-role="employee"] .owner-only{display:none!important;}
+
+
+/* CLIENT PORTAL POLISH V5 STYLES */
+[data-dd-duplicate-role="true"]{display:none!important;}
+body[data-dd-role="client"] .owner-only,
+body[data-dd-role="client"] .employee-only{display:none!important;}
+body[data-dd-role="employee"] .owner-only{display:none!important;}
+body[data-dd-role="client"] .sidebar .nav-section-title,
+body[data-dd-role="client"] .sidebar .group-title{display:none!important;}

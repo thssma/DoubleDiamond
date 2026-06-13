@@ -414,15 +414,15 @@ function renderDashboard(){
 
 <div class="v651-hero">
 <h2>🏡 My Project</h2>
-<p>72% concluído • 🟢 Dentro do prazo</p>
-<p>Next Step: Instalação de irrigação</p>
+<p>72% completed • 🟢 On Schedule</p>
+<p>Next Step: Irrigation Installation</p>
 <p>Next Visit: 12/06 • 08:00</p>
 </div>
 
 <div class="v651-grid">
-<div class="v651-card"><h3>🚀 Próxima Etapa</h3><p>Instalação de irrigação</p></div>
-<div class="v651-card"><h3>📅 Próxima Visita</h3><p>12/06 às 08:00</p></div>
-<div class="v651-card"><h3>🟢 Status</h3><p>Dentro do prazo</p></div>
+<div class="v651-card"><h3>🚀 Next Step</h3><p>Irrigation Installation</p></div>
+<div class="v651-card"><h3>📅 Next Visit</h3><p>12/06 às 08:00</p></div>
+<div class="v651-card"><h3>🟢 Status</h3><p>On Schedule</p></div>
 </div>
 
 <div class="v651-card">
@@ -433,7 +433,7 @@ function renderDashboard(){
 </div>
 
 <div class="v651-card">
-<h3>👷 Team Responsável</h3>
+<h3>👷 Team Assigned to</h3>
 <div class="v651-team">
 <span class="v651-avatar">Supervisor</span>
 <span class="v651-avatar">Paisagista</span>
@@ -1112,7 +1112,7 @@ function generateSafeCopilotResponse(message){
   }
 
   if(lower.includes("projeto") || lower.includes("operação")){
-    return "Análise simulada: priorize projetos com tarefas pendentes, baixa saúde operacional e falta de equipe.";
+    return "Análise simulada: priorize projetos com tarefas pendentes, baixa saúde operacional e falta de team.";
   }
 
   if(lower.includes("venda") || lower.includes("crm") || lower.includes("lead")){
@@ -1468,7 +1468,7 @@ function renderFieldDashboard(){
   setContent(`
     <div class="field-hero">
       <h2>Field Operations Platform</h2>
-      <p>PWA, offline, push, rotas, clima, equipe externa, GPS, fotos, assinatura e ordens de serviço.</p>
+      <p>PWA, offline, push, rotas, clima, team externa, GPS, fotos, assinatura e ordens de serviço.</p>
     </div>
 
     <div class="cards">
@@ -1485,7 +1485,7 @@ function renderFieldDashboard(){
     <div class="field-phone">
       <div class="field-phone-screen">
         <h2>DoubleDiamond Field</h2>
-        <p>Modo equipe em campo</p>
+        <p>Modo team em campo</p>
         <button class="field-phone-button">Check-in GPS</button>
         <button class="field-phone-button">Fotos</button>
         <button class="field-phone-button">Work Order de Serviço</button>
@@ -1610,7 +1610,7 @@ function renderRoutePlanning(){
   setContent(`
     <div class="field-hero">
       <h2>Route Planning Foundation</h2>
-      <p>Planejamento de rotas para visitas, execução e equipe externa.</p>
+      <p>Planejamento de rotas para visitas, execução e team externa.</p>
     </div>
 
     <div class="card">
@@ -1618,7 +1618,7 @@ function renderRoutePlanning(){
       <div class="form-grid">
         <select id="routeCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="routeName" placeholder="Nome da rota">
-        <input id="routeAssigned" placeholder="Responsável">
+        <input id="routeAssigned" placeholder="Assigned to">
         <input id="routeDate" type="date">
         <select id="routeStatus"><option>Planned</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select>
       </div>
@@ -1755,7 +1755,7 @@ function renderMobileWorkforce(){
   setContent(`
     <div class="field-hero">
       <h2>Mobile Workforce + GPS + Fotos + Assinatura</h2>
-      <p>Controle de equipe externa, check-in GPS, upload de fotos e aceite digital.</p>
+      <p>Controle de team externa, check-in GPS, upload de fotos e aceite digital.</p>
     </div>
 
     <div class="card">
@@ -1881,7 +1881,7 @@ function renderWorkOrders(){
         <input id="woNumber" placeholder="Número OS">
         <input id="woClient" placeholder="Client">
         <input id="woProject" placeholder="Projeto">
-        <input id="woAssigned" placeholder="Responsável">
+        <input id="woAssigned" placeholder="Assigned to">
         <input id="woService" placeholder="Tipo de serviço">
         <input id="woDate" type="date">
         <select id="woStatus"><option>Open</option><option>Scheduled</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select>
@@ -1915,7 +1915,7 @@ function renderWorkOrders(){
             <small>${w.client_name} • ${w.project_name}</small><br>
             <span class="field-badge">${w.status}</span>
             <p>${w.service_type} • ${w.priority}</p>
-            <p>Responsável: ${w.assigned_to || "N/A"}</p>
+            <p>Assigned to: ${w.assigned_to || "N/A"}</p>
             <p>Assinaturas: ${signatures.length}</p>
             ${logs.map(l => `<div class="soft-box"><strong>${l.log_type}</strong><br><small>${l.message}</small></div>`).join("")}
           </div>
@@ -3629,7 +3629,7 @@ async function generateProjectRisk(){
     risk_score: score,
     risk_level: level,
     risk_reasons: `${pending} pendências e ${delay} dias de atraso.`,
-    recommended_action: level === "High" ? "Revisar equipe, rota e prioridade imediatamente." : "Monitorar execução e atualizar checklist.",
+    recommended_action: level === "High" ? "Revisar team, rota e prioridade imediatamente." : "Monitorar execução e atualizar checklist.",
     status: "Open"
   });
 
@@ -3697,7 +3697,7 @@ function renderAIWorkforcePlanner(){
   setTitle("AI Workforce Planner");
 
   setContent(`
-    <div class="aiops-hero"><h2>V55 AI Workforce Planner</h2><p>Sugere distribuição de equipe por prioridade, tarefa e operação.</p></div>
+    <div class="aiops-hero"><h2>V55 AI Workforce Planner</h2><p>Sugere distribuição de team por prioridade, tarefa e operação.</p></div>
 
     <div class="card">
       <h2>Nova Sugestão de Team</h2>
@@ -3718,7 +3718,7 @@ function renderAIWorkforcePlanner(){
           <p><strong>Foco:</strong> ${p.task_focus}</p>
           <p>${p.recommendation}</p>
         </div>
-      `).join("") || "<div class='card'>Nenhum plano de equipe.</div>"}
+      `).join("") || "<div class='card'>Nenhum plano de team.</div>"}
     </div>
   `);
 }
@@ -3836,7 +3836,7 @@ async function generateWeatherImpact(){
     location_name: val("weatherAILocation"),
     impact_level: level,
     affected_work: val("weatherAIWork"),
-    recommendation: level === "High" ? "Reagendar equipe externa e avisar cliente." : "Monitorar clima e manter plano alternativo.",
+    recommendation: level === "High" ? "Reagendar team externa e avisar cliente." : "Monitorar clima e manter plano alternativo.",
     status: "Monitor"
   });
 
@@ -3922,7 +3922,7 @@ async function generateAutomationRecommendations(){
 
   const items = [
     ["Cobrança automática", "Invoice Overdue", "Send WhatsApp + Gmail", "Reduz inadimplência e tempo manual.", "High"],
-    ["Lembrete de visita", "Appointment Tomorrow", "Send Push + WhatsApp", "Reduz esquecimento da equipe e do cliente.", "Medium"],
+    ["Lembrete de visita", "Appointment Tomorrow", "Send Push + WhatsApp", "Reduz esquecimento da team e do cliente.", "Medium"],
     ["OS concluída", "Work Order Completed", "Generate Report + Email Client", "Aumenta profissionalismo e percepção de valor.", "High"]
   ];
 
@@ -3994,7 +3994,7 @@ async function runAICommand(){
   }else if(lower.includes("rota")){
     result += "Sugestão: revisar rotas com maior número de paradas e clima crítico.";
   }else{
-    result += "Sugestão geral: priorizar leads quentes, projetos críticos, caixa e equipe de campo.";
+    result += "Sugestão geral: priorizar leads quentes, projetos críticos, caixa e team de campo.";
   }
 
   const res = await apiInsert("ai_command_center_logs", {
@@ -4184,7 +4184,7 @@ async function generateProjectRisk(){
     risk_score: score,
     risk_level: level,
     risk_reasons: `${pending} pendências e ${delay} dias de atraso.`,
-    recommended_action: level === "High" ? "Revisar equipe, rota e prioridade imediatamente." : "Monitorar execução e atualizar checklist.",
+    recommended_action: level === "High" ? "Revisar team, rota e prioridade imediatamente." : "Monitorar execução e atualizar checklist.",
     status: "Open"
   });
   if(!res.ok) return alert("Erro ao gerar risco. Rode o SQL V51-V60.");
@@ -4229,7 +4229,7 @@ async function generateFinancialAdvice(){
 function renderAIWorkforcePlanner(){
   setTitle("AI Workforce Planner");
   setContent(`
-    <div class="aiops-hero"><h2>V55 AI Workforce Planner</h2><p>Sugere distribuição de equipe.</p></div>
+    <div class="aiops-hero"><h2>V55 AI Workforce Planner</h2><p>Sugere distribuição de team.</p></div>
     <div class="card">
       <h2>Nova Sugestão</h2>
       <div class="form-grid">
@@ -4240,7 +4240,7 @@ function renderAIWorkforcePlanner(){
       </div>
       <button class="primary-btn" onclick="generateWorkforcePlan()">Gerar Plano</button>
     </div>
-    <div class="aiops-grid">${aiWorkforcePlans.length ? aiWorkforcePlans.map(p => `<div class="aiops-card"><h2>${p.employee_name}</h2><small>${p.plan_name} • ${p.priority}</small><p><strong>Foco:</strong> ${p.task_focus}</p><p>${p.recommendation}</p></div>`).join("") : "<div class='card'>Nenhum plano de equipe.</div>"}</div>
+    <div class="aiops-grid">${aiWorkforcePlans.length ? aiWorkforcePlans.map(p => `<div class="aiops-card"><h2>${p.employee_name}</h2><small>${p.plan_name} • ${p.priority}</small><p><strong>Foco:</strong> ${p.task_focus}</p><p>${p.recommendation}</p></div>`).join("") : "<div class='card'>Nenhum plano de team.</div>"}</div>
   `);
 }
 
@@ -4323,7 +4323,7 @@ async function generateWeatherImpact(){
     location_name: val("weatherAILocation"),
     impact_level: level,
     affected_work: val("weatherAIWork"),
-    recommendation: level === "High" ? "Reagendar equipe externa e avisar cliente." : "Monitorar clima e manter plano alternativo.",
+    recommendation: level === "High" ? "Reagendar team externa e avisar cliente." : "Monitorar clima e manter plano alternativo.",
     status:"Monitor"
   });
   if(!res.ok) return alert("Erro ao gerar impacto. Rode o SQL V51-V60.");
@@ -4412,7 +4412,7 @@ async function runAICommand(){
   else if(lower.includes("relatório")) result += "Sugestão: gerar relatório executivo V58 com riscos e próximas ações.";
   else if(lower.includes("automação")) result += "Sugestão: criar automações para cobrança, visitas e OS concluída.";
   else if(lower.includes("rota")) result += "Sugestão: revisar rotas com maior número de paradas e clima crítico.";
-  else result += "Sugestão geral: priorizar leads quentes, projetos críticos, caixa e equipe de campo.";
+  else result += "Sugestão geral: priorizar leads quentes, projetos críticos, caixa e team de campo.";
   const res = await apiInsert("ai_command_center_logs", {company_id, command_text:command, command_result:result, command_status:"Completed"});
   if(!res.ok) return alert("Erro ao executar comando. Rode o SQL V51-V60.");
   aiCommandCenterLogs = await apiGet("ai_command_center_logs");
@@ -4471,7 +4471,7 @@ function renderRoleExperience(){
       <div class="role-card" onclick="setRoleExperience('owner')">
         <span class="role-badge">GESTOR</span>
         <h2>👑 Business Command Center</h2>
-        <p>Financial, BI, equipe, clientes, integrações, automações e IA.</p>
+        <p>Financial, BI, team, clientes, integrações, automações e IA.</p>
       </div>
 
       <div class="role-card" onclick="setRoleExperience('employee')">
@@ -4676,7 +4676,7 @@ function renderDashboard(){
           <span class="v64-tag">${p.status||"Em andamento"}</span>
           <h2>${p.service_type||p.work_order_title||"Serviço externo"}</h2>
           <div class="v64-progress"><span style="width:${progress}%"></span></div>
-          <p>${progress}% concluído • Próxima atualização em campo</p>
+          <p>${progress}% completed • Próxima atualização em campo</p>
           <button class="secondary-btn" onclick="changePage('workOrders')">Abrir</button>
         </div>`}).join("")||`
         <div class="v64-project-card"><div class="v64-project-cover">🌿 First Project</div><span class="v64-tag">Ready to Start</span><h2>Create a work order</h2><div class="v64-progress"><span style="width:18%"></span></div><p>Use Work Orders to feed the Home dashboard.</p><button class="secondary-btn" onclick="changePage('workOrders')">Create / Open Work Order</button></div>`}
@@ -4710,9 +4710,9 @@ function renderClientHome(){
   const photos=typeof fieldPhotos!=="undefined"?fieldPhotos:[], reportsCount=typeof reportCenterExports!=="undefined"?reportCenterExports.length:0;
   const paid=ddPaidTotalV64(), revenue=ddInvoiceTotalV64(), progress=revenue?Math.min(100,Math.round((paid/revenue)*100)):72;
   setContent(`
-    <section class="v64-hero"><div class="v64-eyebrow">Client Portal</div><h2>🤝 My Project</h2><p>Track progress, fotos, relatórios, pagamentos e mensagens da equipe.</p><div class="v64-hero-actions"><button class="v64-primary" onclick="changePage('reportCenter')">Ver Reports</button><button class="v64-secondary" onclick="changePage('gmailReal')">Falar com Team</button></div></section>
-    <div class="v64-grid"><div class="v64-project-card"><div class="v64-project-cover">🏡 Projeto em andamento</div><span class="v64-tag">Project Status</span><h2>Overall Progress</h2><div class="v64-progress"><span style="width:${progress}%"></span></div><p>${progress}% concluído • Next Visit em planejamento</p></div>
-    <div class="v64-feed-card"><h2>Quick Access</h2><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('workOrders')">🧾<strong>Work Orders</strong><small>Acompanhar serviços</small></div><div class="v64-action-card" onclick="changePage('reportCenter')">📑<strong>Reports</strong><small>${reportsCount} disponíveis</small></div><div class="v64-action-card" onclick="changePage('billingDashboard')">💳<strong>Payments</strong><small>Ver cobranças</small></div><div class="v64-action-card" onclick="changePage('gmailReal')">💬<strong>Messages</strong><small>Contato com equipe</small></div></div></div>
+    <section class="v64-hero"><div class="v64-eyebrow">Client Portal</div><h2>🤝 My Project</h2><p>Track progress, fotos, relatórios, pagamentos e mensagens da team.</p><div class="v64-hero-actions"><button class="v64-primary" onclick="changePage('reportCenter')">View Reports</button><button class="v64-secondary" onclick="changePage('gmailReal')">Contact Team</button></div></section>
+    <div class="v64-grid"><div class="v64-project-card"><div class="v64-project-cover">🏡 Project in Progress</div><span class="v64-tag">Project Status</span><h2>Overall Progress</h2><div class="v64-progress"><span style="width:${progress}%"></span></div><p>${progress}% completed • Next Visit em planejamento</p></div>
+    <div class="v64-feed-card"><h2>Quick Access</h2><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('workOrders')">🧾<strong>Work Orders</strong><small>Acompanhar serviços</small></div><div class="v64-action-card" onclick="changePage('reportCenter')">📑<strong>Reports</strong><small>${reportsCount} disponíveis</small></div><div class="v64-action-card" onclick="changePage('billingDashboard')">💳<strong>Payments</strong><small>Ver cobranças</small></div><div class="v64-action-card" onclick="changePage('gmailReal')">💬<strong>Messages</strong><small>Contato com team</small></div></div></div>
     <div class="v64-feed-card"><h2>Recent Photos</h2>${photos.slice(0,4).map(p=>`<div class="v64-feed-item"><div class="v64-feed-icon">📸</div><div><strong>${p.photo_type||"Foto de campo"}</strong><br><small>${p.project_name||p.photo_url||"Atualização do projeto"}</small></div></div>`).join("")||"<p>No photos uploaded yet.</p>"}</div></div>`);
 }
 
@@ -4843,16 +4843,16 @@ function renderClientHome(){
   setContent(`
     <div class="v651-premium-page">
       <section class="v651-premium-hero">
-        <div class="v651-hero-top"><div><div class="v651-eyebrow">Client Portal · V66.0</div><h2>🏡 My Project</h2><p>Track progress, fotos antes/durante/depois, próximas visitas, equipe, documentos e atualizações.</p></div><div class="v651-status-pill">🟢 Dentro do prazo</div></div>
-        <div class="v651-progress"><span></span></div><strong>72% concluído</strong><p style="color:#d1fae5;margin-top:8px;">Última atualização: ${lastUpdate}</p>
-        <div class="v651-hero-actions"><button class="v651-primary" onclick="changePage('reportCenter', event)">Ver Reports</button><button class="v651-secondary" onclick="changePage('whatsappReal', event)">Falar com Team</button><button class="v651-secondary" onclick="changePage('profitabilityEngine', event)">Payments</button></div>
+        <div class="v651-hero-top"><div><div class="v651-eyebrow">Client Portal · V66.0</div><h2>🏡 My Project</h2><p>Track progress, before/during/after photos, upcoming visits, team, documents e updates.</p></div><div class="v651-status-pill">🟢 On Schedule</div></div>
+        <div class="v651-progress"><span></span></div><strong>72% completed</strong><p style="color:#d1fae5;margin-top:8px;">Last Update: ${lastUpdate}</p>
+        <div class="v651-hero-actions"><button class="v651-primary" onclick="changePage('reportCenter', event)">View Reports</button><button class="v651-secondary" onclick="changePage('whatsappReal', event)">Contact Team</button><button class="v651-secondary" onclick="changePage('profitabilityEngine', event)">Payments</button></div>
       </section>
       <div class="v66-kpis"><div class="v66-kpi">📸 Total Photos<strong>${recentPhotosSafe.length||4}</strong></div><div class="v66-kpi">📅 Last Update<strong>${lastUpdate}</strong></div><div class="v66-kpi">👷 Visits Completed<strong>${visitsCompleted||3}</strong></div><div class="v66-kpi">📈 Progress<strong>72%</strong></div></div>
-      <div class="v651-grid"><div class="v651-card"><h3>🚀 Próxima Etapa</h3><p><strong>Instalação de irrigação</strong></p><small>Responsável: Team Verde</small></div><div class="v651-card"><h3>📅 Próxima Visita</h3><p><strong>12/06 às 08:00</strong></p><small>Irrigação e preparação do terreno</small></div><div class="v651-card"><h3>📊 Status do Projeto</h3><p><strong>${projectName}</strong></p><small>Projeto em andamento</small></div><div class="v651-card"><h3>📑 Reports</h3><p><strong>${reportsCount}</strong> disponíveis</p><small>Documents preparados para o cliente</small></div></div>
+      <div class="v651-grid"><div class="v651-card"><h3>🚀 Next Step</h3><p><strong>Irrigation Installation</strong></p><small>Assigned to: Team Verde</small></div><div class="v651-card"><h3>📅 Next Visit</h3><p><strong>12/06 às 08:00</strong></p><small>Irrigation and site preparation</small></div><div class="v651-card"><h3>📊 Project Status</h3><p><strong>${projectName}</strong></p><small>Project in Progress</small></div><div class="v651-card"><h3>📑 Reports</h3><p><strong>${reportsCount}</strong> disponíveis</p><small>Documents preparados para o cliente</small></div></div>
       <div class="v651-card"><h3>🏡 Evolução do Projeto</h3><div class="v66-tabs"><button class="v66-tab active" data-tab="Todos" onclick="ddV66RenderGallery('Todos')">Todos</button><button class="v66-tab" data-tab="Antes" onclick="ddV66RenderGallery('Antes')">Antes</button><button class="v66-tab" data-tab="Durante" onclick="ddV66RenderGallery('Durante')">Durante</button><button class="v66-tab" data-tab="Depois" onclick="ddV66RenderGallery('Depois')">Depois</button></div><div id="v66GalleryArea" class="v66-gallery-grid"></div></div>
       <div class="v651-card"><h3>🆚 Comparação Antes / Depois</h3><div class="v66-comparison"><div class="v66-compare-card">Antes<br><small>Estado original do projeto</small></div><div class="v66-compare-card after">Depois<br><small>Resultado planejado / evolução atual</small></div></div></div>
-      <div class="v651-grid"><div class="v651-card"><h3>📍 Project Timeline</h3><div class="v651-timeline"><div class="v651-step"><div class="v651-dot">✓</div><div><strong>Contrato aprovado</strong><br><small>Projeto confirmado</small></div></div><div class="v651-step"><div class="v651-dot">✓</div><div><strong>Planejamento</strong><br><small>Escopo e equipe definidos</small></div></div><div class="v651-step"><div class="v651-dot current">⏳</div><div><strong>Execução em andamento</strong><br><small>Instalação e paisagismo</small></div></div><div class="v651-step"><div class="v651-dot todo">□</div><div><strong>Entrega</strong><br><small>Projeto concluído</small></div></div></div></div><div class="v651-card"><h3>📰 Recent Updates</h3><div class="v651-feed-item"><div class="v651-feed-icon">🌱</div><div><strong>Hoje</strong><br><small>Team iniciou preparação do terreno</small></div></div><div class="v651-feed-item"><div class="v651-feed-icon">🚚</div><div><strong>Ontem</strong><br><small>Materiais entregues no local</small></div></div></div></div>
-      <div class="v651-grid"><div class="v651-card"><h3>👷 Team Responsável</h3><div class="v651-team"><div class="v651-person"><div class="v651-avatar">SV</div><div><strong>Supervisor</strong><br><small>Coordenação do projeto</small></div></div><div class="v651-person"><div class="v651-avatar">PS</div><div><strong>Paisagista</strong><br><small>Execução e acabamento</small></div></div></div></div><div class="v651-card"><h3>💰 Financial Summary</h3><div class="v651-grid"><div><strong>Total</strong><br><small>R$ 18.000,00</small></div><div><strong>Pago</strong><br><small>R$ 15.000,00</small></div><div><strong>Pendente</strong><br><small>R$ 3.000,00</small></div></div></div></div>
+      <div class="v651-grid"><div class="v651-card"><h3>📍 Project Timeline</h3><div class="v651-timeline"><div class="v651-step"><div class="v651-dot">✓</div><div><strong>Contrato aprovado</strong><br><small>Projeto confirmado</small></div></div><div class="v651-step"><div class="v651-dot">✓</div><div><strong>Planejamento</strong><br><small>Escopo e team definidos</small></div></div><div class="v651-step"><div class="v651-dot current">⏳</div><div><strong>Execução em andamento</strong><br><small>Instalação e paisagismo</small></div></div><div class="v651-step"><div class="v651-dot todo">□</div><div><strong>Entrega</strong><br><small>Projeto completed</small></div></div></div></div><div class="v651-card"><h3>📰 Recent Updates</h3><div class="v651-feed-item"><div class="v651-feed-icon">🌱</div><div><strong>Hoje</strong><br><small>Team iniciou preparação do terreno</small></div></div><div class="v651-feed-item"><div class="v651-feed-icon">🚚</div><div><strong>Ontem</strong><br><small>Materiais entregues no local</small></div></div></div></div>
+      <div class="v651-grid"><div class="v651-card"><h3>👷 Team Assigned to</h3><div class="v651-team"><div class="v651-person"><div class="v651-avatar">SV</div><div><strong>Supervisor</strong><br><small>Coordenação do projeto</small></div></div><div class="v651-person"><div class="v651-avatar">PS</div><div><strong>Paisagista</strong><br><small>Execução e acabamento</small></div></div></div></div><div class="v651-card"><h3>💰 Financial Summary</h3><div class="v651-grid"><div><strong>Total</strong><br><small>R$ 18.000,00</small></div><div><strong>Pago</strong><br><small>R$ 15.000,00</small></div><div><strong>Pendente</strong><br><small>R$ 3.000,00</small></div></div></div></div>
       <div class="v651-card"><h3>📄 Documents</h3><div class="v651-docs"><div class="v651-doc">📄 Contrato</div><div class="v651-doc">📄 Orçamento</div><div class="v651-doc">📄 Reports</div><div class="v651-doc">📄 Garantia</div></div></div>
     </div>`);
   setTimeout(()=>ddV66RenderGallery("Todos"),0);
@@ -6172,4 +6172,174 @@ setTimeout(ddClientLabelPatch,1000);
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runRoleAccess,300));
   setTimeout(runRoleAccess,800);
   setInterval(runRoleAccess,1500);
+})();
+
+
+/* CLIENT PORTAL POLISH + ROLE GUARD V5 */
+(function(){
+  const DD_IMG_FALLBACK = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' width='900' height='500'><defs><linearGradient id='g' x1='0' x2='1'><stop stop-color='#dcfce7'/><stop offset='1' stop-color='#fef3c7'/></linearGradient></defs><rect width='100%' height='100%' fill='url(#g)'/><text x='50%' y='48%' dominant-baseline='middle' text-anchor='middle' fill='#14532d' font-family='Arial' font-size='32' font-weight='700'>Project Photo</text><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' fill='#64748b' font-family='Arial' font-size='20'>Image unavailable</text></svg>"
+  );
+
+  const translationsV5 = [
+    [/Dentro do prazo/g, "On Schedule"],
+    [/72% concluído/g, "72% completed"],
+    [/Última atualização/g, "Last Update"],
+    [/Próxima Etapa/g, "Next Step"],
+    [/Próxima Visita/g, "Next Visit"],
+    [/Status do Projeto/g, "Project Status"],
+    [/Projeto em andamento/g, "Project in Progress"],
+    [/Instalação de irrigação/g, "Irrigation Installation"],
+    [/Irrigação e preparação do terreno/g, "Irrigation and site preparation"],
+    [/Responsável/g, "Assigned to"],
+    [/Equipe Verde/g, "Green Team"],
+    [/Documentos preparados para o cliente/g, "Documents prepared for the client"],
+    [/concluído/g, "completed"],
+    [/Acompanhe progresso/g, "Track progress"],
+    [/fotos antes\/durante\/depois/g, "before/during/after photos"],
+    [/próximas visitas/g, "upcoming visits"],
+    [/equipe/g, "team"],
+    [/documentos/g, "documents"],
+    [/atualizações/g, "updates"],
+    [/Ver Reports/g, "View Reports"],
+    [/Falar com Team/g, "Contact Team"],
+    [/Financeiro/g, "Financial"],
+    [/Cliente/g, "Client"],
+    [/Relatorio/g, "Report"],
+    [/Reporte/g, "Report"]
+  ];
+
+  function getRoleV5(){
+    try{
+      const s = JSON.parse(localStorage.getItem("dd_auth_session_v1") || "{}");
+      return localStorage.getItem("dd_role") || s.role || "client";
+    }catch(e){
+      return localStorage.getItem("dd_role") || "client";
+    }
+  }
+
+  function translateV5(){
+    document.querySelectorAll("body *").forEach(el=>{
+      if(el.childNodes && el.childNodes.length===1 && el.childNodes[0].nodeType===3){
+        let t = el.textContent;
+        translationsV5.forEach(([re, rep]) => t = t.replace(re, rep));
+        el.textContent = t;
+      }
+      ["placeholder","title","aria-label"].forEach(attr=>{
+        if(el.getAttribute && el.getAttribute(attr)){
+          let v = el.getAttribute(attr);
+          translationsV5.forEach(([re, rep]) => v = v.replace(re, rep));
+          el.setAttribute(attr, v);
+        }
+      });
+    });
+  }
+
+  function removeDuplicateRoleBadgesV5(){
+    const badges = [...document.querySelectorAll("[data-role-final-badge], .role-pill, .top-pill, span, button")]
+      .filter(el => ["CLIENT","OWNER","EMPLOYEE"].includes((el.textContent || "").trim().toUpperCase()));
+    const seen = {};
+    badges.forEach(el=>{
+      const key = (el.textContent || "").trim().toUpperCase();
+      if(seen[key]){
+        el.style.display = "none";
+        el.setAttribute("data-dd-duplicate-role","true");
+      }else{
+        seen[key] = true;
+        el.style.display = "";
+      }
+    });
+  }
+
+  function fixImagesV5(){
+    document.querySelectorAll("img").forEach(img=>{
+      if(!img.dataset.ddFallbackV5){
+        img.dataset.ddFallbackV5 = "true";
+        img.onerror = function(){
+          this.onerror = null;
+          this.src = DD_IMG_FALLBACK;
+        };
+      }
+      const src = img.getAttribute("src") || "";
+      if(src.includes("photo-1599598425947-5b1a1cfacd57") || src.includes("images.unsplash.com/photo-1599598425947-5b1a1cfacd57")){
+        img.src = DD_IMG_FALLBACK;
+      }
+    });
+
+    document.querySelectorAll("[style*='background-image']").forEach(el=>{
+      const st = el.getAttribute("style") || "";
+      if(st.includes("photo-1599598425947-5b1a1cfacd57")){
+        el.style.backgroundImage = `url("${DD_IMG_FALLBACK}")`;
+      }
+    });
+  }
+
+  function roleGuardV5(){
+    const role = getRoleV5();
+    document.body.setAttribute("data-dd-role", role);
+
+    if(role === "client"){
+      const blockedWords = ["finance","administration","intelligence","workforce","routes","field","work orders","command center","owner command","employee view"];
+      document.querySelectorAll("a,button,.nav-item,[onclick]").forEach(el=>{
+        const t = (el.textContent || "").toLowerCase();
+        if(blockedWords.some(w => t.includes(w))){
+          el.style.display = "none";
+        }
+      });
+    }
+
+    if(role === "employee"){
+      const blockedWords = ["finance","administration","intelligence"];
+      document.querySelectorAll("a,button,.nav-item,[onclick]").forEach(el=>{
+        const t = (el.textContent || "").toLowerCase();
+        if(blockedWords.some(w => t.includes(w))){
+          el.style.display = "none";
+        }
+      });
+    }
+  }
+
+  function improveBackV5(){
+    document.querySelectorAll("button,a").forEach(el=>{
+      const t = (el.textContent || "").trim().toLowerCase();
+      if(t.includes("back") && !el.dataset.ddBackV5){
+        el.dataset.ddBackV5 = "true";
+        el.addEventListener("click", function(ev){
+          try{
+            ev.preventDefault();
+            const role = getRoleV5();
+            if(role === "client" && typeof changePage === "function"){
+              changePage("clientPortal");
+            }else if(typeof changePage === "function"){
+              changePage("home");
+            }else{
+              history.back();
+            }
+          }catch(e){ history.back(); }
+        }, true);
+      }
+    });
+  }
+
+  function runV5(){
+    translateV5();
+    removeDuplicateRoleBadgesV5();
+    fixImagesV5();
+    roleGuardV5();
+    improveBackV5();
+  }
+
+  const oldChangePageV5 = window.changePage;
+  if(typeof oldChangePageV5 === "function"){
+    window.changePage = function(){
+      const result = oldChangePageV5.apply(this, arguments);
+      setTimeout(runV5,50);
+      setTimeout(runV5,300);
+      return result;
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded",()=>setTimeout(runV5,300));
+  setTimeout(runV5,800);
+  setInterval(runV5,1500);
 })();
