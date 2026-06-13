@@ -2,7 +2,7 @@
 /* HARD REMOVE UNSPLASH SOURCE V6 */
 (function(){
   const SAFE_PROJECT_PHOTO = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E";
-  const BAD_PHOTO_RE = /images\.unsplash\.com\/data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E|data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E/i;
+  const BAD_PHOTO_RE = /images\.unsplash\.com\/photo-1599598425947-5b1a1cfacd57|photo-1599598425947-5b1a1cfacd57/i;
 
   function scrubNode(el){
     try{
@@ -1423,7 +1423,7 @@ function renderMobileReady(){
         <p>Mobile Field Mode</p>
         <button class="mobile-preview-button">Dashboard</button>
         <button class="mobile-preview-button">Projetos</button>
-        <button class="mobile-preview-button">Photos</button>
+        <button class="mobile-preview-button">Fotos</button>
         <button class="mobile-preview-button">Check-in</button>
       </div>
     </div>
@@ -1536,7 +1536,7 @@ function renderFieldDashboard(){
         <h2>DoubleDiamond Field</h2>
         <p>Modo team em campo</p>
         <button class="field-phone-button">Check-in GPS</button>
-        <button class="field-phone-button">Photos</button>
+        <button class="field-phone-button">Fotos</button>
         <button class="field-phone-button">Work Order de Serviço</button>
         <button class="field-phone-button">Assinatura</button>
       </div>
@@ -1663,7 +1663,7 @@ function renderRoutePlanning(){
     </div>
 
     <div class="card">
-      <h2>Nova Route</h2>
+      <h2>Nova Rota</h2>
       <div class="form-grid">
         <select id="routeCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="routeName" placeholder="Nome da rota">
@@ -1672,13 +1672,13 @@ function renderRoutePlanning(){
         <select id="routeStatus"><option>Planned</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select>
       </div>
       <textarea id="routeNotes" placeholder="Observações"></textarea>
-      <button class="primary-btn" onclick="createRoutePlan()">Criar Route</button>
+      <button class="primary-btn" onclick="createRoutePlan()">Criar Rota</button>
     </div>
 
     <div class="card">
       <h2>Adicionar Parada</h2>
       <div class="form-grid">
-        <select id="stopRoute"><option value="">Route</option>${routePlans.map(r => `<option value="${r.id}">${r.route_name}</option>`).join("")}</select>
+        <select id="stopRoute"><option value="">Rota</option>${routePlans.map(r => `<option value="${r.id}">${r.route_name}</option>`).join("")}</select>
         <input id="stopClient" placeholder="Client">
         <input id="stopAddress" placeholder="Endereço">
         <input id="stopOrder" type="number" placeholder="Work Order">
@@ -1803,7 +1803,7 @@ function renderMobileWorkforce(){
 
   setContent(`
     <div class="field-hero">
-      <h2>Mobile Workforce + GPS + Photos + Assinatura</h2>
+      <h2>Mobile Workforce + GPS + Fotos + Assinatura</h2>
       <p>Controle de team externa, check-in GPS, upload de fotos e aceite digital.</p>
     </div>
 
@@ -2456,7 +2456,7 @@ function renderMapsReal(){
     <div class="realint-hero"><h2>Google Maps Real Ready</h2><p>Routes com link real para Google Maps e fila para cálculo backend.</p></div>
     <div class="realint-warning">Distância/tempo automáticos exigem Google Maps API no backend. O frontend gera link de navegação seguro.</div>
     <div class="card">
-      <h2>Nova Route Google Maps</h2>
+      <h2>Nova Rota Google Maps</h2>
       <div class="form-grid">
         <select id="mapsCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <select id="mapsRoutePlan"><option value="">Route Plan opcional</option>${typeof routePlans !== "undefined" ? routePlans.map(r => `<option value="${r.id}">${r.route_name}</option>`).join("") : ""}</select>
@@ -2464,7 +2464,7 @@ function renderMapsReal(){
         <input id="mapsDestination" placeholder="Destino">
         <select id="mapsMode"><option>driving</option><option>walking</option><option>bicycling</option><option>transit</option></select>
       </div>
-      <button class="primary-btn" onclick="createMapsRouteRequest()">Criar Link de Route</button>
+      <button class="primary-btn" onclick="createMapsRouteRequest()">Criar Link de Rota</button>
     </div>
     <div class="realint-grid">
       ${mapsRouteRequests.map(r => `<div class="realint-card"><h2>${r.origin_address || "Origem"} → ${r.destination_address || "Destino"}</h2><span class="realint-badge">${r.status}</span><p>${r.distance_text || "Distância aguardando backend"} • ${r.duration_text || "Tempo aguardando backend"}</p><a class="primary-btn" href="${r.maps_url}" target="_blank">Abrir Google Maps</a></div>`).join("") || "<div class='card'>Nenhuma rota Google criada.</div>"}
@@ -2650,7 +2650,7 @@ function renderMapsReal(){
     <div class="realint-warning">Distância e tempo automáticos exigem Google Maps API em backend/Edge Function.</div>
 
     <div class="card">
-      <h2>Nova Route</h2>
+      <h2>Nova Rota</h2>
       <div class="form-grid">
         <select id="mapsCompany"><option value="">Client</option>${companyOptionsReal()}</select>
         <input id="mapsOrigin" placeholder="Origem">
@@ -3799,7 +3799,7 @@ function renderAIRouteOptimization(){
     <div class="aiops-hero"><h2>V56 AI Route Optimization</h2><p>Sugere melhorias de rota e economia operacional.</p></div>
 
     <div class="card">
-      <h2>Gerar Otimização de Route</h2>
+      <h2>Gerar Otimização de Rota</h2>
       <div class="form-grid">
         <select id="routeOptCompany"><option value="">Client</option>${getCompanyOptionsAI()}</select>
         <input id="routeOptName" placeholder="Nome da rota">
@@ -4621,17 +4621,17 @@ function renderEmployeeHome(){
     </div>
 
     <div class="role-mobile-card">
-      <h2>Next Work Order</h2>
+      <h2>Próxima Work Order</h2>
       <p>${nextWO ? nextWO.client_name || "Client" : "Nenhuma ordem encontrada"}</p>
       <p>${nextWO ? nextWO.service_type || "Serviço" : "Crie uma ordem para aparecer aqui."}</p>
       <button class="primary-btn" onclick="changePage('workOrders')">Abrir OS</button>
     </div>
 
     <div class="role-action-grid">
-      <button class="role-action" onclick="changePage('routePlanning')">🗺️ Iniciar Route</button>
+      <button class="role-action" onclick="changePage('routePlanning')">🗺️ Iniciar Rota</button>
       <button class="role-action" onclick="changePage('mobileWorkforce')">📍 Check-in</button>
       <button class="role-action" onclick="changePage('mobileWorkforce')">📷 Enviar Foto</button>
-      <button class="role-action" onclick="changePage('workOrders')">✅ Complete Serviço</button>
+      <button class="role-action" onclick="changePage('workOrders')">✅ Finalizar Serviço</button>
       <button class="role-action" onclick="changePage('weatherCenter')">🌦️ Clima</button>
       <button class="role-action" onclick="changePage('fieldDashboard')">🌱 Campo</button>
     </div>
@@ -4659,7 +4659,7 @@ function renderClientHome(){
     <div class="role-mobile-card">
       <h2>Status</h2>
       <p>Em andamento</p>
-      <p>Next update available in the report.</p>
+      <p>Próxima atualização disponível no relatório.</p>
       <button class="primary-btn" onclick="changePage('workOrders')">Ver Work Orders</button>
     </div>
 
@@ -4725,7 +4725,7 @@ function renderDashboard(){
           <span class="v64-tag">${p.status||"Em andamento"}</span>
           <h2>${p.service_type||p.work_order_title||"Serviço externo"}</h2>
           <div class="v64-progress"><span style="width:${progress}%"></span></div>
-          <p>${progress}% completed • Next field update</p>
+          <p>${progress}% completed • Próxima atualização em campo</p>
           <button class="secondary-btn" onclick="changePage('workOrders')">Abrir</button>
         </div>`}).join("")||`
         <div class="v64-project-card"><div class="v64-project-cover">🌿 First Project</div><span class="v64-tag">Ready to Start</span><h2>Create a work order</h2><div class="v64-progress"><span style="width:18%"></span></div><p>Use Work Orders to feed the Home dashboard.</p><button class="secondary-btn" onclick="changePage('workOrders')">Create / Open Work Order</button></div>`}
@@ -4749,8 +4749,8 @@ function renderEmployeeHome(){
   setTitle("Meu Trabalho Hoje");
   const jobs=typeof workOrders!=="undefined"?workOrders:[], nextJob=jobs[0];
   setContent(`
-    <section class="v64-hero"><div class="v64-eyebrow">Employee Mobile Workspace</div><h2>👷 Meu Trabalho Hoje</h2><p>Routes, check-in, fotos, assinatura e conclusão de serviços em uma tela simples.</p><div class="v64-hero-actions"><button class="v64-primary" onclick="changePage('routePlanning')">Iniciar Route</button><button class="v64-secondary" onclick="changePage('mobileWorkforce')">Check-in</button></div></section>
-    <div class="v64-grid"><div class="v64-mobile-shell"><div class="v64-mobile-screen"><span class="v64-tag">Next Work Order</span><h2>${nextJob?(nextJob.client_name||"Client"):"No work orders for today"}</h2><p>${nextJob?(nextJob.service_type||"Field service"):"Create a work order to show it here."}</p><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('routePlanning')">🗺️<strong>Route</strong><small>Open planning</small></div><div class="v64-action-card" onclick="changePage('mobileWorkforce')">📍<strong>Check-in</strong><small>Record attendance</small></div><div class="v64-action-card" onclick="changePage('mobileWorkforce')">📷<strong>Photos</strong><small>Upload from field</small></div><div class="v64-action-card" onclick="changePage('workOrders')">✅<strong>Complete</strong><small>Complete Work Order</small></div></div></div></div>
+    <section class="v64-hero"><div class="v64-eyebrow">Employee Mobile Workspace</div><h2>👷 Meu Trabalho Hoje</h2><p>Routes, check-in, fotos, assinatura e conclusão de serviços em uma tela simples.</p><div class="v64-hero-actions"><button class="v64-primary" onclick="changePage('routePlanning')">Iniciar Rota</button><button class="v64-secondary" onclick="changePage('mobileWorkforce')">Check-in</button></div></section>
+    <div class="v64-grid"><div class="v64-mobile-shell"><div class="v64-mobile-screen"><span class="v64-tag">Próxima Work Order</span><h2>${nextJob?(nextJob.client_name||"Client"):"Nenhuma ordem para hoje"}</h2><p>${nextJob?(nextJob.service_type||"Serviço em campo"):"Cadastre uma OS para aparecer aqui."}</p><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('routePlanning')">🗺️<strong>Rota</strong><small>Abrir planejamento</small></div><div class="v64-action-card" onclick="changePage('mobileWorkforce')">📍<strong>Check-in</strong><small>Registrar presença</small></div><div class="v64-action-card" onclick="changePage('mobileWorkforce')">📷<strong>Fotos</strong><small>Enviar campo</small></div><div class="v64-action-card" onclick="changePage('workOrders')">✅<strong>Finalizar</strong><small>Concluir OS</small></div></div></div></div>
     <div class="v64-feed-card"><h2>Tarefas do dia</h2>${jobs.slice(0,5).map(j=>`<div class="v64-feed-item"><div class="v64-feed-icon">🧾</div><div><strong>${j.client_name||"Client"}</strong><br><small>${j.service_type||j.status||"Serviço"}</small></div></div>`).join("")||"<p>Nenhuma tarefa cadastrada.</p>"}</div></div>`);
 }
 
@@ -5271,7 +5271,7 @@ function s1RealOpsHtml(){
       <div class="s1-grid">
         <div class="s1-card"><h3>🧾 Work Orders</h3><strong>${wo.length}</strong><span class="s1-pill">work_orders</span></div>
         <div class="s1-card"><h3>👷 Check-ins</h3><strong>${checks.length}</strong><span class="s1-pill">team_checkins</span></div>
-        <div class="s1-card"><h3>📸 Photos</h3><strong>${photos.length}</strong><span class="s1-pill">field_photos</span></div>
+        <div class="s1-card"><h3>📸 Fotos</h3><strong>${photos.length}</strong><span class="s1-pill">field_photos</span></div>
         <div class="s1-card"><h3>📍 Timeline</h3><strong>${timeline.length}</strong><span class="s1-pill">project_timeline</span></div>
       </div>
 
@@ -5553,8 +5553,8 @@ renderClientHome = function(){
   function ddLoginStaff(){
     const role=(document.getElementById("ddStaffRole")||{}).value || "employee";
     const pin=(document.getElementById("ddStaffPin")||{}).value || "";
-    if(role==="owner" && pin!==DEFAULT_OWNER_PIN) return alert("Invalid Owner PIN.");
-    if(role==="employee" && pin!==DEFAULT_EMPLOYEE_PIN) return alert("Invalid Employee PIN.");
+    if(role==="owner" && pin!==DEFAULT_OWNER_PIN) return alert("Owner PIN inválido.");
+    if(role==="employee" && pin!==DEFAULT_EMPLOYEE_PIN) return alert("Employee PIN inválido.");
     ddSetSession({role, name: role==="owner"?"Owner":"Employee", logged_at:new Date().toISOString()});
     ddBootAuthenticated(role);
   }
@@ -5594,11 +5594,9 @@ renderClientHome = function(){
         <button class="dd-staff-trigger" onclick="ddRevealStaff()" title="Staff access">💎</button>
         <section id="ddStaffBox" class="dd-staff-box">
           <h3>Staff Access</h3>
-          <form id="ddStaffForm" autocomplete="on" onsubmit="event.preventDefault(); ddLoginStaff();">
-            <select id="ddStaffRole"><option value="employee">Employee</option><option value="owner">Owner</option></select>
-            <input id="ddStaffPin" type="password" placeholder="Access PIN" autocomplete="current-password">
-            <button type="submit">Enter Internal App</button>
-          </form>
+          <select id="ddStaffRole"><option value="employee">Employee</option><option value="owner">Owner</option></select>
+          <input id="ddStaffPin" type="password" placeholder="Access PIN">
+          <button onclick="ddLoginStaff()">Enter Internal App</button>
           <small>Owner PIN: owner123 · Employee PIN: field123</small>
         </section>
       </main>
@@ -5868,7 +5866,7 @@ setTimeout(ddClientLabelPatch,1000);
   }
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runEnglishPatch,200));
-  setInterval(runEnglishPatch,30000);
+  setInterval(runEnglishPatch,15000);
 })();
 
 
@@ -5940,7 +5938,7 @@ setTimeout(ddClientLabelPatch,1000);
     });
   }
 
-  setInterval(run, 30000);
+  setInterval(run, 15000);
   document.addEventListener("DOMContentLoaded",()=>setTimeout(run,250));
 })();
 
@@ -6048,7 +6046,7 @@ setTimeout(ddClientLabelPatch,1000);
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runV3,250));
   setTimeout(runV3,500);
-  setInterval(runV3,30000);
+  setInterval(runV3,15000);
 })();
 
 
@@ -6222,7 +6220,7 @@ setTimeout(ddClientLabelPatch,1000);
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runRoleAccess,300));
   setTimeout(runRoleAccess,800);
-  setInterval(runRoleAccess,30000);
+  setInterval(runRoleAccess,15000);
 })();
 
 
@@ -6568,73 +6566,63 @@ setTimeout(ddClientLabelPatch,1000);
 })();
 
 
-/* V1 COMMERCIAL AUDIT CLEAN PATCH */
+/* V1 COMMERCIAL AUDIT CLEAN FIXED */
 (function(){
-  function removeOldLoginShellWhenCommercialLoginExists(){
-    const commercial = document.getElementById("dd-commercial-login");
-    const oldShell = document.getElementById("ddLoginShell");
-    if(commercial && oldShell) oldShell.remove();
-  }
+  function ddAuditCleanFixed(){
+    try{
+      document.querySelectorAll("input[type='password']").forEach(function(input){
+        if(input.closest("form")) return;
+        var parent = input.parentElement;
+        if(!parent || parent.dataset.ddFormFixed === "true") return;
+        parent.dataset.ddFormFixed = "true";
+        var form = document.createElement("form");
+        form.autocomplete = "on";
+        form.style.display = "contents";
+        parent.insertBefore(form, input);
+        form.appendChild(input);
+        form.addEventListener("submit", function(e){
+          e.preventDefault();
+          var btn = parent.querySelector("button");
+          if(btn) btn.click();
+        });
+      });
 
-  function cleanResidualLanguage(){
-    const replacements = [
-      [/Próxima/g, "Next"],
-      [/Última/g, "Last"],
-      [/Atualização/g, "Update"],
-      [/atualização/g, "update"],
-      [/Relatorio/g, "Report"],
-      [/Reporte/g, "Report"],
-      [/Cliente/g, "Client"],
-      [/Empresa/g, "Client"],
-      [/Financeiro/g, "Financial"],
-      [/concluído/g, "completed"],
-      [/Dentro do prazo/g, "On Schedule"]
-    ];
-    document.querySelectorAll("body *").forEach(el=>{
-      if(el.childNodes && el.childNodes.length === 1 && el.childNodes[0].nodeType === 3){
-        let t = el.textContent;
-        replacements.forEach(([re, rep]) => t = t.replace(re, rep));
-        el.textContent = t;
-      }
-      ["placeholder","title","aria-label"].forEach(attr=>{
-        if(el.getAttribute && el.getAttribute(attr)){
-          let v = el.getAttribute(attr);
-          replacements.forEach(([re, rep]) => v = v.replace(re, rep));
-          el.setAttribute(attr, v);
+      document.querySelectorAll("body *").forEach(function(el){
+        if(el.childNodes && el.childNodes.length === 1 && el.childNodes[0].nodeType === 3){
+          el.textContent = el.textContent
+            .replace(/Cliente/g, "Client")
+            .replace(/Empresa/g, "Client")
+            .replace(/Relatorio/g, "Report")
+            .replace(/Reporte/g, "Report")
+            .replace(/Financeiro/g, "Financial");
         }
       });
-    });
+
+      var bad = "photo-1599598425947-5b1a1cfacd57";
+      var fallback = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E";
+      document.querySelectorAll("img,[style]").forEach(function(el){
+        if(el.tagName === "IMG" && (el.src || "").indexOf(bad) !== -1){
+          el.src = fallback;
+        }
+        var bg = el.style && el.style.backgroundImage;
+        if(bg && bg.indexOf(bad) !== -1){
+          el.style.backgroundImage = "url('" + fallback + "')";
+        }
+      });
+    }catch(e){
+      console.warn("Audit clean fixed skipped:", e);
+    }
   }
 
-  function ensurePasswordForms(){
-    document.querySelectorAll("input[type='password']").forEach(input=>{
-      if(input.closest("form")) return;
-      const parent = input.parentElement;
-      if(!parent) return;
-      const form = document.createElement("form");
-      form.autocomplete = "on";
-      form.style.display = "contents";
-      parent.insertBefore(form, input);
-      form.appendChild(input);
-    });
-  }
-
-  function runAuditClean(){
-    removeOldLoginShellWhenCommercialLoginExists();
-    cleanResidualLanguage();
-    ensurePasswordForms();
-  }
-
-  const oldChangePageAuditClean = window.changePage;
-  if(typeof oldChangePageAuditClean === "function"){
+  var oldChangePageAuditFixed = window.changePage;
+  if(typeof oldChangePageAuditFixed === "function"){
     window.changePage = function(){
-      const r = oldChangePageAuditClean.apply(this, arguments);
-      setTimeout(runAuditClean, 100);
-      setTimeout(runAuditClean, 500);
+      var r = oldChangePageAuditFixed.apply(this, arguments);
+      setTimeout(ddAuditCleanFixed, 200);
       return r;
     };
   }
 
-  document.addEventListener("DOMContentLoaded",()=>setTimeout(runAuditClean,500));
-  setTimeout(runAuditClean,1000);
+  document.addEventListener("DOMContentLoaded", function(){ setTimeout(ddAuditCleanFixed, 500); });
+  setTimeout(ddAuditCleanFixed, 1000);
 })();
