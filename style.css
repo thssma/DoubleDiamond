@@ -1233,3 +1233,10 @@ input,select,textarea{
     font-size:30px!important;
   }
 }
+
+
+/* ROLE ACCESS FINAL V4 STYLES */
+[data-role-hidden="true"]{display:none!important;}
+body[data-dd-role="client"] .owner-only,
+body[data-dd-role="client"] .employee-only{display:none!important;}
+body[data-dd-role="employee"] .owner-only{display:none!important;}

@@ -5999,3 +5999,177 @@ setTimeout(ddClientLabelPatch,1000);
   setTimeout(runV3,500);
   setInterval(runV3,1500);
 })();
+
+
+/* ROLE BASED ACCESS FINAL V4 */
+(function(){
+  const ROLE_ALLOWED = {
+    client: [
+      "Client Portal",
+      "Reports"
+    ],
+    employee: [
+      "Home",
+      "Work Orders",
+      "Routes",
+      "Field",
+      "Workforce",
+      "Weather",
+      "Mobile Ready",
+      "PWA",
+      "Reports"
+    ],
+    owner: null
+  };
+
+  function getRole(){
+    try{
+      const s = JSON.parse(localStorage.getItem("dd_auth_session_v1") || "{}");
+      return localStorage.getItem("dd_role") || s.role || "client";
+    }catch(e){
+      return localStorage.getItem("dd_role") || "client";
+    }
+  }
+
+  function normalizeText(t){
+    return String(t || "").replace(/\s+/g," ").trim();
+  }
+
+  function isAllowedNav(text, role){
+    if(role === "owner") return true;
+    const allowed = ROLE_ALLOWED[role] || ROLE_ALLOWED.client;
+    return allowed.some(name => normalizeText(text).toLowerCase().includes(name.toLowerCase()));
+  }
+
+  function hideBlockedNav(){
+    const role = getRole();
+    document.body.setAttribute("data-dd-role", role);
+
+    document.querySelectorAll("a, button, .nav-item, [onclick]").forEach(el=>{
+      const txt = normalizeText(el.textContent);
+      if(!txt) return;
+
+      const looksNav =
+        txt.includes("Home") ||
+        txt.includes("Work Orders") ||
+        txt.includes("Routes") ||
+        txt.includes("Field") ||
+        txt.includes("Workforce") ||
+        txt.includes("Weather") ||
+        txt.includes("Mobile") ||
+        txt.includes("PWA") ||
+        txt.includes("CRM") ||
+        txt.includes("Client Portal") ||
+        txt.includes("Reports") ||
+        txt.includes("Finance") ||
+        txt.includes("Intelligence") ||
+        txt.includes("Administration") ||
+        txt.includes("AI") ||
+        txt.includes("BI");
+
+      if(!looksNav) return;
+
+      const allowed = isAllowedNav(txt, role);
+      if(!allowed){
+        el.style.display = "none";
+        el.setAttribute("data-role-hidden","true");
+      }else{
+        if(el.getAttribute("data-role-hidden")==="true"){
+          el.style.display = "";
+          el.removeAttribute("data-role-hidden");
+        }
+      }
+    });
+
+    document.querySelectorAll(".nav-section-title,.group-title,.section-title").forEach(el=>{
+      const parent = el.parentElement;
+      if(!parent) return;
+      const visible = [...parent.children].some(c => c !== el && getComputedStyle(c).display !== "none");
+      if(!visible) el.style.display = "none";
+    });
+  }
+
+  function protectCurrentPage(){
+    const role = getRole();
+    if(role === "owner") return;
+
+    const title = normalizeText(document.querySelector("h1")?.textContent || document.title || "");
+    const currentText = normalizeText(document.body.textContent || "");
+
+    if(role === "client"){
+      const allowed =
+        currentText.includes("Client Portal") ||
+        currentText.includes("Report Center") ||
+        title.includes("Report") ||
+        title.includes("Client");
+
+      if(!allowed){
+        if(typeof changePage === "function"){
+          changePage("clientPortal");
+        }
+      }
+    }
+
+    if(role === "employee"){
+      const blocked =
+        title.includes("Finance") ||
+        title.includes("Administration") ||
+        title.includes("Intelligence") ||
+        currentText.includes("Executive") ||
+        currentText.includes("Command Center");
+
+      if(blocked && typeof changePage === "function"){
+        changePage("field");
+      }
+    }
+  }
+
+  function roleBadge(){
+    const role = getRole().toUpperCase();
+    const existing = document.querySelector("[data-role-final-badge]");
+    if(existing){
+      existing.textContent = role;
+      return;
+    }
+
+    const badge = document.createElement("span");
+    badge.setAttribute("data-role-final-badge","true");
+    badge.textContent = role;
+    badge.style.cssText = "display:inline-flex;align-items:center;padding:10px 16px;border-radius:999px;background:#dcfce7;color:#14532d;font-weight:900;margin-left:8px;";
+    const top = document.querySelector(".topbar,.header-actions,header") || document.body;
+    top.prepend(badge);
+  }
+
+  function clientLanding(){
+    const role = getRole();
+    if(role !== "client") return;
+
+    const current = normalizeText(document.querySelector("h1")?.textContent || "");
+    if(current.includes("Home") || current.includes("Command Center")){
+      if(typeof changePage === "function"){
+        changePage("clientPortal");
+      }
+    }
+  }
+
+  function runRoleAccess(){
+    hideBlockedNav();
+    roleBadge();
+    protectCurrentPage();
+    clientLanding();
+  }
+
+  const oldChangePageRoleFinal = window.changePage;
+  if(typeof oldChangePageRoleFinal === "function"){
+    window.changePage = function(){
+      const result = oldChangePageRoleFinal.apply(this, arguments);
+      setTimeout(runRoleAccess, 50);
+      setTimeout(runRoleAccess, 300);
+      return result;
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded",()=>setTimeout(runRoleAccess,300));
+  setTimeout(runRoleAccess,800);
+  setInterval(runRoleAccess,1500);
+})();
