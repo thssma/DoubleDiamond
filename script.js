@@ -183,7 +183,7 @@ function changePage(page, event){
 
   const routes = {
     dashboard: renderDashboard,
-    empresas: renderEmpresas,
+    clients: renderClients,
     integrationHub: renderIntegrationHub,
     aiFoundation: renderAIFoundation,
     realIntegrations: renderRealIntegrations,
@@ -393,10 +393,10 @@ function renderDashboard(){
 
       
 <div class="v65-timeline">
-<h3>📍 Timeline do Projeto</h3>
+<h3>📍 Project Timeline</h3>
 <div class="v65-step"><span class="v65-done">✓</span><div>Orçamento aprovado</div></div>
 <div class="v65-step"><span class="v65-done">✓</span><div>Projeto criado</div></div>
-<div class="v65-step"><span class="v65-done">✓</span><div>Equipe programada</div></div>
+<div class="v65-step"><span class="v65-done">✓</span><div>Team programada</div></div>
 <div class="v65-step"><span class="v65-current">⏳</span><div>Execução em andamento</div></div>
 <div class="v65-step"><span>⬜</span><div>Entrega final</div></div>
 </div>
@@ -413,10 +413,10 @@ function renderDashboard(){
 
 
 <div class="v651-hero">
-<h2>🏡 Meu Projeto</h2>
+<h2>🏡 My Project</h2>
 <p>72% concluído • 🟢 Dentro do prazo</p>
-<p>Próxima etapa: Instalação de irrigação</p>
-<p>Próxima visita: 12/06 • 08:00</p>
+<p>Next Step: Instalação de irrigação</p>
+<p>Next Visit: 12/06 • 08:00</p>
 </div>
 
 <div class="v651-grid">
@@ -426,14 +426,14 @@ function renderDashboard(){
 </div>
 
 <div class="v651-card">
-<h3>📰 Atualizações Recentes</h3>
-<div class="v651-feed-item">Hoje • Equipe iniciou preparação do terreno</div>
+<h3>📰 Recent Updates</h3>
+<div class="v651-feed-item">Hoje • Team iniciou preparação do terreno</div>
 <div class="v651-feed-item">Ontem • Materiais entregues</div>
 <div class="v651-feed-item">05/06 • Projeto aprovado</div>
 </div>
 
 <div class="v651-card">
-<h3>👷 Equipe Responsável</h3>
+<h3>👷 Team Responsável</h3>
 <div class="v651-team">
 <span class="v651-avatar">Supervisor</span>
 <span class="v651-avatar">Paisagista</span>
@@ -526,33 +526,33 @@ function renderDashboard(){
   setContent(`<div class="v62-home">${body}</div>`);
 }
 
-function renderEmpresas(){
-  setTitle("Empresas");
+function renderClients(){
+  setTitle("Clients");
 
   setContent(`
-    <div class="foundation-note">V14 Multiempresa: camada inicial para SaaS.</div>
+    <div class="foundation-note">V14 Multiclient: camada inicial para SaaS.</div>
 
     <div class="card">
-      <h2>Novo Cliente</h2>
+      <h2>Novo Client</h2>
       <div class="form-grid">
-        <input id="companyName" placeholder="Nome do cliente">
+        <input id="companyName" placeholder="Client Name">
         <input id="companyEmail" placeholder="Email">
         <input id="companyPhone" placeholder="Telefone">
         <select id="companyPlan"><option>Starter</option><option>Professional</option><option>Enterprise</option></select>
         <select id="companyStatus"><option>Active</option><option>Inactive</option><option>Trial</option></select>
       </div>
-      <button class="primary-btn" onclick="addCompany()">Cadastrar Cliente</button>
+      <button class="primary-btn" onclick="addCompany()">Cadastrar Client</button>
     </div>
 
     <div class="card">
-      <h2>Usuário do Cliente</h2>
+      <h2>Usuário do Client</h2>
       <div class="form-grid">
-        <select id="companyUserCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="companyUserCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="companyUserName" placeholder="Nome do usuário">
         <input id="companyUserEmail" placeholder="Email do usuário">
         <select id="companyUserRole"><option>Owner</option><option>Manager</option><option>Employee</option><option>Client</option></select>
       </div>
-      <button class="primary-btn" onclick="addCompanyUser()">Adicionar Usuário</button>
+      <button class="primary-btn" onclick="addCompanyUser()">Add User</button>
     </div>
 
     <div class="enterprise-grid">
@@ -566,7 +566,7 @@ function renderEmpresas(){
             <p><strong>Plano:</strong> ${company.plan}</p>
             <p><strong>Usuários:</strong> ${users.length}</p>
             ${users.map(u => `<div class="soft-box"><strong>${u.user_name}</strong><br><small>${u.user_email || ""} • ${u.role}</small></div>`).join("")}
-            <button class="danger-btn" onclick="removeCompany('${company.id}')">Remover Empresa</button>
+            <button class="danger-btn" onclick="removeCompany('${company.id}')">Remover Client</button>
           </div>
         `;
       }).join("") || "<div class='card'><p>Nenhuma cliente cadastrada.</p></div>"}
@@ -576,7 +576,7 @@ function renderEmpresas(){
 
 async function addCompany(){
   const name = val("companyName").trim();
-  if(!name) return alert("Digite o nome da empresa.");
+  if(!name) return alert("Digite o nome da client.");
 
   const res = await apiInsert("companies", {
     name,
@@ -586,28 +586,28 @@ async function addCompany(){
     status: val("companyStatus")
   });
 
-  if(!res.ok) return alert("Erro ao criar empresa.");
+  if(!res.ok) return alert("Erro ao criar client.");
 
   companies = await apiGet("companies");
   projects = await apiGet("projects");
-  renderEmpresas();
+  renderClients();
 }
 
 async function removeCompany(id){
   const res = await apiDelete("companies", id);
-  if(!res.ok) return alert("Erro ao remover empresa.");
+  if(!res.ok) return alert("Erro ao remover client.");
 
   companies = await apiGet("companies");
   projects = await apiGet("projects");
   companyUsers = await apiGet("company_users");
-  renderEmpresas();
+  renderClients();
 }
 
 async function addCompanyUser(){
   const companyId = val("companyUserCompany");
   const name = val("companyUserName").trim();
 
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   if(!name) return alert("Digite o nome do usuário.");
 
   const res = await apiInsert("company_users", {
@@ -618,10 +618,10 @@ async function addCompanyUser(){
     status: "Active"
   });
 
-  if(!res.ok) return alert("Erro ao criar usuário da empresa.");
+  if(!res.ok) return alert("Erro ao criar usuário da client.");
 
   companyUsers = await apiGet("company_users");
-  renderEmpresas();
+  renderClients();
 }
 
 function renderIntegrationHub(){
@@ -633,7 +633,7 @@ function renderIntegrationHub(){
     <div class="card">
       <h2>Nova Conexão</h2>
       <div class="form-grid">
-        <select id="integrationCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="integrationCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <select id="integrationProvider"><option value="">Provider</option>${integrationProviders.map(p => `<option value="${p.name}">${p.name}</option>`).join("")}</select>
         <select id="integrationStatus"><option>Disconnected</option><option>Connected</option><option>Error</option></select>
       </div>
@@ -654,7 +654,7 @@ function renderIntegrationHub(){
               const company = companies.find(c => c.id === conn.company_id);
               return `
                 <div class="soft-box">
-                  <strong>${company?.name || "Empresa"}</strong><br>
+                  <strong>${company?.name || "Client"}</strong><br>
                   <span class="integration-status ${getIntegrationClass(conn.connection_status)}">${conn.connection_status}</span>
                   <p>${conn.notes || ""}</p>
                   <button class="secondary-btn" onclick="logIntegrationTest('${conn.company_id}', '${conn.provider_name}', '${conn.connection_status}')">Gerar Log Teste</button>
@@ -683,7 +683,7 @@ async function addIntegrationConnection(){
   const companyId = val("integrationCompany");
   const provider = val("integrationProvider");
 
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   if(!provider) return alert("Selecione o provider.");
 
   const res = await apiInsert("integration_connections", {
@@ -766,7 +766,7 @@ async function generateAIInsights(){
     insights.push({
       agent_name: "CEO Advisor",
       insight_type: "SaaS",
-      title: "Multiempresa sem cliente cadastrada",
+      title: "Multiclient sem cliente cadastrada",
       message: "Crie a primeira cliente para iniciar a preparação SaaS.",
       priority: "Medium",
       status: "Open"
@@ -825,7 +825,7 @@ function renderConfiguracoes(){
   setContent(`
     <div class="card">
       <h2>Enterprise Core</h2>
-      <p>Versão estrutural para V14 Multiempresa, V15 Integration Hub e V16 AI Foundation.</p>
+      <p>Versão estrutural para V14 Multiclient, V15 Integration Hub e V16 AI Foundation.</p>
       <div class="soft-box">
         URL Supabase: ${SUPABASE_URL}<br>
         Status: Foundation ativa
@@ -855,7 +855,7 @@ function renderRealIntegrations(){
       <h2>Adicionar Ação na Fila</h2>
       <div class="form-grid">
         <select id="queueCompany">
-          <option value="">Cliente</option>
+          <option value="">Client</option>
           ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
         </select>
         <select id="queueProvider">
@@ -893,7 +893,7 @@ function renderRealIntegrations(){
 
 async function addIntegrationQueue(){
   const companyId = val("queueCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   let payload = {};
   try{
@@ -941,7 +941,7 @@ function renderCredentialManager(){
       <h2>Registrar Credencial</h2>
       <div class="form-grid">
         <select id="credCompany">
-          <option value="">Cliente</option>
+          <option value="">Client</option>
           ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
         </select>
         <select id="credProvider">
@@ -971,7 +971,7 @@ function renderCredentialManager(){
       ${integrationCredentials.map(cred => `
         <div class="real-card">
           <h2>${cred.provider}</h2>
-          <small>${companies.find(c => c.id === cred.company_id)?.name || "Empresa"}</small><br>
+          <small>${companies.find(c => c.id === cred.company_id)?.name || "Client"}</small><br>
           <span class="queue-status">${cred.secret_status}</span>
           <p>${cred.credential_label || ""}</p>
           <p>${cred.public_identifier || ""}</p>
@@ -983,7 +983,7 @@ function renderCredentialManager(){
 
 async function addCredential(){
   const companyId = val("credCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("integration_credentials", {
     company_id: companyId,
@@ -1116,7 +1116,7 @@ function generateSafeCopilotResponse(message){
   }
 
   if(lower.includes("venda") || lower.includes("crm") || lower.includes("lead")){
-    return "Análise simulada: priorize leads quentes, empresas em trial e planos com maior potencial de conversão.";
+    return "Análise simulada: priorize leads quentes, clients em trial e planos com maior potencial de conversão.";
   }
 
   return "Copilot em modo seguro. A estrutura está pronta para conectar OpenAI no backend sem expor a API key no frontend.";
@@ -1161,12 +1161,12 @@ function renderExecutiveDashboard(){
     <div class="cards">
       ${metric("MRR", "R$ " + formatMoneyExecutive(m.mrr))}
       ${metric("Invoices", "R$ " + formatMoneyExecutive(m.invoiceTotal))}
-      ${metric("Recebido", "R$ " + formatMoneyExecutive(m.paidTotal))}
-      ${metric("Empresas Ativas", m.activeCompanies)}
+      ${metric("Received", "R$ " + formatMoneyExecutive(m.paidTotal))}
+      ${metric("Clients Ativas", m.activeCompanies)}
       ${metric("Conexões", m.connections)}
       ${metric("AI Insights", m.insights)}
       ${metric("Fila Integrações", m.queue)}
-      ${metric("Relatórios", m.reports)}
+      ${metric("Reports", m.reports)}
     </div>
 
     <div class="card">
@@ -1226,11 +1226,11 @@ function renderKpiCenter(){
 
     <div class="kpi-grid">
       <div class="kpi-card kpi-good"><h3>MRR</h3><p class="kpi-number">R$ ${formatMoneyExecutive(m.mrr)}</p></div>
-      <div class="kpi-card kpi-good"><h3>Receita por Empresa</h3><p class="kpi-number">R$ ${formatMoneyExecutive(avgRevenue)}</p></div>
+      <div class="kpi-card kpi-good"><h3>Receita por Client</h3><p class="kpi-number">R$ ${formatMoneyExecutive(avgRevenue)}</p></div>
       <div class="kpi-card kpi-warn"><h3>Taxa de Conexão</h3><p class="kpi-number">${conversion}%</p></div>
       <div class="kpi-card kpi-good"><h3>Recebimento</h3><p class="kpi-number">${collectionRate}%</p></div>
       <div class="kpi-card kpi-warn"><h3>Automação</h3><p class="kpi-number">${m.automations}</p></div>
-      <div class="kpi-card kpi-warn"><h3>Relatórios</h3><p class="kpi-number">${m.reports}</p></div>
+      <div class="kpi-card kpi-warn"><h3>Reports</h3><p class="kpi-number">${m.reports}</p></div>
     </div>
   `);
 }
@@ -1248,7 +1248,7 @@ function renderAutomationCenter(){
       <h2>Nova Automação</h2>
       <div class="form-grid">
         <select id="autoCompany">
-          <option value="">Cliente</option>
+          <option value="">Client</option>
           ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
         </select>
         <input id="autoName" placeholder="Nome da automação">
@@ -1263,7 +1263,7 @@ function renderAutomationCenter(){
       ${automationCenterItems.length ? automationCenterItems.map(a => `
         <div class="automation-card">
           <h2>${a.automation_name}</h2>
-          <small>${companies.find(c => c.id === a.company_id)?.name || "Empresa"}</small>
+          <small>${companies.find(c => c.id === a.company_id)?.name || "Client"}</small>
           <p><strong>Trigger:</strong> ${a.trigger_name}</p>
           <p><strong>Ação:</strong> ${a.action_name}</p>
           <span class="export-badge">${a.status}</span>
@@ -1275,7 +1275,7 @@ function renderAutomationCenter(){
 
 async function addAutomationCenterItem(){
   const companyId = val("autoCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("automation_center_items", {
     company_id: companyId,
@@ -1292,26 +1292,26 @@ async function addAutomationCenterItem(){
 }
 
 function renderReportCenter(){
-  setTitle("Centro de Relatórios");
+  setTitle("Report Center");
 
   setContent(`
     <div class="executive-hero">
       <h2>Report Center</h2>
-      <p>Central de relatórios preparada para PDF, CSV e Excel.</p>
+      <p>Reports prepared for PDF, CSV and Excel.</p>
     </div>
 
     <div class="card">
-      <h2>Novo Relatório</h2>
+      <h2>New Report</h2>
       <div class="form-grid">
         <select id="reportCompany">
-          <option value="">Cliente</option>
+          <option value="">Client</option>
           ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
         </select>
         <input id="reportName" placeholder="Nome do relatório">
         <select id="reportType"><option>Financeiro</option><option>Projetos</option><option>CRM</option><option>Operações</option><option>SaaS</option><option>Marketplace</option></select>
         <select id="reportFormat"><option>CSV</option><option>PDF</option><option>Excel</option></select>
       </div>
-      <button class="primary-btn" onclick="createReportExport()">Preparar Relatório</button>
+      <button class="primary-btn" onclick="createReportExport()">Prepare Report</button>
     </div>
 
     <div class="report-grid">
@@ -1329,7 +1329,7 @@ function renderReportCenter(){
 
 async function createReportExport(){
   const companyId = val("reportCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("report_center_exports", {
     company_id: companyId,
@@ -1358,7 +1358,7 @@ function renderMobileReady(){
       <h2>Configuração Mobile</h2>
       <div class="form-grid">
         <select id="mobileCompany">
-          <option value="">Cliente</option>
+          <option value="">Client</option>
           ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
         </select>
         <select id="pwaEnabled"><option value="true">PWA ON</option><option value="false">PWA OFF</option></select>
@@ -1382,7 +1382,7 @@ function renderMobileReady(){
     <div class="mobile-grid">
       ${mobileAppSettings.length ? mobileAppSettings.map(s => `
         <div class="mobile-card">
-          <h2>${companies.find(c => c.id === s.company_id)?.name || "Empresa"}</h2>
+          <h2>${companies.find(c => c.id === s.company_id)?.name || "Client"}</h2>
           <p>PWA: ${s.pwa_enabled ? "ON" : "OFF"}</p>
           <p>Offline: ${s.offline_cache_enabled ? "ON" : "OFF"}</p>
           <p>Push Ready: ${s.push_ready ? "ON" : "OFF"}</p>
@@ -1394,7 +1394,7 @@ function renderMobileReady(){
 
 async function saveMobileSettings(){
   const companyId = val("mobileCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("mobile_app_settings", {
     company_id: companyId,
@@ -1475,11 +1475,11 @@ function renderFieldDashboard(){
       ${metric("PWA Settings", pwaSettings.length)}
       ${metric("Cache Offline", offlineCacheItems.length)}
       ${metric("Push Templates", pushNotificationTemplates.length)}
-      ${metric("Rotas", routePlans.length)}
+      ${metric("Routes", routePlans.length)}
       ${metric("Alertas Clima", weatherAlerts.length)}
       ${metric("Tarefas Campo", mobileWorkforceTasks.length)}
       ${metric("GPS Check-ins", gpsCheckins.length)}
-      ${metric("Ordens Serviço", workOrders.length)}
+      ${metric("Work Orders Serviço", workOrders.length)}
     </div>
 
     <div class="field-phone">
@@ -1488,7 +1488,7 @@ function renderFieldDashboard(){
         <p>Modo equipe em campo</p>
         <button class="field-phone-button">Check-in GPS</button>
         <button class="field-phone-button">Fotos</button>
-        <button class="field-phone-button">Ordem de Serviço</button>
+        <button class="field-phone-button">Work Order de Serviço</button>
         <button class="field-phone-button">Assinatura</button>
       </div>
     </div>
@@ -1507,7 +1507,7 @@ function renderPwaCenter(){
     <div class="card">
       <h2>PWA Settings</h2>
       <div class="form-grid">
-        <select id="pwaCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="pwaCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="pwaAppName" placeholder="Nome do app" value="DoubleDiamond">
         <input id="pwaShortName" placeholder="Nome curto" value="DD">
         <input id="pwaTheme" placeholder="Theme color" value="#2563eb">
@@ -1519,9 +1519,9 @@ function renderPwaCenter(){
     <div class="card">
       <h2>Cache Offline</h2>
       <div class="form-grid">
-        <select id="cacheCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="cacheCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="cacheKey" placeholder="Cache Key. Ex: projects">
-        <select id="cacheModule"><option>Clientes</option><option>Projetos</option><option>Agenda</option><option>Tarefas</option><option>Ordens</option></select>
+        <select id="cacheModule"><option>Clients</option><option>Projetos</option><option>Agenda</option><option>Tarefas</option><option>Work Orders</option></select>
         <select id="cacheStatus"><option>Ready</option><option>Syncing</option><option>Error</option></select>
       </div>
       <button class="secondary-btn" onclick="saveOfflineCache()">Salvar Cache</button>
@@ -1530,7 +1530,7 @@ function renderPwaCenter(){
     <div class="card">
       <h2>Push Template</h2>
       <div class="form-grid">
-        <select id="pushCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="pushCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="pushName" placeholder="Nome template">
         <input id="pushTrigger" placeholder="Trigger. Ex: Task Assigned">
         <input id="pushTitle" placeholder="Título">
@@ -1549,7 +1549,7 @@ function renderPwaCenter(){
 
 async function savePwaSettings(){
   const companyId = val("pwaCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("pwa_settings", {
     company_id: companyId,
@@ -1569,7 +1569,7 @@ async function savePwaSettings(){
 
 async function saveOfflineCache(){
   const companyId = val("cacheCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("offline_cache_items", {
     company_id: companyId,
@@ -1587,7 +1587,7 @@ async function saveOfflineCache(){
 
 async function savePushTemplate(){
   const companyId = val("pushCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("push_notification_templates", {
     company_id: companyId,
@@ -1616,7 +1616,7 @@ function renderRoutePlanning(){
     <div class="card">
       <h2>Nova Rota</h2>
       <div class="form-grid">
-        <select id="routeCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="routeCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="routeName" placeholder="Nome da rota">
         <input id="routeAssigned" placeholder="Responsável">
         <input id="routeDate" type="date">
@@ -1630,9 +1630,9 @@ function renderRoutePlanning(){
       <h2>Adicionar Parada</h2>
       <div class="form-grid">
         <select id="stopRoute"><option value="">Rota</option>${routePlans.map(r => `<option value="${r.id}">${r.route_name}</option>`).join("")}</select>
-        <input id="stopClient" placeholder="Cliente">
+        <input id="stopClient" placeholder="Client">
         <input id="stopAddress" placeholder="Endereço">
-        <input id="stopOrder" type="number" placeholder="Ordem">
+        <input id="stopOrder" type="number" placeholder="Work Order">
         <input id="stopMinutes" type="number" placeholder="Minutos estimados">
       </div>
       <button class="secondary-btn" onclick="addRouteStop()">Adicionar Parada</button>
@@ -1656,7 +1656,7 @@ function renderRoutePlanning(){
 
 async function createRoutePlan(){
   const companyId = val("routeCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("route_plans", {
     company_id: companyId,
@@ -1704,7 +1704,7 @@ function renderWeatherCenter(){
     <div class="card">
       <h2>Novo Alerta Climático</h2>
       <div class="form-grid">
-        <select id="weatherCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="weatherCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="weatherLocation" placeholder="Local">
         <select id="weatherType"><option>Rain</option><option>Storm</option><option>Heat</option><option>Snow</option><option>Wind</option></select>
         <select id="weatherSeverity"><option>Low</option><option>Medium</option><option>Critical</option></select>
@@ -1731,7 +1731,7 @@ function renderWeatherCenter(){
 
 async function addWeatherAlert(){
   const companyId = val("weatherCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("weather_alerts", {
     company_id: companyId,
@@ -1761,8 +1761,8 @@ function renderMobileWorkforce(){
     <div class="card">
       <h2>Nova Tarefa de Campo</h2>
       <div class="form-grid">
-        <select id="mwCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
-        <input id="mwEmployee" placeholder="Funcionário">
+        <select id="mwCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="mwEmployee" placeholder="Employee">
         <input id="mwTitle" placeholder="Tarefa">
         <input id="mwProject" placeholder="Projeto">
         <select id="mwPriority"><option>Normal</option><option>High</option><option>Urgent</option></select>
@@ -1774,8 +1774,8 @@ function renderMobileWorkforce(){
     <div class="card">
       <h2>GPS Check-in</h2>
       <div class="form-grid">
-        <select id="gpsCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
-        <input id="gpsEmployee" placeholder="Funcionário">
+        <select id="gpsCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <input id="gpsEmployee" placeholder="Employee">
         <input id="gpsProject" placeholder="Projeto">
         <select id="gpsType"><option>IN</option><option>OUT</option></select>
         <input id="gpsLat" placeholder="Latitude">
@@ -1788,9 +1788,9 @@ function renderMobileWorkforce(){
     <div class="card">
       <h2>Foto de Campo</h2>
       <div class="form-grid">
-        <select id="photoCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="photoCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="photoProject" placeholder="Projeto">
-        <input id="photoEmployee" placeholder="Funcionário">
+        <input id="photoEmployee" placeholder="Employee">
         <select id="photoType"><option>Before</option><option>During</option><option>After</option><option>Problem</option><option>Material</option></select>
         <input id="photoUrl" placeholder="URL da foto">
       </div>
@@ -1808,7 +1808,7 @@ function renderMobileWorkforce(){
 
 async function addMobileWorkforceTask(){
   const companyId = val("mwCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("mobile_workforce_tasks", {
     company_id: companyId,
@@ -1827,7 +1827,7 @@ async function addMobileWorkforceTask(){
 
 async function addGpsCheckin(){
   const companyId = val("gpsCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("gps_checkins", {
     company_id: companyId,
@@ -1848,7 +1848,7 @@ async function addGpsCheckin(){
 
 async function addFieldPhoto(){
   const companyId = val("photoCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("field_photos", {
     company_id: companyId,
@@ -1866,20 +1866,20 @@ async function addFieldPhoto(){
 }
 
 function renderWorkOrders(){
-  setTitle("Ordens de Serviço");
+  setTitle("Work Orders de Serviço");
 
   setContent(`
     <div class="field-hero">
       <h2>Smart Work Orders</h2>
-      <p>Ordens de serviço com status, prioridade, execução, assinatura e histórico.</p>
+      <p>Work Orders de serviço com status, prioridade, execução, assinatura e histórico.</p>
     </div>
 
     <div class="card">
-      <h2>Nova Ordem de Serviço</h2>
+      <h2>Nova Work Order de Serviço</h2>
       <div class="form-grid">
-        <select id="woCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="woCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="woNumber" placeholder="Número OS">
-        <input id="woClient" placeholder="Cliente">
+        <input id="woClient" placeholder="Client">
         <input id="woProject" placeholder="Projeto">
         <input id="woAssigned" placeholder="Responsável">
         <input id="woService" placeholder="Tipo de serviço">
@@ -1894,7 +1894,7 @@ function renderWorkOrders(){
     <div class="card">
       <h2>Assinatura Digital</h2>
       <div class="form-grid">
-        <select id="sigWorkOrder"><option value="">Ordem de Serviço</option>${workOrders.map(w => `<option value="${w.id}">${w.work_order_number} - ${w.client_name}</option>`).join("")}</select>
+        <select id="sigWorkOrder"><option value="">Work Order de Serviço</option>${workOrders.map(w => `<option value="${w.id}">${w.work_order_number} - ${w.client_name}</option>`).join("")}</select>
         <input id="sigName" placeholder="Nome assinante">
         <select id="sigRole"><option>Client</option><option>Technician</option><option>Manager</option></select>
       </div>
@@ -1927,7 +1927,7 @@ function renderWorkOrders(){
 
 async function createWorkOrder(){
   const companyId = val("woCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("work_orders", {
     company_id: companyId,
@@ -2048,14 +2048,14 @@ function renderBIDashboard(){
     </div>
 
     <div class="cards">
-      ${metric("Receita Total", "R$ " + formatMoneyBI(m.invoiceTotal))}
-      ${metric("Recebido", "R$ " + formatMoneyBI(m.paidTotal))}
+      ${metric("Total Revenue", "R$ " + formatMoneyBI(m.invoiceTotal))}
+      ${metric("Received", "R$ " + formatMoneyBI(m.paidTotal))}
       ${metric("MRR", "R$ " + formatMoneyBI(m.mrr))}
       ${metric("Lucro Estimado", "R$ " + formatMoneyBI(m.profit))}
       ${metric("Margem", m.margin + "%")}
-      ${metric("Empresas", m.companies)}
-      ${metric("Ordens Serviço", m.workOrders)}
-      ${metric("Rotas", m.routes)}
+      ${metric("Clients", m.companies)}
+      ${metric("Work Orders Serviço", m.workOrders)}
+      ${metric("Routes", m.routes)}
     </div>
 
     <div class="card">
@@ -2113,8 +2113,8 @@ function renderAnalyticsCenter(){
     <div class="card">
       <h2>Novo Ranking</h2>
       <div class="form-grid">
-        <select id="rankingCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
-        <select id="rankingType"><option>Top Cliente</option><option>Top Serviço</option><option>Top Projeto</option><option>Top Funcionário</option><option>Top Receita</option></select>
+        <select id="rankingCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="rankingType"><option>Top Client</option><option>Top Serviço</option><option>Top Projeto</option><option>Top Employee</option><option>Top Receita</option></select>
         <input id="rankingEntity" placeholder="Nome">
         <input id="rankingValue" type="number" placeholder="Valor">
       </div>
@@ -2137,7 +2137,7 @@ function renderAnalyticsCenter(){
 
 async function addAnalyticsRanking(){
   const companyId = val("rankingCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("analytics_rankings", {
     company_id: companyId,
@@ -2224,8 +2224,8 @@ function renderProfitabilityEngine(){
     <div class="card">
       <h2>Novo Registro de Lucratividade</h2>
       <div class="form-grid">
-        <select id="profitCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
-        <select id="profitType"><option>Cliente</option><option>Projeto</option><option>Serviço</option><option>Operação</option></select>
+        <select id="profitCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="profitType"><option>Client</option><option>Projeto</option><option>Serviço</option><option>Operação</option></select>
         <input id="profitName" placeholder="Nome">
         <input id="profitRevenue" type="number" placeholder="Receita">
         <input id="profitCost" type="number" placeholder="Custo">
@@ -2250,7 +2250,7 @@ function renderProfitabilityEngine(){
 
 async function addProfitabilityRecord(){
   const companyId = val("profitCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const revenue = Number(val("profitRevenue") || 0);
   const cost = Number(val("profitCost") || 0);
@@ -2314,11 +2314,11 @@ async function generateExecutiveIntelligence(){
   }
 
   if(m.workOrders > 0 && m.gps === 0){
-    items.push(["Operação", "Ordens sem GPS", "Existem ordens de serviço, mas nenhum check-in GPS. Incentive uso do mobile em campo.", "Info"]);
+    items.push(["Operação", "Work Orders sem GPS", "Existem ordens de serviço, mas nenhum check-in GPS. Incentive uso do mobile em campo.", "Info"]);
   }
 
   if(m.routes === 0){
-    items.push(["Campo", "Rotas não planejadas", "Nenhuma rota cadastrada. Planejamento de rotas reduz tempo e combustível.", "Info"]);
+    items.push(["Campo", "Routes não planejadas", "Nenhuma rota cadastrada. Planejamento de rotas reduz tempo e combustível.", "Info"]);
   }
 
   if(!items.length){
@@ -2404,12 +2404,12 @@ function formatMoneyBI(value){
 function renderMapsReal(){
   setTitle("Google Maps Real");
   setContent(`
-    <div class="realint-hero"><h2>Google Maps Real Ready</h2><p>Rotas com link real para Google Maps e fila para cálculo backend.</p></div>
+    <div class="realint-hero"><h2>Google Maps Real Ready</h2><p>Routes com link real para Google Maps e fila para cálculo backend.</p></div>
     <div class="realint-warning">Distância/tempo automáticos exigem Google Maps API no backend. O frontend gera link de navegação seguro.</div>
     <div class="card">
       <h2>Nova Rota Google Maps</h2>
       <div class="form-grid">
-        <select id="mapsCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="mapsCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <select id="mapsRoutePlan"><option value="">Route Plan opcional</option>${typeof routePlans !== "undefined" ? routePlans.map(r => `<option value="${r.id}">${r.route_name}</option>`).join("") : ""}</select>
         <input id="mapsOrigin" placeholder="Origem">
         <input id="mapsDestination" placeholder="Destino">
@@ -2424,7 +2424,7 @@ function renderMapsReal(){
 }
 async function createMapsRouteRequest(){
   const companyId = val("mapsCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   const origin = val("mapsOrigin");
   const destination = val("mapsDestination");
   if(!origin || !destination) return alert("Preencha origem e destino.");
@@ -2442,7 +2442,7 @@ function renderWhatsAppReal(){
     <div class="card">
       <h2>Adicionar Mensagem WhatsApp</h2>
       <div class="form-grid">
-        <select id="waCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="waCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="waPhone" placeholder="Telefone com DDI. Ex: 5511999999999">
         <input id="waTemplate" placeholder="Template. Ex: payment_reminder">
       </div>
@@ -2454,7 +2454,7 @@ function renderWhatsAppReal(){
 }
 async function queueWhatsAppMessage(){
   const companyId = val("waCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   const res = await apiInsert("whatsapp_message_queue", {company_id:companyId,phone_number:val("waPhone"),template_name:val("waTemplate"),message_body:val("waBody"),provider_status:"Pending"});
   if(!res.ok) return alert("Erro ao adicionar mensagem.");
   whatsappMessageQueue = await apiGet("whatsapp_message_queue");
@@ -2474,7 +2474,7 @@ function renderGmailReal(){
     <div class="card">
       <h2>Novo Email</h2>
       <div class="form-grid">
-        <select id="gmailCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="gmailCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="gmailTo" placeholder="Email destino">
         <input id="gmailSubject" placeholder="Assunto">
       </div>
@@ -2486,7 +2486,7 @@ function renderGmailReal(){
 }
 async function queueGmailMessage(){
   const companyId = val("gmailCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   const res = await apiInsert("gmail_message_queue", {company_id:companyId,to_email:val("gmailTo"),subject:val("gmailSubject"),body:val("gmailBody"),provider_status:"Pending"});
   if(!res.ok) return alert("Erro ao adicionar email.");
   gmailMessageQueue = await apiGet("gmail_message_queue");
@@ -2505,7 +2505,7 @@ function renderPushReal(){
     <div class="card">
       <h2>Nova Push Notification</h2>
       <div class="form-grid">
-        <select id="pushRealCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="pushRealCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="pushTarget" placeholder="Usuário alvo">
         <input id="pushRealTitle" placeholder="Título">
       </div>
@@ -2517,7 +2517,7 @@ function renderPushReal(){
 }
 async function queuePushNotification(){
   const companyId = val("pushRealCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   const res = await apiInsert("push_notification_queue", {company_id:companyId,target_user:val("pushTarget"),title:val("pushRealTitle"),body:val("pushRealBody"),push_status:"Pending"});
   if(!res.ok) return alert("Erro ao adicionar push.");
   pushNotificationQueue = await apiGet("push_notification_queue");
@@ -2532,11 +2532,11 @@ async function simulatePushSent(id){
 function renderAutomationFlowsReal(){
   setTitle("Automation Flows Real");
   setContent(`
-    <div class="realint-hero"><h2>Automation Flows Real</h2><p>Fluxos conectando Lead, Orçamento, Projeto, OS, WhatsApp, Email e Relatório.</p></div>
+    <div class="realint-hero"><h2>Automation Flows Real</h2><p>Fluxos conectando Lead, Orçamento, Projeto, OS, WhatsApp, Email e Report.</p></div>
     <div class="card">
       <h2>Novo Flow Template</h2>
       <div class="form-grid">
-        <select id="flowCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="flowCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="flowName" placeholder="Nome do fluxo">
         <input id="flowTrigger" placeholder="Trigger. Ex: Quote Approved">
         <select id="flowStatus"><option>Active</option><option>Paused</option><option>Error</option></select>
@@ -2556,7 +2556,7 @@ function renderFlowSteps(steps){
 }
 async function createAutomationFlowTemplate(){
   const companyId = val("flowCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   let steps = [];
   try{ steps = val("flowSteps") ? JSON.parse(val("flowSteps")) : []; }catch(e){ return alert("Steps JSON inválido."); }
   const res = await apiInsert("automation_flow_templates", {company_id:companyId,flow_name:val("flowName"),trigger_name:val("flowTrigger"),steps,status:val("flowStatus")});
@@ -2603,7 +2603,7 @@ function renderMapsReal(){
     <div class="card">
       <h2>Nova Rota</h2>
       <div class="form-grid">
-        <select id="mapsCompany"><option value="">Cliente</option>${companyOptionsReal()}</select>
+        <select id="mapsCompany"><option value="">Client</option>${companyOptionsReal()}</select>
         <input id="mapsOrigin" placeholder="Origem">
         <input id="mapsDestination" placeholder="Destino">
         <select id="mapsMode"><option>driving</option><option>walking</option><option>bicycling</option><option>transit</option></select>
@@ -2629,7 +2629,7 @@ async function createMapsRouteRequest(){
   const origin = val("mapsOrigin").trim();
   const destination = val("mapsDestination").trim();
 
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   if(!origin || !destination) return alert("Preencha origem e destino.");
 
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=${encodeURIComponent(val("mapsMode"))}`;
@@ -2658,7 +2658,7 @@ function renderWhatsAppReal(){
     <div class="card">
       <h2>Nova Mensagem</h2>
       <div class="form-grid">
-        <select id="waCompany"><option value="">Cliente</option>${companyOptionsReal()}</select>
+        <select id="waCompany"><option value="">Client</option>${companyOptionsReal()}</select>
         <input id="waPhone" placeholder="Telefone com DDI. Ex: 5511999999999">
         <input id="waTemplate" placeholder="Template. Ex: payment_reminder">
       </div>
@@ -2682,7 +2682,7 @@ function renderWhatsAppReal(){
 
 async function queueWhatsAppMessage(){
   const companyId = val("waCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("whatsapp_message_queue", {
     company_id: companyId,
@@ -2719,7 +2719,7 @@ function renderGmailReal(){
     <div class="card">
       <h2>Novo Email</h2>
       <div class="form-grid">
-        <select id="gmailCompany"><option value="">Cliente</option>${companyOptionsReal()}</select>
+        <select id="gmailCompany"><option value="">Client</option>${companyOptionsReal()}</select>
         <input id="gmailTo" placeholder="Email destino">
         <input id="gmailSubject" placeholder="Assunto">
       </div>
@@ -2743,7 +2743,7 @@ function renderGmailReal(){
 
 async function queueGmailMessage(){
   const companyId = val("gmailCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("gmail_message_queue", {
     company_id: companyId,
@@ -2779,7 +2779,7 @@ function renderPushReal(){
     <div class="card">
       <h2>Nova Push</h2>
       <div class="form-grid">
-        <select id="pushRealCompany"><option value="">Cliente</option>${companyOptionsReal()}</select>
+        <select id="pushRealCompany"><option value="">Client</option>${companyOptionsReal()}</select>
         <input id="pushTarget" placeholder="Usuário alvo">
         <input id="pushRealTitle" placeholder="Título">
       </div>
@@ -2803,7 +2803,7 @@ function renderPushReal(){
 
 async function queuePushNotification(){
   const companyId = val("pushRealCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("push_notification_queue", {
     company_id: companyId,
@@ -2834,12 +2834,12 @@ async function simulatePushSent(id){
 function renderAutomationFlowsReal(){
   setTitle("Automation Flows Real");
   setContent(`
-    <div class="realint-hero"><h2>Automation Flows Real</h2><p>Fluxos conectando Lead, Orçamento, Projeto, OS, WhatsApp, Email e Relatório.</p></div>
+    <div class="realint-hero"><h2>Automation Flows Real</h2><p>Fluxos conectando Lead, Orçamento, Projeto, OS, WhatsApp, Email e Report.</p></div>
 
     <div class="card">
       <h2>Novo Flow Template</h2>
       <div class="form-grid">
-        <select id="flowCompany"><option value="">Cliente</option>${companyOptionsReal()}</select>
+        <select id="flowCompany"><option value="">Client</option>${companyOptionsReal()}</select>
         <input id="flowName" placeholder="Nome do fluxo">
         <input id="flowTrigger" placeholder="Trigger. Ex: Quote Approved">
         <select id="flowStatus"><option>Active</option><option>Paused</option><option>Error</option></select>
@@ -2884,7 +2884,7 @@ function renderFlowSteps(steps){
 
 async function createAutomationFlowTemplate(){
   const companyId = val("flowCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   let steps = [];
   try{
@@ -2993,7 +2993,7 @@ function renderArchitectureHardening(){
 
     <div class="cards">
       ${metric("Funções JS", DD_ARCHITECTURE_AUDIT.functionCount)}
-      ${metric("Rotas", DD_ARCHITECTURE_AUDIT.routeCount)}
+      ${metric("Routes", DD_ARCHITECTURE_AUDIT.routeCount)}
       ${metric("Script Size", DD_ARCHITECTURE_AUDIT.scriptSize)}
       ${metric("AI Ready", aiOperationsReadiness.length)}
       ${metric("Audit Logs", architectureAuditLogs.length)}
@@ -3008,7 +3008,7 @@ function renderArchitectureHardening(){
       </div>
 
       <div class="hardening-card hardening-info">
-        <h2>Menus e Rotas</h2>
+        <h2>Menus e Routes</h2>
         <span class="hardening-badge">${menuInfo.status}</span>
         <p>${menuInfo.message}</p>
       </div>
@@ -3091,7 +3091,7 @@ V60 AI Command Center
 
 function detectDuplicateFunctionNames(){
   const names = Object.getOwnPropertyNames(window).filter(k => typeof window[k] === "function");
-  const localKnown = ["addAnalyticsRanking", "addAutomationCenterItem", "addCompany", "addCompanyUser", "addCredential", "addFieldPhoto", "addGpsCheckin", "addIntegrationConnection", "addIntegrationQueue", "addMobileWorkforceTask", "addProfitabilityRecord", "addRouteStop", "addWeatherAlert", "apiDelete", "apiGet", "apiInsert", "apiPatch", "changePage", "closeAIInsight", "closeExecutiveIntelligence", "companyOptionsReal", "createAutomationFlowTemplate", "createCopilotConversation", "createMapsRouteRequest", "createReportExport", "createRoutePlan", "createWorkOrder", "formatMoneyBI", "formatMoneyExecutive", "generateAIInsights", "generateExecutiveIntelligence", "generateForecastScenarios", "generateSafeCopilotResponse", "getBIBaseMetrics", "getExecutiveMetrics", "getIntegrationClass", "loadData", "logIntegrationTest", "markQueueSimulated", "metric", "queueGmailMessage", "queuePushNotification", "queueWhatsAppMessage", "removeAIInsight", "removeCompany", "renderAIFoundation", "renderAnalyticsCenter", "renderAutomationCenter", "renderAutomationFlowsReal", "renderBIDashboard", "renderConfiguracoes", "renderCopilot", "renderCopilotMessages", "renderCredentialManager", "renderDashboard", "renderEmpresas", "renderExecutiveDashboard", "renderExecutiveIntelligence", "renderFieldDashboard", "renderFlowSteps", "renderForecastEngine", "renderGmailReal", "renderIntegrationHub", "renderKpiCenter", "renderMapsReal", "renderMobileReady", "renderMobileWorkforce", "renderProfitabilityEngine", "renderPushReal", "renderPwaCenter", "renderRealIntegrations", "renderReportCenter", "renderRoutePlanning", "renderWeatherCenter", "renderWhatsAppReal", "renderWorkOrders", "runAutomationFlow", "saveBISnapshot", "saveExecutiveSnapshot", "saveMobileSettings", "saveOfflineCache", "savePushTemplate", "savePwaSettings", "sendCopilotMessage", "setContent", "setTitle", "signWorkOrder", "simulateGmailSent", "simulatePushSent", "simulateWhatsAppSent", "val"];
+  const localKnown = ["addAnalyticsRanking", "addAutomationCenterItem", "addCompany", "addCompanyUser", "addCredential", "addFieldPhoto", "addGpsCheckin", "addIntegrationConnection", "addIntegrationQueue", "addMobileWorkforceTask", "addProfitabilityRecord", "addRouteStop", "addWeatherAlert", "apiDelete", "apiGet", "apiInsert", "apiPatch", "changePage", "closeAIInsight", "closeExecutiveIntelligence", "companyOptionsReal", "createAutomationFlowTemplate", "createCopilotConversation", "createMapsRouteRequest", "createReportExport", "createRoutePlan", "createWorkOrder", "formatMoneyBI", "formatMoneyExecutive", "generateAIInsights", "generateExecutiveIntelligence", "generateForecastScenarios", "generateSafeCopilotResponse", "getBIBaseMetrics", "getExecutiveMetrics", "getIntegrationClass", "loadData", "logIntegrationTest", "markQueueSimulated", "metric", "queueGmailMessage", "queuePushNotification", "queueWhatsAppMessage", "removeAIInsight", "removeCompany", "renderAIFoundation", "renderAnalyticsCenter", "renderAutomationCenter", "renderAutomationFlowsReal", "renderBIDashboard", "renderConfiguracoes", "renderCopilot", "renderCopilotMessages", "renderCredentialManager", "renderDashboard", "renderClients", "renderExecutiveDashboard", "renderExecutiveIntelligence", "renderFieldDashboard", "renderFlowSteps", "renderForecastEngine", "renderGmailReal", "renderIntegrationHub", "renderKpiCenter", "renderMapsReal", "renderMobileReady", "renderMobileWorkforce", "renderProfitabilityEngine", "renderPushReal", "renderPwaCenter", "renderRealIntegrations", "renderReportCenter", "renderRoutePlanning", "renderWeatherCenter", "renderWhatsAppReal", "renderWorkOrders", "runAutomationFlow", "saveBISnapshot", "saveExecutiveSnapshot", "saveMobileSettings", "saveOfflineCache", "savePushTemplate", "savePwaSettings", "sendCopilotMessage", "setContent", "setTitle", "signWorkOrder", "simulateGmailSent", "simulatePushSent", "simulateWhatsAppSent", "val"];
   const duplicates = localKnown.filter((name, index) => localKnown.indexOf(name) !== index);
 
   return {
@@ -3103,7 +3103,7 @@ function detectDuplicateFunctionNames(){
 function detectMenuRouteHealth(){
   return {
     status: "OK",
-    message: "Rotas principais preservadas. Architecture e AI Ready adicionados como módulos auxiliares."
+    message: "Routes principais preservadas. Architecture e AI Ready adicionados como módulos auxiliares."
   };
 }
 
@@ -3111,7 +3111,7 @@ async function saveArchitectureAudit(){
   const res = await apiInsert("architecture_audit_logs", {
     audit_type: "V50.1",
     audit_title: "Architecture Hardening Snapshot",
-    audit_message: `Funções: ${DD_ARCHITECTURE_AUDIT.functionCount} | Rotas: ${DD_ARCHITECTURE_AUDIT.routeCount} | Script: ${DD_ARCHITECTURE_AUDIT.scriptSize} chars | AI Ready: V51-V60`,
+    audit_message: `Funções: ${DD_ARCHITECTURE_AUDIT.functionCount} | Routes: ${DD_ARCHITECTURE_AUDIT.routeCount} | Script: ${DD_ARCHITECTURE_AUDIT.scriptSize} chars | AI Ready: V51-V60`,
     severity: "Info",
     status: "Open"
   });
@@ -3271,7 +3271,7 @@ function countFunctionsInRuntime(){
 function buildModuleRegistryPreview(){
   return [
     {group:"Core", name:"Dashboard", route:"dashboard"},
-    {group:"Enterprise", name:"Empresas", route:"empresas"},
+    {group:"Enterprise", name:"Clients", route:"clients"},
     {group:"Enterprise", name:"Integration Hub", route:"integrationHub"},
     {group:"AI", name:"AI Foundation", route:"aiFoundation"},
     {group:"Integrations", name:"Real Integrations", route:"realIntegrations"},
@@ -3281,10 +3281,10 @@ function buildModuleRegistryPreview(){
     {group:"Growth", name:"Billing", route:"billingDashboard"},
     {group:"Growth", name:"Marketplace", route:"marketplaceDashboard"},
     {group:"Field", name:"Campo", route:"fieldDashboard"},
-    {group:"Field", name:"Rotas", route:"routePlanning"},
+    {group:"Field", name:"Routes", route:"routePlanning"},
     {group:"Field", name:"Clima", route:"weatherCenter"},
     {group:"Field", name:"Mobile Workforce", route:"mobileWorkforce"},
-    {group:"Field", name:"Ordens Serviço", route:"workOrders"},
+    {group:"Field", name:"Work Orders Serviço", route:"workOrders"},
     {group:"BI", name:"BI Dashboard", route:"biDashboard"},
     {group:"BI", name:"Analytics", route:"analyticsCenter"},
     {group:"BI", name:"Forecast", route:"forecastEngine"},
@@ -3338,7 +3338,7 @@ async function seedModuleRegistry(){
 function inferRendererName(route){
   const map = {
     dashboard:"renderDashboard",
-    empresas:"renderEmpresas",
+    clients:"renderClients",
     integrationHub:"renderIntegrationHub",
     aiFoundation:"renderAIFoundation",
     realIntegrations:"renderRealIntegrations",
@@ -3443,7 +3443,7 @@ function renderAILeadScoring(){
     <div class="card">
       <h2>Gerar Score Manual</h2>
       <div class="form-grid">
-        <select id="leadScoreCompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
+        <select id="leadScoreCompany"><option value="">Client</option>${getCompanyOptionsAI()}</select>
         <input id="leadScoreName" placeholder="Nome do lead">
         <input id="leadScoreBudget" type="number" placeholder="Orçamento estimado">
         <select id="leadScoreUrgency"><option>Baixa</option><option>Média</option><option>Alta</option></select>
@@ -3471,7 +3471,7 @@ function renderAILeadScoring(){
 
 async function generateAILeadScore(){
   const companyId = val("leadScoreCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const budget = Number(val("leadScoreBudget") || 0);
   const urgency = val("leadScoreUrgency");
@@ -3535,8 +3535,8 @@ function renderAIQuoteGenerator(){
     <div class="card">
       <h2>Novo Orçamento AI</h2>
       <div class="form-grid">
-        <select id="quoteAICompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
-        <input id="quoteAIClient" placeholder="Cliente">
+        <select id="quoteAICompany"><option value="">Client</option>${getCompanyOptionsAI()}</select>
+        <input id="quoteAIClient" placeholder="Client">
         <input id="quoteAIService" placeholder="Serviço">
         <input id="quoteAIArea" type="number" placeholder="Área/quantidade">
         <input id="quoteAIComplexity" type="number" placeholder="Complexidade 1 a 5">
@@ -3561,7 +3561,7 @@ function renderAIQuoteGenerator(){
 
 async function generateAIQuoteDraft(){
   const companyId = val("quoteAICompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const area = Number(val("quoteAIArea") || 1);
   const complexity = Math.max(1, Number(val("quoteAIComplexity") || 1));
@@ -3592,7 +3592,7 @@ function renderAIProjectRisk(){
     <div class="card">
       <h2>Analisar Projeto</h2>
       <div class="form-grid">
-        <select id="riskCompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
+        <select id="riskCompany"><option value="">Client</option>${getCompanyOptionsAI()}</select>
         <input id="riskProject" placeholder="Projeto">
         <input id="riskPending" type="number" placeholder="Pendências">
         <input id="riskDelay" type="number" placeholder="Dias de atraso">
@@ -3616,7 +3616,7 @@ function renderAIProjectRisk(){
 
 async function generateProjectRisk(){
   const companyId = val("riskCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const pending = Number(val("riskPending") || 0);
   const delay = Number(val("riskDelay") || 0);
@@ -3674,7 +3674,7 @@ async function generateFinancialAdvice(){
     {
       advice_type:"Cash Flow",
       title:"Controle de recebimentos",
-      message:`Receita faturada estimada: R$ ${formatMoneyAI(invoicesTotal)}. Recebido: R$ ${formatMoneyAI(paid)}. Aberto: R$ ${formatMoneyAI(open)}.`,
+      message:`Receita faturada estimada: R$ ${formatMoneyAI(invoicesTotal)}. Received: R$ ${formatMoneyAI(paid)}. Aberto: R$ ${formatMoneyAI(open)}.`,
       priority: open > paid ? "High" : "Medium"
     },
     {
@@ -3700,10 +3700,10 @@ function renderAIWorkforcePlanner(){
     <div class="aiops-hero"><h2>V55 AI Workforce Planner</h2><p>Sugere distribuição de equipe por prioridade, tarefa e operação.</p></div>
 
     <div class="card">
-      <h2>Nova Sugestão de Equipe</h2>
+      <h2>Nova Sugestão de Team</h2>
       <div class="form-grid">
-        <select id="workforceCompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
-        <input id="workforceEmployee" placeholder="Funcionário">
+        <select id="workforceCompany"><option value="">Client</option>${getCompanyOptionsAI()}</select>
+        <input id="workforceEmployee" placeholder="Employee">
         <input id="workforceFocus" placeholder="Foco/Tarefa">
         <select id="workforcePriority"><option>Normal</option><option>High</option><option>Urgent</option></select>
       </div>
@@ -3725,7 +3725,7 @@ function renderAIWorkforcePlanner(){
 
 async function generateWorkforcePlan(){
   const companyId = val("workforceCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("ai_workforce_plans", {
     company_id: companyId,
@@ -3752,7 +3752,7 @@ function renderAIRouteOptimization(){
     <div class="card">
       <h2>Gerar Otimização de Rota</h2>
       <div class="form-grid">
-        <select id="routeOptCompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
+        <select id="routeOptCompany"><option value="">Client</option>${getCompanyOptionsAI()}</select>
         <input id="routeOptName" placeholder="Nome da rota">
         <input id="routeOptStops" type="number" placeholder="Quantidade de paradas">
       </div>
@@ -3775,7 +3775,7 @@ function renderAIRouteOptimization(){
 
 async function generateRouteOptimization(){
   const companyId = val("routeOptCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const stops = Number(val("routeOptStops") || 1);
   const score = Math.min(100, 50 + stops * 5);
@@ -3804,7 +3804,7 @@ function renderAIWeatherImpact(){
     <div class="card">
       <h2>Novo Impacto Climático</h2>
       <div class="form-grid">
-        <select id="weatherAICompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
+        <select id="weatherAICompany"><option value="">Client</option>${getCompanyOptionsAI()}</select>
         <input id="weatherAILocation" placeholder="Local">
         <select id="weatherAILevel"><option>Low</option><option>Medium</option><option>High</option></select>
         <input id="weatherAIWork" placeholder="Trabalho afetado">
@@ -3827,7 +3827,7 @@ function renderAIWeatherImpact(){
 
 async function generateWeatherImpact(){
   const companyId = val("weatherAICompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const level = val("weatherAILevel");
 
@@ -3853,8 +3853,8 @@ function renderAIExecutiveReports(){
     <div class="aiops-hero"><h2>V58 AI Executive Reports</h2><p>Gera relatório executivo com highlights, riscos e próximas ações.</p></div>
 
     <div class="card">
-      <h2>Gerar Relatório Executivo</h2>
-      <button class="success-btn" onclick="generateExecutiveReportAI()">Gerar Relatório</button>
+      <h2>Gerar Report Executivo</h2>
+      <button class="success-btn" onclick="generateExecutiveReportAI()">Gerar Report</button>
     </div>
 
     <div class="aiops-grid">
@@ -4066,7 +4066,7 @@ function renderAILeadScoring(){
     <div class="card">
       <h2>Gerar Score</h2>
       <div class="form-grid">
-        <select id="leadScoreCompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
+        <select id="leadScoreCompany"><option value="">Client</option>${ddAICompanyOptions()}</select>
         <input id="leadScoreName" placeholder="Nome do lead">
         <input id="leadScoreBudget" type="number" placeholder="Orçamento estimado">
         <select id="leadScoreUrgency"><option>Baixa</option><option>Média</option><option>Alta</option></select>
@@ -4084,7 +4084,7 @@ function renderAILeadScoring(){
 
 async function generateAILeadScore(){
   const companyId = val("leadScoreCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   const budget = Number(val("leadScoreBudget") || 0);
   const urgency = val("leadScoreUrgency");
   let score = 35 + (budget >= 10000 ? 30 : budget >= 3000 ? 18 : 8) + (urgency === "Alta" ? 25 : urgency === "Média" ? 12 : 0);
@@ -4110,8 +4110,8 @@ function renderAIQuoteGenerator(){
     <div class="card">
       <h2>Novo Orçamento AI</h2>
       <div class="form-grid">
-        <select id="quoteAICompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
-        <input id="quoteAIClient" placeholder="Cliente">
+        <select id="quoteAICompany"><option value="">Client</option>${ddAICompanyOptions()}</select>
+        <input id="quoteAIClient" placeholder="Client">
         <input id="quoteAIService" placeholder="Serviço">
         <input id="quoteAIArea" type="number" placeholder="Área/quantidade">
         <input id="quoteAIComplexity" type="number" placeholder="Complexidade 1 a 5">
@@ -4129,7 +4129,7 @@ function renderAIQuoteGenerator(){
 
 async function generateAIQuoteDraft(){
   const companyId = val("quoteAICompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   const area = Number(val("quoteAIArea") || 1);
   const complexity = Math.max(1, Number(val("quoteAIComplexity") || 1));
   const estimated = area * complexity * 180;
@@ -4154,7 +4154,7 @@ function renderAIProjectRisk(){
     <div class="card">
       <h2>Analisar Projeto</h2>
       <div class="form-grid">
-        <select id="riskCompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
+        <select id="riskCompany"><option value="">Client</option>${ddAICompanyOptions()}</select>
         <input id="riskProject" placeholder="Projeto">
         <input id="riskPending" type="number" placeholder="Pendências">
         <input id="riskDelay" type="number" placeholder="Dias de atraso">
@@ -4173,7 +4173,7 @@ function renderAIProjectRisk(){
 
 async function generateProjectRisk(){
   const companyId = val("riskCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   const pending = Number(val("riskPending") || 0);
   const delay = Number(val("riskDelay") || 0);
   const score = Math.min(100, pending * 12 + delay * 8);
@@ -4217,7 +4217,7 @@ async function generateFinancialAdvice(){
     company_id: companyId,
     advice_type:"Cash Flow",
     title:"Controle de recebimentos",
-    message:`Faturado: R$ ${formatMoneyAI(invoicesTotal)}. Recebido: R$ ${formatMoneyAI(paid)}. Aberto: R$ ${formatMoneyAI(open)}.`,
+    message:`Faturado: R$ ${formatMoneyAI(invoicesTotal)}. Received: R$ ${formatMoneyAI(paid)}. Aberto: R$ ${formatMoneyAI(open)}.`,
     priority: open > paid ? "High" : "Medium",
     status:"Open"
   });
@@ -4233,8 +4233,8 @@ function renderAIWorkforcePlanner(){
     <div class="card">
       <h2>Nova Sugestão</h2>
       <div class="form-grid">
-        <select id="workforceCompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
-        <input id="workforceEmployee" placeholder="Funcionário">
+        <select id="workforceCompany"><option value="">Client</option>${ddAICompanyOptions()}</select>
+        <input id="workforceEmployee" placeholder="Employee">
         <input id="workforceFocus" placeholder="Foco/Tarefa">
         <select id="workforcePriority"><option>Normal</option><option>High</option><option>Urgent</option></select>
       </div>
@@ -4246,7 +4246,7 @@ function renderAIWorkforcePlanner(){
 
 async function generateWorkforcePlan(){
   const companyId = val("workforceCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   const res = await apiInsert("ai_workforce_plans", {
     company_id: companyId,
     plan_name:"AI Workforce Plan",
@@ -4268,7 +4268,7 @@ function renderAIRouteOptimization(){
     <div class="card">
       <h2>Nova Otimização</h2>
       <div class="form-grid">
-        <select id="routeOptCompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
+        <select id="routeOptCompany"><option value="">Client</option>${ddAICompanyOptions()}</select>
         <input id="routeOptName" placeholder="Nome da rota">
         <input id="routeOptStops" type="number" placeholder="Quantidade de paradas">
       </div>
@@ -4280,7 +4280,7 @@ function renderAIRouteOptimization(){
 
 async function generateRouteOptimization(){
   const companyId = val("routeOptCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   const stops = Number(val("routeOptStops") || 1);
   const score = Math.min(100, 50 + stops * 5);
   const res = await apiInsert("ai_route_optimizations", {
@@ -4303,7 +4303,7 @@ function renderAIWeatherImpact(){
     <div class="card">
       <h2>Novo Impacto</h2>
       <div class="form-grid">
-        <select id="weatherAICompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
+        <select id="weatherAICompany"><option value="">Client</option>${ddAICompanyOptions()}</select>
         <input id="weatherAILocation" placeholder="Local">
         <select id="weatherAILevel"><option>Low</option><option>Medium</option><option>High</option></select>
         <input id="weatherAIWork" placeholder="Trabalho afetado">
@@ -4316,7 +4316,7 @@ function renderAIWeatherImpact(){
 
 async function generateWeatherImpact(){
   const companyId = val("weatherAICompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
   const level = val("weatherAILevel");
   const res = await apiInsert("ai_weather_impacts", {
     company_id: companyId,
@@ -4335,7 +4335,7 @@ function renderAIExecutiveReports(){
   setTitle("AI Executive Reports");
   setContent(`
     <div class="aiops-hero"><h2>V58 AI Executive Reports</h2><p>Gera relatório executivo.</p></div>
-    <div class="card"><h2>Gerar Relatório</h2><button class="success-btn" onclick="generateExecutiveReportAI()">Gerar Relatório</button></div>
+    <div class="card"><h2>Gerar Report</h2><button class="success-btn" onclick="generateExecutiveReportAI()">Gerar Report</button></div>
     <div class="aiops-grid">${aiExecutiveReports.length ? aiExecutiveReports.map(r => `<div class="aiops-card"><h2>${r.report_title}</h2><small>${r.status}</small><p><strong>Resumo:</strong> ${r.report_summary}</p><p><strong>Highlights:</strong> ${r.highlights}</p><p><strong>Riscos:</strong> ${r.risks}</p><p><strong>Ações:</strong> ${r.next_actions}</p></div>`).join("") : "<div class='card'>Nenhum relatório executivo AI.</div>"}</div>
   `);
 }
@@ -4477,12 +4477,12 @@ function renderRoleExperience(){
       <div class="role-card" onclick="setRoleExperience('employee')">
         <span class="role-badge">CAMPO</span>
         <h2>👷 Meu Trabalho Hoje</h2>
-        <p>Ordens, rotas, check-in, fotos, clima e execução em campo.</p>
+        <p>Work Orders, rotas, check-in, fotos, clima e execução em campo.</p>
       </div>
 
       <div class="role-card" onclick="setRoleExperience('client')">
         <span class="role-badge">CLIENTE</span>
-        <h2>🤝 Meu Projeto</h2>
+        <h2>🤝 My Project</h2>
         <p>Projetos, fotos, relatórios, pagamentos e comunicação.</p>
       </div>
     </div>
@@ -4490,7 +4490,7 @@ function renderRoleExperience(){
     <div class="card">
       <h2>Criar usuário de teste</h2>
       <div class="form-grid">
-        <select id="roleUserCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="roleUserCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="roleUserName" placeholder="Nome">
         <input id="roleUserEmail" placeholder="Email">
         <select id="roleUserRole"><option value="owner">owner</option><option value="employee">employee</option><option value="client">client</option></select>
@@ -4512,7 +4512,7 @@ function renderRoleExperience(){
 
 async function createRoleUser(){
   const companyId = val("roleUserCompany");
-  if(!companyId) return alert("Selecione a empresa.");
+  if(!companyId) return alert("Selecione a client.");
 
   const res = await apiInsert("user_profiles", {
     company_id: companyId,
@@ -4543,18 +4543,18 @@ function renderOwnerHome(){
 
     <div class="cards">
       ${metric("Receita", "R$ " + Number(revenue || 0).toLocaleString("pt-BR"))}
-      ${metric("Ordens/Projetos", activeProjects)}
-      ${metric("Equipe/Campo", typeof gpsCheckins !== "undefined" ? gpsCheckins.length : 0)}
+      ${metric("Work Orders/Projetos", activeProjects)}
+      ${metric("Team/Campo", typeof gpsCheckins !== "undefined" ? gpsCheckins.length : 0)}
       ${metric("Alertas", alerts)}
       ${metric("AI Insights", typeof aiCommandCenterLogs !== "undefined" ? aiCommandCenterLogs.length : 0)}
     </div>
 
     <div class="role-action-grid">
-      <button class="role-action" onclick="changePage('workOrders')">🧾 Ordens de Serviço</button>
+      <button class="role-action" onclick="changePage('workOrders')">🧾 Work Orders de Serviço</button>
       <button class="role-action" onclick="changePage('billingDashboard')">💰 Financeiro</button>
       <button class="role-action" onclick="changePage('biDashboard')">📊 BI</button>
       <button class="role-action" onclick="changePage('aiOperationsCommand')">🧠 AI Command</button>
-      <button class="role-action" onclick="changePage('mapsReal')">🗺️ Rotas</button>
+      <button class="role-action" onclick="changePage('mapsReal')">🗺️ Routes</button>
       <button class="role-action" onclick="changePage('whatsappReal')">🟢 WhatsApp</button>
     </div>
   `);
@@ -4572,8 +4572,8 @@ function renderEmployeeHome(){
     </div>
 
     <div class="role-mobile-card">
-      <h2>Próxima Ordem</h2>
-      <p>${nextWO ? nextWO.client_name || "Cliente" : "Nenhuma ordem encontrada"}</p>
+      <h2>Próxima Work Order</h2>
+      <p>${nextWO ? nextWO.client_name || "Client" : "Nenhuma ordem encontrada"}</p>
       <p>${nextWO ? nextWO.service_type || "Serviço" : "Crie uma ordem para aparecer aqui."}</p>
       <button class="primary-btn" onclick="changePage('workOrders')">Abrir OS</button>
     </div>
@@ -4597,13 +4597,13 @@ function renderEmployeeHome(){
 }
 
 function renderClientHome(){
-  setTitle("Meu Projeto");
+  setTitle("My Project");
 
   const latestPhoto = typeof fieldPhotos !== "undefined" && fieldPhotos.length ? fieldPhotos[0] : null;
 
   setContent(`
     <div class="role-hero">
-      <h2>🤝 Meu Projeto</h2>
+      <h2>🤝 My Project</h2>
       <p>Acompanhe seu projeto sem complicação.</p>
     </div>
 
@@ -4611,18 +4611,18 @@ function renderClientHome(){
       <h2>Status</h2>
       <p>Em andamento</p>
       <p>Próxima atualização disponível no relatório.</p>
-      <button class="primary-btn" onclick="changePage('workOrders')">Ver Ordens</button>
+      <button class="primary-btn" onclick="changePage('workOrders')">Ver Work Orders</button>
     </div>
 
     <div class="role-action-grid">
-      <button class="role-action" onclick="changePage('workOrders')">🧾 Minhas Ordens</button>
-      <button class="role-action" onclick="changePage('reportCenter')">📑 Relatórios</button>
-      <button class="role-action" onclick="changePage('billingDashboard')">💳 Pagamentos</button>
+      <button class="role-action" onclick="changePage('workOrders')">🧾 Minhas Work Orders</button>
+      <button class="role-action" onclick="changePage('reportCenter')">📑 Reports</button>
+      <button class="role-action" onclick="changePage('billingDashboard')">💳 Payments</button>
       <button class="role-action" onclick="changePage('gmailReal')">💬 Mensagem</button>
     </div>
 
     <div class="card">
-      <h2>Fotos recentes</h2>
+      <h2>Recent Photos</h2>
       ${latestPhoto ? `<p>${latestPhoto.project_name || "Projeto"} • ${latestPhoto.photo_type || "Foto"}</p><small>${latestPhoto.photo_url || ""}</small>` : "<p>Nenhuma foto cadastrada ainda.</p>"}
     </div>
   `);
@@ -4652,23 +4652,23 @@ function renderDashboard(){
     <section class="v64-hero">
       <div class="v64-eyebrow">Professional Field Service Platform</div>
       <h2>DoubleDiamond Command Center</h2>
-      <p>Visão executiva para paisagismo, irrigação, rotas, equipe de campo, clientes e inteligência operacional.</p>
+      <p>Executive view for landscaping, irrigation, routes, field teams, clients and operational intelligence.</p>
       <div class="v64-hero-actions">
-        <button class="v64-primary" onclick="changePage('workOrders')">Nova / Ver Ordem</button>
-        <button class="v64-secondary" onclick="changePage('routePlanning')">Ver Rotas</button>
-        <button class="v64-secondary" onclick="changePage('biDashboard')">Abrir BI</button>
+        <button class="v64-primary" onclick="changePage('workOrders')">Nova / Ver Work Order</button>
+        <button class="v64-secondary" onclick="changePage('routePlanning')">View Routes</button>
+        <button class="v64-secondary" onclick="changePage('biDashboard')">Open BI</button>
         <button class="v64-secondary" onclick="changePage('aiOperationsCommand')">AI Command</button>
       </div>
     </section>
     <div class="v64-kpi-grid">
       <div class="v64-kpi-card"><small>Receita total</small><h3>R$ ${ddMoneyV64(revenue)}</h3><p>Faturamento registrado.</p></div>
-      <div class="v64-kpi-card"><small>Recebido</small><h3>R$ ${ddMoneyV64(paid)}</h3><p>Pagamentos confirmados.</p></div>
+      <div class="v64-kpi-card"><small>Received</small><h3>R$ ${ddMoneyV64(paid)}</h3><p>Payments confirmados.</p></div>
       <div class="v64-kpi-card"><small>Em aberto</small><h3>R$ ${ddMoneyV64(openRevenue)}</h3><p>Potencial de cobrança.</p></div>
-      <div class="v64-kpi-card"><small>Ordens / Projetos</small><h3>${projects.length}</h3><p>Itens operacionais.</p></div>
-      <div class="v64-kpi-card"><small>Equipe em campo</small><h3>${teams}</h3><p>Check-ins registrados.</p></div>
-      <div class="v64-kpi-card"><small>Rotas</small><h3>${routes}</h3><p>Planejamentos ativos.</p></div>
+      <div class="v64-kpi-card"><small>Work Orders / Projetos</small><h3>${projects.length}</h3><p>Itens operacionais.</p></div>
+      <div class="v64-kpi-card"><small>Team em campo</small><h3>${teams}</h3><p>Check-ins registrados.</p></div>
+      <div class="v64-kpi-card"><small>Routes</small><h3>${routes}</h3><p>Planejamentos ativos.</p></div>
     </div>
-    <div class="v64-section-title"><h2>Projetos e Ordens Ativas</h2><span>Pipeline operacional</span></div>
+    <div class="v64-section-title"><h2>Projetos e Work Orders Ativas</h2><span>Pipeline operacional</span></div>
     <div class="v64-grid">
       ${projects.slice(0,3).map((p,idx)=>{const progress=[82,64,45][idx]||55;return `
         <div class="v64-project-card">
@@ -4679,12 +4679,12 @@ function renderDashboard(){
           <p>${progress}% concluído • Próxima atualização em campo</p>
           <button class="secondary-btn" onclick="changePage('workOrders')">Abrir</button>
         </div>`}).join("")||`
-        <div class="v64-project-card"><div class="v64-project-cover">🌿 Primeiro projeto</div><span class="v64-tag">Pronto para começar</span><h2>Cadastre uma ordem de serviço</h2><div class="v64-progress"><span style="width:18%"></span></div><p>Use Work Orders para alimentar a Home.</p><button class="secondary-btn" onclick="changePage('workOrders')">Criar / Abrir OS</button></div>`}
+        <div class="v64-project-card"><div class="v64-project-cover">🌿 First Project</div><span class="v64-tag">Ready to Start</span><h2>Create a work order</h2><div class="v64-progress"><span style="width:18%"></span></div><p>Use Work Orders to feed the Home dashboard.</p><button class="secondary-btn" onclick="changePage('workOrders')">Create / Open Work Order</button></div>`}
     </div>
     <div class="v64-section-title"><h2>Atividade de Hoje</h2><span>Feed operacional</span></div>
     <div class="v64-grid">
       <div class="v64-feed-card">
-        ${[["📍","Equipe pronta para rota","Abra Rotas para organizar deslocamentos."],["🧾","Ordens em acompanhamento",projects.length+" ordens/projetos disponíveis."],["🌦","Clima monitorado",weatherCount?weatherCount+" alertas encontrados.":"Sem alerta crítico."],["🧠","IA operacional",aiAlerts?aiAlerts+" riscos/projeções cadastrados.":"Sem risco AI crítico."]].map(i=>`
+        ${[["📍","Team pronta para rota","Abra Routes para organizar deslocamentos."],["🧾","Work Orders em acompanhamento",projects.length+" ordens/projetos disponíveis."],["🌦","Clima monitorado",weatherCount?weatherCount+" alertas encontrados.":"Sem alerta crítico."],["🧠","IA operacional",aiAlerts?aiAlerts+" riscos/projeções cadastrados.":"Sem risco AI crítico."]].map(i=>`
           <div class="v64-feed-item"><div class="v64-feed-icon">${i[0]}</div><div><strong>${i[1]}</strong><br><small>${i[2]}</small></div></div>`).join("")}
       </div>
       <div class="v64-alert-card">
@@ -4700,20 +4700,20 @@ function renderEmployeeHome(){
   setTitle("Meu Trabalho Hoje");
   const jobs=typeof workOrders!=="undefined"?workOrders:[], nextJob=jobs[0];
   setContent(`
-    <section class="v64-hero"><div class="v64-eyebrow">Employee Mobile Workspace</div><h2>👷 Meu Trabalho Hoje</h2><p>Rotas, check-in, fotos, assinatura e conclusão de serviços em uma tela simples.</p><div class="v64-hero-actions"><button class="v64-primary" onclick="changePage('routePlanning')">Iniciar Rota</button><button class="v64-secondary" onclick="changePage('mobileWorkforce')">Check-in</button></div></section>
-    <div class="v64-grid"><div class="v64-mobile-shell"><div class="v64-mobile-screen"><span class="v64-tag">Próxima Ordem</span><h2>${nextJob?(nextJob.client_name||"Cliente"):"Nenhuma ordem para hoje"}</h2><p>${nextJob?(nextJob.service_type||"Serviço em campo"):"Cadastre uma OS para aparecer aqui."}</p><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('routePlanning')">🗺️<strong>Rota</strong><small>Abrir planejamento</small></div><div class="v64-action-card" onclick="changePage('mobileWorkforce')">📍<strong>Check-in</strong><small>Registrar presença</small></div><div class="v64-action-card" onclick="changePage('mobileWorkforce')">📷<strong>Fotos</strong><small>Enviar campo</small></div><div class="v64-action-card" onclick="changePage('workOrders')">✅<strong>Finalizar</strong><small>Concluir OS</small></div></div></div></div>
-    <div class="v64-feed-card"><h2>Tarefas do dia</h2>${jobs.slice(0,5).map(j=>`<div class="v64-feed-item"><div class="v64-feed-icon">🧾</div><div><strong>${j.client_name||"Cliente"}</strong><br><small>${j.service_type||j.status||"Serviço"}</small></div></div>`).join("")||"<p>Nenhuma tarefa cadastrada.</p>"}</div></div>`);
+    <section class="v64-hero"><div class="v64-eyebrow">Employee Mobile Workspace</div><h2>👷 Meu Trabalho Hoje</h2><p>Routes, check-in, fotos, assinatura e conclusão de serviços em uma tela simples.</p><div class="v64-hero-actions"><button class="v64-primary" onclick="changePage('routePlanning')">Iniciar Rota</button><button class="v64-secondary" onclick="changePage('mobileWorkforce')">Check-in</button></div></section>
+    <div class="v64-grid"><div class="v64-mobile-shell"><div class="v64-mobile-screen"><span class="v64-tag">Próxima Work Order</span><h2>${nextJob?(nextJob.client_name||"Client"):"Nenhuma ordem para hoje"}</h2><p>${nextJob?(nextJob.service_type||"Serviço em campo"):"Cadastre uma OS para aparecer aqui."}</p><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('routePlanning')">🗺️<strong>Rota</strong><small>Abrir planejamento</small></div><div class="v64-action-card" onclick="changePage('mobileWorkforce')">📍<strong>Check-in</strong><small>Registrar presença</small></div><div class="v64-action-card" onclick="changePage('mobileWorkforce')">📷<strong>Fotos</strong><small>Enviar campo</small></div><div class="v64-action-card" onclick="changePage('workOrders')">✅<strong>Finalizar</strong><small>Concluir OS</small></div></div></div></div>
+    <div class="v64-feed-card"><h2>Tarefas do dia</h2>${jobs.slice(0,5).map(j=>`<div class="v64-feed-item"><div class="v64-feed-icon">🧾</div><div><strong>${j.client_name||"Client"}</strong><br><small>${j.service_type||j.status||"Serviço"}</small></div></div>`).join("")||"<p>Nenhuma tarefa cadastrada.</p>"}</div></div>`);
 }
 
 function renderClientHome(){
-  setTitle("Meu Projeto");
+  setTitle("My Project");
   const photos=typeof fieldPhotos!=="undefined"?fieldPhotos:[], reportsCount=typeof reportCenterExports!=="undefined"?reportCenterExports.length:0;
   const paid=ddPaidTotalV64(), revenue=ddInvoiceTotalV64(), progress=revenue?Math.min(100,Math.round((paid/revenue)*100)):72;
   setContent(`
-    <section class="v64-hero"><div class="v64-eyebrow">Client Portal</div><h2>🤝 Meu Projeto</h2><p>Acompanhe progresso, fotos, relatórios, pagamentos e mensagens da equipe.</p><div class="v64-hero-actions"><button class="v64-primary" onclick="changePage('reportCenter')">Ver Relatórios</button><button class="v64-secondary" onclick="changePage('gmailReal')">Falar com Equipe</button></div></section>
-    <div class="v64-grid"><div class="v64-project-card"><div class="v64-project-cover">🏡 Projeto em andamento</div><span class="v64-tag">Status do projeto</span><h2>Progresso geral</h2><div class="v64-progress"><span style="width:${progress}%"></span></div><p>${progress}% concluído • Próxima visita em planejamento</p></div>
-    <div class="v64-feed-card"><h2>Acesso rápido</h2><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('workOrders')">🧾<strong>Ordens</strong><small>Acompanhar serviços</small></div><div class="v64-action-card" onclick="changePage('reportCenter')">📑<strong>Relatórios</strong><small>${reportsCount} disponíveis</small></div><div class="v64-action-card" onclick="changePage('billingDashboard')">💳<strong>Pagamentos</strong><small>Ver cobranças</small></div><div class="v64-action-card" onclick="changePage('gmailReal')">💬<strong>Mensagens</strong><small>Contato com equipe</small></div></div></div>
-    <div class="v64-feed-card"><h2>Fotos recentes</h2>${photos.slice(0,4).map(p=>`<div class="v64-feed-item"><div class="v64-feed-icon">📸</div><div><strong>${p.photo_type||"Foto de campo"}</strong><br><small>${p.project_name||p.photo_url||"Atualização do projeto"}</small></div></div>`).join("")||"<p>Nenhuma foto enviada ainda.</p>"}</div></div>`);
+    <section class="v64-hero"><div class="v64-eyebrow">Client Portal</div><h2>🤝 My Project</h2><p>Track progress, fotos, relatórios, pagamentos e mensagens da equipe.</p><div class="v64-hero-actions"><button class="v64-primary" onclick="changePage('reportCenter')">Ver Reports</button><button class="v64-secondary" onclick="changePage('gmailReal')">Falar com Team</button></div></section>
+    <div class="v64-grid"><div class="v64-project-card"><div class="v64-project-cover">🏡 Projeto em andamento</div><span class="v64-tag">Project Status</span><h2>Overall Progress</h2><div class="v64-progress"><span style="width:${progress}%"></span></div><p>${progress}% concluído • Next Visit em planejamento</p></div>
+    <div class="v64-feed-card"><h2>Quick Access</h2><div class="v64-action-grid"><div class="v64-action-card" onclick="changePage('workOrders')">🧾<strong>Work Orders</strong><small>Acompanhar serviços</small></div><div class="v64-action-card" onclick="changePage('reportCenter')">📑<strong>Reports</strong><small>${reportsCount} disponíveis</small></div><div class="v64-action-card" onclick="changePage('billingDashboard')">💳<strong>Payments</strong><small>Ver cobranças</small></div><div class="v64-action-card" onclick="changePage('gmailReal')">💬<strong>Messages</strong><small>Contato com equipe</small></div></div></div>
+    <div class="v64-feed-card"><h2>Recent Photos</h2>${photos.slice(0,4).map(p=>`<div class="v64-feed-item"><div class="v64-feed-icon">📸</div><div><strong>${p.photo_type||"Foto de campo"}</strong><br><small>${p.project_name||p.photo_url||"Atualização do projeto"}</small></div></div>`).join("")||"<p>No photos uploaded yet.</p>"}</div></div>`);
 }
 
 /* V64.2 INSTANT NAVIGATION */
@@ -4785,7 +4785,7 @@ renderDashboard = function(){
     content.insertAdjacentHTML("afterbegin", `
       <div class="performance-pill">
         <span class="performance-dot"></span>
-        Carregando dados em segundo plano...
+        Loading data in the background...
       </div>
     `);
   }
@@ -4799,12 +4799,12 @@ function ddV66GalleryItems(category){
     title:p.photo_type||p.label||p.caption||["Antes","Durante","Depois"][idx%3],
     category:p.category||p.photo_type||["Antes","Durante","Depois"][idx%3],
     date:p.created_at?new Date(p.created_at).toLocaleDateString("pt-BR"):"Atualização recente",
-    by:p.uploaded_by||p.user_name||"Equipe de Campo",
+    by:p.uploaded_by||p.user_name||"Team de Campo",
     url:p.url||p.photo_url||p.image_url||""
   }));
   const fallback=[
     {title:"Área original",category:"Antes",date:"05/06/2026",by:"Supervisor",url:""},
-    {title:"Preparação do terreno",category:"Durante",date:"09/06/2026",by:"Equipe Verde",url:""},
+    {title:"Preparação do terreno",category:"Durante",date:"09/06/2026",by:"Team Verde",url:""},
     {title:"Irrigação em instalação",category:"Durante",date:"11/06/2026",by:"Técnico de Irrigação",url:""},
     {title:"Resultado esperado",category:"Depois",date:"Entrega prevista",by:"Paisagista",url:""}
   ];
@@ -4834,7 +4834,7 @@ function ddV66RenderGallery(category="Todos"){
   document.querySelectorAll(".v66-tab").forEach(btn=>btn.classList.toggle("active",btn.dataset.tab===category));
 }
 function renderClientHome(){
-  setTitle("Meu Projeto");
+  setTitle("My Project");
   const recentPhotosSafe=Array.isArray(fieldPhotos)?fieldPhotos.slice(0,6):[];
   const reportsCount=Array.isArray(reportCenterExports)?reportCenterExports.length:0;
   const visitsCompleted=Array.isArray(workOrderLogs)?workOrderLogs.length:3;
@@ -4843,17 +4843,17 @@ function renderClientHome(){
   setContent(`
     <div class="v651-premium-page">
       <section class="v651-premium-hero">
-        <div class="v651-hero-top"><div><div class="v651-eyebrow">Client Portal · V66.0</div><h2>🏡 Meu Projeto</h2><p>Acompanhe progresso, fotos antes/durante/depois, próximas visitas, equipe, documentos e atualizações.</p></div><div class="v651-status-pill">🟢 Dentro do prazo</div></div>
+        <div class="v651-hero-top"><div><div class="v651-eyebrow">Client Portal · V66.0</div><h2>🏡 My Project</h2><p>Track progress, fotos antes/durante/depois, próximas visitas, equipe, documentos e atualizações.</p></div><div class="v651-status-pill">🟢 Dentro do prazo</div></div>
         <div class="v651-progress"><span></span></div><strong>72% concluído</strong><p style="color:#d1fae5;margin-top:8px;">Última atualização: ${lastUpdate}</p>
-        <div class="v651-hero-actions"><button class="v651-primary" onclick="changePage('reportCenter', event)">Ver Relatórios</button><button class="v651-secondary" onclick="changePage('whatsappReal', event)">Falar com Equipe</button><button class="v651-secondary" onclick="changePage('profitabilityEngine', event)">Pagamentos</button></div>
+        <div class="v651-hero-actions"><button class="v651-primary" onclick="changePage('reportCenter', event)">Ver Reports</button><button class="v651-secondary" onclick="changePage('whatsappReal', event)">Falar com Team</button><button class="v651-secondary" onclick="changePage('profitabilityEngine', event)">Payments</button></div>
       </section>
       <div class="v66-kpis"><div class="v66-kpi">📸 Total Photos<strong>${recentPhotosSafe.length||4}</strong></div><div class="v66-kpi">📅 Last Update<strong>${lastUpdate}</strong></div><div class="v66-kpi">👷 Visits Completed<strong>${visitsCompleted||3}</strong></div><div class="v66-kpi">📈 Progress<strong>72%</strong></div></div>
-      <div class="v651-grid"><div class="v651-card"><h3>🚀 Próxima Etapa</h3><p><strong>Instalação de irrigação</strong></p><small>Responsável: Equipe Verde</small></div><div class="v651-card"><h3>📅 Próxima Visita</h3><p><strong>12/06 às 08:00</strong></p><small>Irrigação e preparação do terreno</small></div><div class="v651-card"><h3>📊 Status do Projeto</h3><p><strong>${projectName}</strong></p><small>Projeto em andamento</small></div><div class="v651-card"><h3>📑 Relatórios</h3><p><strong>${reportsCount}</strong> disponíveis</p><small>Documentos preparados para o cliente</small></div></div>
+      <div class="v651-grid"><div class="v651-card"><h3>🚀 Próxima Etapa</h3><p><strong>Instalação de irrigação</strong></p><small>Responsável: Team Verde</small></div><div class="v651-card"><h3>📅 Próxima Visita</h3><p><strong>12/06 às 08:00</strong></p><small>Irrigação e preparação do terreno</small></div><div class="v651-card"><h3>📊 Status do Projeto</h3><p><strong>${projectName}</strong></p><small>Projeto em andamento</small></div><div class="v651-card"><h3>📑 Reports</h3><p><strong>${reportsCount}</strong> disponíveis</p><small>Documents preparados para o cliente</small></div></div>
       <div class="v651-card"><h3>🏡 Evolução do Projeto</h3><div class="v66-tabs"><button class="v66-tab active" data-tab="Todos" onclick="ddV66RenderGallery('Todos')">Todos</button><button class="v66-tab" data-tab="Antes" onclick="ddV66RenderGallery('Antes')">Antes</button><button class="v66-tab" data-tab="Durante" onclick="ddV66RenderGallery('Durante')">Durante</button><button class="v66-tab" data-tab="Depois" onclick="ddV66RenderGallery('Depois')">Depois</button></div><div id="v66GalleryArea" class="v66-gallery-grid"></div></div>
       <div class="v651-card"><h3>🆚 Comparação Antes / Depois</h3><div class="v66-comparison"><div class="v66-compare-card">Antes<br><small>Estado original do projeto</small></div><div class="v66-compare-card after">Depois<br><small>Resultado planejado / evolução atual</small></div></div></div>
-      <div class="v651-grid"><div class="v651-card"><h3>📍 Timeline do Projeto</h3><div class="v651-timeline"><div class="v651-step"><div class="v651-dot">✓</div><div><strong>Contrato aprovado</strong><br><small>Projeto confirmado</small></div></div><div class="v651-step"><div class="v651-dot">✓</div><div><strong>Planejamento</strong><br><small>Escopo e equipe definidos</small></div></div><div class="v651-step"><div class="v651-dot current">⏳</div><div><strong>Execução em andamento</strong><br><small>Instalação e paisagismo</small></div></div><div class="v651-step"><div class="v651-dot todo">□</div><div><strong>Entrega</strong><br><small>Projeto concluído</small></div></div></div></div><div class="v651-card"><h3>📰 Atualizações Recentes</h3><div class="v651-feed-item"><div class="v651-feed-icon">🌱</div><div><strong>Hoje</strong><br><small>Equipe iniciou preparação do terreno</small></div></div><div class="v651-feed-item"><div class="v651-feed-icon">🚚</div><div><strong>Ontem</strong><br><small>Materiais entregues no local</small></div></div></div></div>
-      <div class="v651-grid"><div class="v651-card"><h3>👷 Equipe Responsável</h3><div class="v651-team"><div class="v651-person"><div class="v651-avatar">SV</div><div><strong>Supervisor</strong><br><small>Coordenação do projeto</small></div></div><div class="v651-person"><div class="v651-avatar">PS</div><div><strong>Paisagista</strong><br><small>Execução e acabamento</small></div></div></div></div><div class="v651-card"><h3>💰 Resumo Financeiro</h3><div class="v651-grid"><div><strong>Total</strong><br><small>R$ 18.000,00</small></div><div><strong>Pago</strong><br><small>R$ 15.000,00</small></div><div><strong>Pendente</strong><br><small>R$ 3.000,00</small></div></div></div></div>
-      <div class="v651-card"><h3>📄 Documentos</h3><div class="v651-docs"><div class="v651-doc">📄 Contrato</div><div class="v651-doc">📄 Orçamento</div><div class="v651-doc">📄 Relatórios</div><div class="v651-doc">📄 Garantia</div></div></div>
+      <div class="v651-grid"><div class="v651-card"><h3>📍 Project Timeline</h3><div class="v651-timeline"><div class="v651-step"><div class="v651-dot">✓</div><div><strong>Contrato aprovado</strong><br><small>Projeto confirmado</small></div></div><div class="v651-step"><div class="v651-dot">✓</div><div><strong>Planejamento</strong><br><small>Escopo e equipe definidos</small></div></div><div class="v651-step"><div class="v651-dot current">⏳</div><div><strong>Execução em andamento</strong><br><small>Instalação e paisagismo</small></div></div><div class="v651-step"><div class="v651-dot todo">□</div><div><strong>Entrega</strong><br><small>Projeto concluído</small></div></div></div></div><div class="v651-card"><h3>📰 Recent Updates</h3><div class="v651-feed-item"><div class="v651-feed-icon">🌱</div><div><strong>Hoje</strong><br><small>Team iniciou preparação do terreno</small></div></div><div class="v651-feed-item"><div class="v651-feed-icon">🚚</div><div><strong>Ontem</strong><br><small>Materiais entregues no local</small></div></div></div></div>
+      <div class="v651-grid"><div class="v651-card"><h3>👷 Team Responsável</h3><div class="v651-team"><div class="v651-person"><div class="v651-avatar">SV</div><div><strong>Supervisor</strong><br><small>Coordenação do projeto</small></div></div><div class="v651-person"><div class="v651-avatar">PS</div><div><strong>Paisagista</strong><br><small>Execução e acabamento</small></div></div></div></div><div class="v651-card"><h3>💰 Financial Summary</h3><div class="v651-grid"><div><strong>Total</strong><br><small>R$ 18.000,00</small></div><div><strong>Pago</strong><br><small>R$ 15.000,00</small></div><div><strong>Pendente</strong><br><small>R$ 3.000,00</small></div></div></div></div>
+      <div class="v651-card"><h3>📄 Documents</h3><div class="v651-docs"><div class="v651-doc">📄 Contrato</div><div class="v651-doc">📄 Orçamento</div><div class="v651-doc">📄 Reports</div><div class="v651-doc">📄 Garantia</div></div></div>
     </div>`);
   setTimeout(()=>ddV66RenderGallery("Todos"),0);
 }
@@ -4872,7 +4872,7 @@ function ddV67NormalizePhoto(p, idx){
     title: p.title || p.caption || p.photo_type || p.label || `${cat} do projeto`,
     category: cat,
     date: p.created_at ? new Date(p.created_at).toLocaleDateString("pt-BR") : "Atualização recente",
-    by: p.uploaded_by || p.user_name || p.technician_name || "Equipe de Campo",
+    by: p.uploaded_by || p.user_name || p.technician_name || "Team de Campo",
     desc: p.description || p.notes || "Atualização visual do projeto.",
     url: p.url || p.photo_url || p.image_url || p.public_url || ""
   };
@@ -4884,7 +4884,7 @@ function ddV67GalleryItems(category){
 
   const fallback = [
     {title:"Área original",category:"Antes",date:"05/06/2026",by:"Supervisor",desc:"Registro inicial antes da execução.",url:""},
-    {title:"Preparação do terreno",category:"Durante",date:"09/06/2026",by:"Equipe Verde",desc:"Preparação para paisagismo e irrigação.",url:""},
+    {title:"Preparação do terreno",category:"Durante",date:"09/06/2026",by:"Team Verde",desc:"Preparação para paisagismo e irrigação.",url:""},
     {title:"Irrigação em instalação",category:"Durante",date:"11/06/2026",by:"Técnico de Irrigação",desc:"Instalação do sistema de irrigação.",url:""},
     {title:"Resultado esperado",category:"Depois",date:"Entrega prevista",by:"Paisagista",desc:"Visual planejado para a entrega final.",url:""}
   ];
@@ -5001,7 +5001,7 @@ renderClientHome = function(){
 /* V68.1 FIELD PHOTO UPLOAD SYNTAX FIX */
 async function addFieldPhotoV68(){
   const projectName = val("v68ProjectName") || "Jardim Residencial";
-  const employeeName = val("v68EmployeeName") || "Equipe Verde";
+  const employeeName = val("v68EmployeeName") || "Team Verde";
   const photoType = val("v68PhotoType") || "Durante";
   const photoUrl = val("v68PhotoUrl");
   const notes = val("v68Notes") || "";
@@ -5042,7 +5042,7 @@ function v68UploadBlock(){
       '<div class="v68-mini-img" style="' + bg + '">' + v68SafeText(p.photo_type || "Foto") + '</div>' +
       '<div class="v68-mini-body">' +
       '<strong>' + v68SafeText(p.project_name || "Projeto") + '</strong><br>' +
-      '<small>' + v68SafeText(p.employee_name || "Equipe") + ' • ' + (p.created_at ? new Date(p.created_at).toLocaleDateString("pt-BR") : "") + '</small>' +
+      '<small>' + v68SafeText(p.employee_name || "Team") + ' • ' + (p.created_at ? new Date(p.created_at).toLocaleDateString("pt-BR") : "") + '</small>' +
       '<p>' + v68SafeText(p.notes || "") + '</p>' +
       '</div></div>';
   }).join("") : "<p>Nenhuma foto cadastrada ainda.</p>";
@@ -5052,14 +5052,14 @@ function v68UploadBlock(){
     '<p>Salva diretamente na tabela <strong>field_photos</strong> usando as colunas reais do banco.</p>' +
     '<div class="v68-form-grid">' +
       '<input id="v68ProjectName" placeholder="Projeto" value="Jardim Residencial">' +
-      '<input id="v68EmployeeName" placeholder="Funcionário / Equipe" value="Equipe Verde">' +
+      '<input id="v68EmployeeName" placeholder="Employee / Team" value="Team Verde">' +
       '<select id="v68PhotoType"><option>Antes</option><option selected>Durante</option><option>Depois</option></select>' +
       '<input id="v68PhotoUrl" placeholder="URL da foto">' +
     '</div>' +
     '<textarea id="v68Notes" placeholder="Observação da foto"></textarea>' +
     '<div class="v68-actions">' +
       '<button class="primary-btn" onclick="addFieldPhotoV68()">Salvar Foto</button>' +
-      '<button class="secondary-btn" onclick="changePage(\'clientHome\', event)">Ver no Portal Cliente</button>' +
+      '<button class="secondary-btn" onclick="changePage(\'clientHome\', event)">Ver no Portal Client</button>' +
     '</div>' +
     '<div class="v68-photo-list">' + photoHtml + '</div>' +
   '</div>';
@@ -5112,7 +5112,7 @@ function ddV69TimelineItems(){
   return [
     {event:"Contrato aprovado",created_at:"",isCurrent:false},
     {event:"Planejamento iniciado",created_at:"",isCurrent:false},
-    {event:"Equipe programada",created_at:"",isCurrent:false},
+    {event:"Team programada",created_at:"",isCurrent:false},
     {event:"Execução em andamento",created_at:"",isCurrent:true},
     {event:"Inspeção final",created_at:"",isCurrent:false},
     {event:"Entrega final",created_at:"",isCurrent:false}
@@ -5127,7 +5127,7 @@ function ddV69TimelineHtml(){
     '<div class="v69-real-timeline-card">',
       '<div class="v69-timeline-head">',
         '<div>',
-          '<h3>📍 Timeline Real do Projeto</h3>',
+          '<h3>📍 Real Project Timeline</h3>',
           '<small>Eventos carregados da tabela project_timeline.</small>',
         '</div>',
         '<span class="v69-source-pill">' + (usingReal ? 'Supabase conectado' : 'Modo exemplo') + '</span>',
@@ -5176,7 +5176,7 @@ renderClientHome = function(){
   if(eyebrow) eyebrow.textContent = "Client Portal · V69.0";
 
   const oldTimeline = Array.from(document.querySelectorAll(".v651-card,.v69-real-timeline-card")).find(function(card){
-    return card.textContent.includes("Timeline do Projeto") || card.textContent.includes("Timeline Real do Projeto");
+    return card.textContent.includes("Project Timeline") || card.textContent.includes("Real Project Timeline");
   });
 
   if(oldTimeline){
@@ -5218,7 +5218,7 @@ function s1RealOpsHtml(){
 
   return `
     <div class="s1-section">
-      <h2>⚙️ Operação Real</h2>
+      <h2>⚙️ Real Operations</h2>
       <div class="s1-grid">
         <div class="s1-card"><h3>🧾 Work Orders</h3><strong>${wo.length}</strong><span class="s1-pill">work_orders</span></div>
         <div class="s1-card"><h3>👷 Check-ins</h3><strong>${checks.length}</strong><span class="s1-pill">team_checkins</span></div>
@@ -5228,11 +5228,11 @@ function s1RealOpsHtml(){
 
       <div class="s1-grid">
         <div class="s1-card">
-          <h3>🧾 Ordens Recentes</h3>
+          <h3>🧾 Work Orders Recentes</h3>
           <div class="s1-list">
             ${wo.length ? wo.map(w => `
               <div class="s1-row">
-                <strong>${s1Safe(w.title || w.service_type || w.project_name || "Ordem de Serviço")}</strong>
+                <strong>${s1Safe(w.title || w.service_type || w.project_name || "Work Order de Serviço")}</strong>
                 <small>${s1Safe(w.status || "Status não informado")} • ${s1Date(w.created_at)}</small>
               </div>
             `).join("") : "<div class='s1-row'>Nenhuma ordem encontrada.</div>"}
@@ -5240,11 +5240,11 @@ function s1RealOpsHtml(){
         </div>
 
         <div class="s1-card">
-          <h3>👷 Equipe em Campo</h3>
+          <h3>👷 Team em Campo</h3>
           <div class="s1-list">
             ${checks.length ? checks.map(c => `
               <div class="s1-row">
-                <strong>${s1Safe(c.employee_name || c.team_member || c.user_name || "Equipe")}</strong>
+                <strong>${s1Safe(c.employee_name || c.team_member || c.user_name || "Team")}</strong>
                 <small>${s1Safe(c.project_name || c.location || c.status || "Check-in")} • ${s1Date(c.created_at || c.checkin_time)}</small>
               </div>
             `).join("") : "<div class='s1-row'>Nenhum check-in encontrado.</div>"}
@@ -5259,7 +5259,7 @@ async function s1CreateQuickCheckin(){
   const res = await apiInsert("team_checkins", {
     company_id: "demo-company",
     project_name: "Jardim Residencial",
-    employee_name: "Equipe Verde",
+    employee_name: "Team Verde",
     status: "Em campo",
     notes: "Check-in rápido pelo Sprint 1"
   });
@@ -5303,7 +5303,7 @@ renderFieldDashboard = function(){
 async function s2ApproveCurrentStep(){
   const res = await apiInsert("project_timeline", {
     project_id: "Jardim Residencial",
-    event: "Cliente aprovou etapa pelo portal"
+    event: "Client aprovou etapa pelo portal"
   });
 
   if(!res.ok){
@@ -5316,7 +5316,7 @@ async function s2ApproveCurrentStep(){
 }
 
 async function s2SaveSignature(){
-  const signer = val("s2Signer") || "Cliente";
+  const signer = val("s2Signer") || "Client";
   const signature = val("s2Signature") || "";
   if(!signature.trim()) return alert("Digite a assinatura.");
 
@@ -5345,8 +5345,8 @@ async function s2SaveSignature(){
 async function s2CreateReportRecord(){
   const res = await apiInsert("report_center_exports", {
     company_id: "demo-company",
-    report_name: "Relatório Cliente - Jardim Residencial",
-    report_type: "Cliente",
+    report_name: "Client Report - Jardim Residencial",
+    report_type: "Client",
     export_format: "PDF",
     status: "Prepared"
   });
@@ -5356,30 +5356,30 @@ async function s2CreateReportRecord(){
   }
 
   reportCenterExports = await apiGet("report_center_exports");
-  alert("Relatório preparado.");
+  alert("Report preparado.");
   renderClientHome();
 }
 
 function s2ApprovalHtml(){
   return `
     <div class="s2-section">
-      <h2>✅ Sprint 2 · Aprovação, Assinatura e Relatório</h2>
+      <h2>✅ Sprint 2 · Aprovação, Assinatura e Report</h2>
       <div class="s2-kpis">
         <div class="s2-kpi"><strong>Assinaturas</strong><br>${Array.isArray(fieldSignatures) ? fieldSignatures.length : 0}</div>
-        <div class="s2-kpi"><strong>Relatórios</strong><br>${Array.isArray(reportCenterExports) ? reportCenterExports.length : 0}</div>
+        <div class="s2-kpi"><strong>Reports</strong><br>${Array.isArray(reportCenterExports) ? reportCenterExports.length : 0}</div>
         <div class="s2-kpi"><strong>Eventos Timeline</strong><br>${Array.isArray(projectTimeline) ? projectTimeline.length : 0}</div>
       </div>
 
       <div class="s2-actions">
-        <button class="primary-btn" onclick="s2ApproveCurrentStep()">Aprovar Etapa</button>
-        <button class="secondary-btn" onclick="s2CreateReportRecord()">Gerar Registro de Relatório</button>
+        <button class="primary-btn" onclick="s2ApproveCurrentStep()">Approve Step</button>
+        <button class="secondary-btn" onclick="s2CreateReportRecord()">Gerar Registro de Report</button>
       </div>
 
       <div class="s2-signature">
-        <h3>✍️ Assinatura Digital Simples</h3>
-        <input id="s2Signer" placeholder="Nome do assinante" value="Cliente">
-        <textarea id="s2Signature" placeholder="Digite a assinatura ou confirmação"></textarea>
-        <button class="success-btn" onclick="s2SaveSignature()">Salvar Assinatura</button>
+        <h3>✍️ Simple Digital Signature</h3>
+        <input id="s2Signer" placeholder="Nome do assinante" value="Client">
+        <textarea id="s2Signature" placeholder="Enter signature or confirmation"></textarea>
+        <button class="success-btn" onclick="s2SaveSignature()">Save Signature</button>
       </div>
     </div>
   `;
@@ -5437,7 +5437,7 @@ async function s3CreateAIInsight(){
     agent_name: "Operations Advisor",
     insight_type: "Operations",
     title: "Projeto com nova atividade",
-    message: "Cliente recebeu atualização com fotos, timeline e próxima etapa.",
+    message: "Client recebeu atualização com fotos, timeline e próxima etapa.",
     priority: "Medium",
     status: "Open"
   });
@@ -5570,7 +5570,7 @@ renderClientHome = function(){
     document.body.setAttribute("data-dd-role", role);
     const top=document.querySelector(".top-actions");
     if(top && !top.querySelector(".dd-session-pill")){
-      top.insertAdjacentHTML("beforeend", `<button class="dd-back-btn" onclick="ddGoBack()">← Voltar</button><span class="dd-session-pill">${role.toUpperCase()}</span><button class="dd-logout-btn" onclick="ddLogout()">Sair</button>`);
+      top.insertAdjacentHTML("beforeend", `<button class="dd-back-btn" onclick="ddGoBack()">← Back</button><span class="dd-session-pill">${role.toUpperCase()}</span><button class="dd-logout-btn" onclick="ddLogout()">Logout</button>`);
     }
     document.querySelectorAll(".menu-btn").forEach(btn=>{
       const onclick=btn.getAttribute("onclick")||"";
@@ -5624,43 +5624,43 @@ renderClientHome = function(){
   };
 })();
 
-/* CLIENT LANGUAGE OVERRIDE - companies table remains the same, UI says Cliente */
-renderEmpresas = function(){
-  setTitle("Clientes");
+/* CLIENT LANGUAGE OVERRIDE - companies table remains the same, UI says Client */
+renderClients = function(){
+  setTitle("Clients");
   setContent(`
-    <div class="foundation-note">CRM de Clientes: cadastro de clientes/empresas para operações de paisagismo.</div>
+    <div class="foundation-note">CRM de Clients: cadastro de clientes/clients para operações de paisagismo.</div>
     <div class="card">
-      <h2>Novo Cliente</h2>
+      <h2>Novo Client</h2>
       <div class="form-grid">
-        <input id="companyName" placeholder="Nome do cliente ou empresa">
+        <input id="companyName" placeholder="Client Name ou client">
         <input id="companyEmail" placeholder="Email do cliente">
         <input id="companyPhone" placeholder="Telefone">
         <select id="companyPlan"><option>Starter</option><option>Professional</option><option>Enterprise</option></select>
         <select id="companyStatus"><option>Active</option><option>Inactive</option><option>Trial</option></select>
       </div>
-      <button class="primary-btn" onclick="addCompany()">Cadastrar Cliente</button>
+      <button class="primary-btn" onclick="addCompany()">Cadastrar Client</button>
     </div>
     <div class="card">
-      <h2>Usuário do Cliente</h2>
+      <h2>Usuário do Client</h2>
       <div class="form-grid">
-        <select id="companyUserCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="companyUserCompany"><option value="">Client</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="companyUserName" placeholder="Nome do usuário">
         <input id="companyUserEmail" placeholder="Email do usuário">
         <select id="companyUserRole"><option>Owner</option><option>Manager</option><option>Employee</option><option>Client</option></select>
       </div>
-      <button class="primary-btn" onclick="addCompanyUser()">Adicionar Usuário</button>
+      <button class="primary-btn" onclick="addCompanyUser()">Add User</button>
     </div>
     <div class="enterprise-grid">
       ${companies.map(company => {
         const users = companyUsers.filter(u => u.company_id === company.id);
-        return `<div class="enterprise-card"><h2>${company.name}</h2><small>${company.email || "Sem email"} • ${company.phone || "Sem telefone"}</small><br><span class="status ${company.status === "Active" ? "status-active" : "status-inactive"}">${company.status}</span><p><strong>Plano:</strong> ${company.plan || "Sem plano"}</p><p><strong>Usuários:</strong> ${users.length}</p>${users.map(u => `<div class="soft-box"><strong>${u.user_name}</strong><br><small>${u.user_email || ""} • ${u.role}</small></div>`).join("")}<button class="danger-btn" onclick="removeCompany('${company.id}')">Remover Cliente</button></div>`;
+        return `<div class="enterprise-card"><h2>${company.name}</h2><small>${company.email || "Sem email"} • ${company.phone || "Sem telefone"}</small><br><span class="status ${company.status === "Active" ? "status-active" : "status-inactive"}">${company.status}</span><p><strong>Plano:</strong> ${company.plan || "Sem plano"}</p><p><strong>Usuários:</strong> ${users.length}</p>${users.map(u => `<div class="soft-box"><strong>${u.user_name}</strong><br><small>${u.user_email || ""} • ${u.role}</small></div>`).join("")}<button class="danger-btn" onclick="removeCompany('${company.id}')">Remover Client</button></div>`;
       }).join("") || "<div class='card'><p>Nenhum cliente cadastrado.</p></div>"}
     </div>`);
 };
 
 /* ROLE LOGIN V1 - safer schema patches for tested tables */
 async function s2SaveSignature(){
-  const signer = val("s2Signer") || "Cliente";
+  const signer = val("s2Signer") || "Client";
   const signature = val("s2Signature") || "";
   if(!signature.trim()) return alert("Digite a assinatura.");
   const res = await apiInsert("field_signatures", {company_id:"demo-company", work_order_id:"WO-TEST-001", signer_name:signer, signer_role:"Client", signature_text:signature, status:"Signed"});
@@ -5677,7 +5677,7 @@ async function s3CreateAutomationRun(){
   renderExecutiveDashboard();
 }
 async function s3CreateAIInsight(){
-  const res = await apiInsert("ai_insights", {company_id:"demo-company", agent_name:"Operations Advisor", insight_type:"Operations", title:"Projeto com nova atividade", message:"Cliente recebeu atualização com fotos, timeline e próxima etapa.", priority:"Medium", status:"Open"});
+  const res = await apiInsert("ai_insights", {company_id:"demo-company", agent_name:"Operations Advisor", insight_type:"Operations", title:"Projeto com nova atividade", message:"Client recebeu atualização com fotos, timeline e próxima etapa.", priority:"Medium", status:"Open"});
   if(!res.ok) return alert("Não foi possível criar insight. Verifique RLS/colunas de ai_insights.");
   aiInsights = await apiGet("ai_insights");
   alert("Insight criado.");
@@ -5691,10 +5691,10 @@ function ddClientLabelPatch(){
     document.querySelectorAll("option, label, h1, h2, h3, button, span, div, p").forEach(el=>{
       if(el.childNodes.length===1 && el.childNodes[0].nodeType===3){
         el.textContent = el.textContent
-          .replace(/\bEmpresa\b/g,"Cliente")
-          .replace(/\bEmpresas\b/g,"Clientes")
-          .replace(/\bempresa\b/g,"cliente")
-          .replace(/\bempresas\b/g,"clientes");
+          .replace(/\bClient\b/g,"Client")
+          .replace(/\bClients\b/g,"Clients")
+          .replace(/\bclient\b/g,"cliente")
+          .replace(/\bclients\b/g,"clientes");
       }
     });
 
@@ -5703,12 +5703,12 @@ function ddClientLabelPatch(){
       document.querySelectorAll("select").forEach(sel=>{
         const txt = (sel.options[sel.selectedIndex]?.textContent || sel.getAttribute("aria-label") || "").toLowerCase();
         const first = sel.options[0]?.textContent?.toLowerCase() || "";
-        if(first.includes("cliente") || first.includes("empresa")){
+        if(first.includes("cliente") || first.includes("client")){
           if(sel.options.length > 1){
             sel.selectedIndex = 1;
           }
           sel.disabled = true;
-          sel.title = "Cliente conectado pelo login";
+          sel.title = "Client conectado pelo login";
         }
       });
     }
@@ -5726,3 +5726,96 @@ if(typeof ddOldChangePageForClientLabels === "function"){
 }
 document.addEventListener("DOMContentLoaded",()=>setTimeout(ddClientLabelPatch,300));
 setTimeout(ddClientLabelPatch,1000);
+
+
+/* ENGLISH ROLE CONSOLIDATION PATCH V1 */
+(function(){
+  const originalAlert = window.alert;
+  window.alert = function(msg){
+    const text = String(msg || "")
+      .replace(/Selecione a empresa\./gi, "Select a client.")
+      .replace(/Selecione o cliente\./gi, "Select a client.")
+      .replace(/Empresa/gi, "Client")
+      .replace(/Relatório/gi, "Report")
+      .replace(/Assinatura/gi, "Signature");
+    return originalAlert(text);
+  };
+
+  function translateVisibleText(){
+    const map = [
+      [/Empresa/g, "Client"],
+      [/Empresas/g, "Clients"],
+      [/empresa/g, "client"],
+      [/empresas/g, "clients"],
+      [/Centro de Relatórios/g, "Report Center"],
+      [/Novo Relatório/g, "New Report"],
+      [/Preparar Relatório/g, "Prepare Report"],
+      [/Relatório Cliente/g, "Client Report"],
+      [/Relatórios/g, "Reports"],
+      [/Relatório/g, "Report"],
+      [/Voltar/g, "Back"],
+      [/Sair/g, "Logout"]
+    ];
+
+    document.querySelectorAll("body *").forEach(el=>{
+      if(el.childNodes && el.childNodes.length===1 && el.childNodes[0].nodeType===3){
+        let t = el.textContent;
+        map.forEach(([re, rep])=> t = t.replace(re, rep));
+        el.textContent = t;
+      }
+
+      if(el.placeholder){
+        let p = el.placeholder;
+        map.forEach(([re, rep])=> p = p.replace(re, rep));
+        el.placeholder = p;
+      }
+
+      if(el.title){
+        let p = el.title;
+        map.forEach(([re, rep])=> p = p.replace(re, rep));
+        el.title = p;
+      }
+    });
+
+    document.querySelectorAll("option").forEach(opt=>{
+      opt.textContent = opt.textContent
+        .replace(/Empresa/g,"Client")
+        .replace(/Empresas/g,"Clients")
+        .replace(/empresa/g,"client")
+        .replace(/empresas/g,"clients");
+    });
+  }
+
+  function lockClientSelectsForClientRole(){
+    const role = localStorage.getItem("dd_role");
+    const isClient = role === "client";
+    document.querySelectorAll("select").forEach(sel=>{
+      const first = (sel.options[0]?.textContent || "").toLowerCase();
+      if(first.includes("client")){
+        if(isClient && sel.options.length > 1){
+          sel.selectedIndex = 1;
+          sel.disabled = true;
+          sel.dataset.lockedByRole = "client";
+        }
+      }
+    });
+  }
+
+  function runEnglishPatch(){
+    translateVisibleText();
+    lockClientSelectsForClientRole();
+  }
+
+  const oldChangePage = window.changePage;
+  if(typeof oldChangePage === "function"){
+    window.changePage = function(){
+      const result = oldChangePage.apply(this, arguments);
+      setTimeout(runEnglishPatch, 50);
+      setTimeout(runEnglishPatch, 300);
+      return result;
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded",()=>setTimeout(runEnglishPatch,200));
+  setInterval(runEnglishPatch,1500);
+})();
