@@ -1,3 +1,52 @@
+
+/* HARD REMOVE UNSPLASH SOURCE V6 */
+(function(){
+  const SAFE_PROJECT_PHOTO = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E";
+  const BAD_PHOTO_RE = /images\.unsplash\.com\/photo-1599598425947-5b1a1cfacd57|photo-1599598425947-5b1a1cfacd57/i;
+
+  function scrubNode(el){
+    try{
+      if(el.tagName === "IMG"){
+        const src = el.getAttribute("src") || "";
+        if(BAD_PHOTO_RE.test(src)) el.setAttribute("src", SAFE_PROJECT_PHOTO);
+        el.onerror = function(){ this.onerror=null; this.src=SAFE_PROJECT_PHOTO; };
+      }
+      const style = el.getAttribute && (el.getAttribute("style") || "");
+      if(style && BAD_PHOTO_RE.test(style)){
+        el.setAttribute("style", style.replace(BAD_PHOTO_RE, SAFE_PROJECT_PHOTO));
+        if(el.style) el.style.backgroundImage = `url("${SAFE_PROJECT_PHOTO}")`;
+      }
+      if(el.style && BAD_PHOTO_RE.test(el.style.backgroundImage || "")){
+        el.style.backgroundImage = `url("${SAFE_PROJECT_PHOTO}")`;
+      }
+    }catch(e){}
+  }
+
+  function scrubAll(){
+    document.querySelectorAll("img, [style]").forEach(scrubNode);
+  }
+
+  const obs = new MutationObserver(muts=>{
+    muts.forEach(m=>{
+      if(m.target) scrubNode(m.target);
+      m.addedNodes && m.addedNodes.forEach(n=>{
+        if(n.nodeType===1){
+          scrubNode(n);
+          n.querySelectorAll && n.querySelectorAll("img,[style]").forEach(scrubNode);
+        }
+      });
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded",()=>{
+    scrubAll();
+    obs.observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:["src","style"]});
+  });
+  setTimeout(scrubAll,100);
+  setTimeout(scrubAll,500);
+  setTimeout(scrubAll,1500);
+})();
+
 const SUPABASE_URL = "https://phpphqcxzwpuiglkqkls.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBocHBocWN4endwdWlnbGtxa2xzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNDE0NTAsImV4cCI6MjA5NjYxNzQ1MH0.z0F0KAHCWKdRTyg5JeNDzAWEbIdFEknT_kmx4QyMz3I";
 
@@ -447,7 +496,7 @@ function renderDashboard(){
       <div class="v62-photo-grid">
         ${(recentPhotos.length?recentPhotos:[
           {label:"Front yard",url:"https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=600&q=70"},
-          {label:"Lawn",url:"https://images.unsplash.com/photo-1599598425947-5b1a1cfacd57?auto=format&fit=crop&w=600&q=70"},
+          {label:"Lawn",url:"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E?auto=format&fit=crop&w=600&q=70"},
           {label:"Garden",url:"https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=70"},
           {label:"Hedges",url:"https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=600&q=70"}
         ]).map(p=>`
@@ -6261,14 +6310,14 @@ setTimeout(ddClientLabelPatch,1000);
         };
       }
       const src = img.getAttribute("src") || "";
-      if(src.includes("photo-1599598425947-5b1a1cfacd57") || src.includes("images.unsplash.com/photo-1599598425947-5b1a1cfacd57")){
+      if(src.includes("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E") || src.includes("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E")){
         img.src = DD_IMG_FALLBACK;
       }
     });
 
     document.querySelectorAll("[style*='background-image']").forEach(el=>{
       const st = el.getAttribute("style") || "";
-      if(st.includes("photo-1599598425947-5b1a1cfacd57")){
+      if(st.includes("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E")){
         el.style.backgroundImage = `url("${DD_IMG_FALLBACK}")`;
       }
     });
@@ -6355,7 +6404,7 @@ setTimeout(ddClientLabelPatch,1000);
     document.querySelectorAll(".v66-photo-preview, [style*='unsplash'], img").forEach(el=>{
       if(el.tagName === "IMG"){
         const src = el.getAttribute("src") || "";
-        if(src.includes("images.unsplash.com") || src.includes("photo-1599598425947-5b1a1cfacd57")){
+        if(src.includes("images.unsplash.com") || src.includes("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E")){
           el.src = DD_PROJECT_PHOTO_PLACEHOLDER;
         }
         if(!el.dataset.ddNo404){
@@ -6369,7 +6418,7 @@ setTimeout(ddClientLabelPatch,1000);
       }
 
       const bg = el.style && el.style.backgroundImage ? el.style.backgroundImage : "";
-      if(bg.includes("images.unsplash.com") || bg.includes("photo-1599598425947-5b1a1cfacd57")){
+      if(bg.includes("images.unsplash.com") || bg.includes("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E")){
         el.style.backgroundImage = `url("${DD_PROJECT_PHOTO_PLACEHOLDER}")`;
         el.style.backgroundSize = "cover";
         el.style.backgroundPosition = "center";
@@ -6438,4 +6487,80 @@ setTimeout(ddClientLabelPatch,1000);
       return r;
     };
   }
+})();
+
+
+/* DOUBLEDIAMOND V1 COMMERCIAL FINAL */
+(function(){
+  function session(){ try{return JSON.parse(localStorage.getItem("dd_auth_session_v1")||"{}")}catch(e){return {}} }
+  function role(){ const s=session(); return localStorage.getItem("dd_role") || s.role || "client"; }
+  function setRole(r,n,e){ localStorage.setItem("dd_role",r); localStorage.setItem("dd_auth_session_v1",JSON.stringify({role:r,name:n||r,email:e||"",logged_at:new Date().toISOString()})); }
+  function toast(m){ let x=document.getElementById("dd-toast"); if(!x){x=document.createElement("div");x.id="dd-toast";x.style.cssText="position:fixed;right:22px;bottom:22px;background:#10192e;color:#fff;padding:14px 18px;border-radius:16px;z-index:999999;font-weight:800";document.body.appendChild(x)} x.textContent=m; x.style.display="block"; clearTimeout(x.t); x.t=setTimeout(()=>x.style.display="none",2500); }
+
+  function loginScreen(){
+    if(localStorage.getItem("dd_auth_session_v1") || document.getElementById("dd-commercial-login")) return;
+    const div=document.createElement("div");
+    div.id="dd-commercial-login";
+    div.innerHTML=`<div class="dd-login-card">
+      <div class="dd-logo-mark">◆</div>
+      <p class="dd-kicker">DOUBLEDIAMOND COMMAND CENTER</p>
+      <h1>Landscaping Operations Platform</h1>
+      <p class="dd-sub">Client portals, field teams, reports and project visibility.</p>
+      <div class="dd-login-tabs"><button data-r="client" class="active">Client</button><button data-r="employee">Employee</button><button data-r="owner">Owner</button></div>
+      <form id="dd-login-form" autocomplete="on">
+        <input id="dd-login-name" placeholder="Name" autocomplete="name">
+        <input id="dd-login-email" type="email" placeholder="Email" autocomplete="email">
+        <input id="dd-login-password" type="password" placeholder="Password" autocomplete="current-password">
+        <button type="submit">Login</button>
+      </form>
+      <button id="dd-forgot-password" class="dd-link-btn">Forgot password?</button>
+      <p class="dd-login-note">V1 commercial demo. Supabase Auth can replace local session in the next backend sprint.</p>
+    </div>`;
+    document.body.appendChild(div);
+    let r="client";
+    div.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{div.querySelectorAll("[data-r]").forEach(z=>z.classList.remove("active"));b.classList.add("active");r=b.dataset.r});
+    div.querySelector("#dd-login-form").onsubmit=e=>{e.preventDefault();setRole(r,div.querySelector("#dd-login-name").value.trim()||r,div.querySelector("#dd-login-email").value.trim());div.remove();toast("Logged in as "+r.toUpperCase());setTimeout(()=>{if(r==="client"&&typeof changePage==="function")changePage("clientPortal"); if(r==="employee"&&typeof changePage==="function")changePage("field"); apply();},100)};
+    div.querySelector("#dd-forgot-password").onclick=()=>toast((div.querySelector("#dd-login-email").value.trim())?"Password reset instructions prepared.":"Enter your email first.");
+  }
+
+  function brand(){
+    document.querySelectorAll("body *").forEach(el=>{
+      if(el.childNodes&&el.childNodes.length===1&&el.childNodes[0].nodeType===3){
+        el.textContent=el.textContent.replace(/DoubleDiamond Platform/g,"DoubleDiamond Command Center").replace(/Field Service Platform/g,"Landscaping Operations Platform").replace(/Cliente/g,"Client").replace(/Relatorio|Reporte/g,"Report").replace(/Financeiro/g,"Financial");
+      }
+    });
+    const badges=[...document.querySelectorAll("span,button,[data-role-final-badge]")].filter(el=>["CLIENT","OWNER","EMPLOYEE"].includes((el.textContent||"").trim().toUpperCase()));
+    const seen={}; badges.forEach(el=>{let k=el.textContent.trim().toUpperCase(); if(seen[k]) el.style.display="none"; else seen[k]=1;});
+  }
+
+  function permissions(){
+    const r=role(); document.body.dataset.ddRole=r;
+    const blocked={client:["work orders","routes","field","workforce","weather","mobile ready","pwa","finance","intelligence","administration","command center","owner"],employee:["finance","intelligence","administration","owner"]};
+    document.querySelectorAll("a,button,.nav-item,[onclick]").forEach(el=>{
+      const t=(el.textContent||"").toLowerCase();
+      if((blocked[r]||[]).some(w=>t.includes(w))){el.style.display="none";el.dataset.ddBlocked="true";}
+    });
+  }
+
+  function clientManagement(){
+    if(role()!=="owner" || document.getElementById("dd-client-management-panel")) return;
+    const txt=(document.body.textContent||"").toLowerCase();
+    if(!txt.includes("client") && !txt.includes("crm")) return;
+    const target=document.querySelector(".card,.panel,.section-card,main,#pageContent")||document.body;
+    const p=document.createElement("section"); p.id="dd-client-management-panel"; p.className="card dd-client-management";
+    p.innerHTML=`<h2>Client Management</h2><p>Create and manage client portal access for V1.</p>
+      <div class="dd-client-grid"><input id="dd-new-client-name" placeholder="Client name"><input id="dd-new-client-email" type="email" placeholder="Client email"><input id="dd-new-client-project" placeholder="Project name"><button id="dd-add-client-btn">Add Client</button></div><div id="dd-client-list"></div>`;
+    target.prepend(p);
+    function load(){let arr=JSON.parse(localStorage.getItem("dd_clients_v1")||"[]");let box=p.querySelector("#dd-client-list");box.innerHTML=arr.length?arr.map((c,i)=>`<div class="dd-client-row"><strong>${c.name}</strong><span>${c.email||"No email"}</span><span>${c.project||"No project"}</span><button data-i="${i}">Delete</button></div>`).join(""):"<p class='dd-empty'>No clients created yet.</p>";box.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{arr.splice(+b.dataset.i,1);localStorage.setItem("dd_clients_v1",JSON.stringify(arr));load()})}
+    p.querySelector("#dd-add-client-btn").onclick=()=>{let name=p.querySelector("#dd-new-client-name").value.trim(); if(!name)return toast("Client name is required."); let arr=JSON.parse(localStorage.getItem("dd_clients_v1")||"[]"); arr.push({name,email:p.querySelector("#dd-new-client-email").value.trim(),project:p.querySelector("#dd-new-client-project").value.trim(),created_at:new Date().toISOString()}); localStorage.setItem("dd_clients_v1",JSON.stringify(arr));toast("Client created.");load()};
+    load();
+  }
+
+  function logout(){
+    document.querySelectorAll("button,a").forEach(el=>{if((el.textContent||"").trim().toLowerCase()==="logout"&&!el.dataset.ddLogoutFinal){el.dataset.ddLogoutFinal=1;el.addEventListener("click",e=>{e.preventDefault();localStorage.removeItem("dd_role");localStorage.removeItem("dd_auth_session_v1");location.href=location.pathname+"?v=v1-commercial-final"},true)}});
+  }
+  function apply(){permissions();brand();clientManagement();logout();}
+  const old=window.changePage; if(typeof old==="function"){window.changePage=function(){let r=old.apply(this,arguments);setTimeout(apply,100);setTimeout(apply,500);return r}}
+  document.addEventListener("DOMContentLoaded",()=>{setTimeout(loginScreen,100);setTimeout(apply,400)});
+  setTimeout(apply,1000); setInterval(apply,15000);
 })();
