@@ -533,21 +533,21 @@ function renderEmpresas(){
     <div class="foundation-note">V14 Multiempresa: camada inicial para SaaS.</div>
 
     <div class="card">
-      <h2>Nova Empresa</h2>
+      <h2>Novo Cliente</h2>
       <div class="form-grid">
-        <input id="companyName" placeholder="Nome da empresa">
+        <input id="companyName" placeholder="Nome do cliente">
         <input id="companyEmail" placeholder="Email">
         <input id="companyPhone" placeholder="Telefone">
         <select id="companyPlan"><option>Starter</option><option>Professional</option><option>Enterprise</option></select>
         <select id="companyStatus"><option>Active</option><option>Inactive</option><option>Trial</option></select>
       </div>
-      <button class="primary-btn" onclick="addCompany()">Adicionar Empresa</button>
+      <button class="primary-btn" onclick="addCompany()">Cadastrar Cliente</button>
     </div>
 
     <div class="card">
-      <h2>Usuário da Empresa</h2>
+      <h2>Usuário do Cliente</h2>
       <div class="form-grid">
-        <select id="companyUserCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="companyUserCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="companyUserName" placeholder="Nome do usuário">
         <input id="companyUserEmail" placeholder="Email do usuário">
         <select id="companyUserRole"><option>Owner</option><option>Manager</option><option>Employee</option><option>Client</option></select>
@@ -569,7 +569,7 @@ function renderEmpresas(){
             <button class="danger-btn" onclick="removeCompany('${company.id}')">Remover Empresa</button>
           </div>
         `;
-      }).join("") || "<div class='card'><p>Nenhuma empresa cadastrada.</p></div>"}
+      }).join("") || "<div class='card'><p>Nenhuma cliente cadastrada.</p></div>"}
     </div>
   `);
 }
@@ -633,7 +633,7 @@ function renderIntegrationHub(){
     <div class="card">
       <h2>Nova Conexão</h2>
       <div class="form-grid">
-        <select id="integrationCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="integrationCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <select id="integrationProvider"><option value="">Provider</option>${integrationProviders.map(p => `<option value="${p.name}">${p.name}</option>`).join("")}</select>
         <select id="integrationStatus"><option>Disconnected</option><option>Connected</option><option>Error</option></select>
       </div>
@@ -766,8 +766,8 @@ async function generateAIInsights(){
     insights.push({
       agent_name: "CEO Advisor",
       insight_type: "SaaS",
-      title: "Multiempresa sem empresa cadastrada",
-      message: "Crie a primeira empresa para iniciar a preparação SaaS.",
+      title: "Multiempresa sem cliente cadastrada",
+      message: "Crie a primeira cliente para iniciar a preparação SaaS.",
       priority: "Medium",
       status: "Open"
     });
@@ -855,7 +855,7 @@ function renderRealIntegrations(){
       <h2>Adicionar Ação na Fila</h2>
       <div class="form-grid">
         <select id="queueCompany">
-          <option value="">Empresa</option>
+          <option value="">Cliente</option>
           ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
         </select>
         <select id="queueProvider">
@@ -941,7 +941,7 @@ function renderCredentialManager(){
       <h2>Registrar Credencial</h2>
       <div class="form-grid">
         <select id="credCompany">
-          <option value="">Empresa</option>
+          <option value="">Cliente</option>
           ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
         </select>
         <select id="credProvider">
@@ -1248,7 +1248,7 @@ function renderAutomationCenter(){
       <h2>Nova Automação</h2>
       <div class="form-grid">
         <select id="autoCompany">
-          <option value="">Empresa</option>
+          <option value="">Cliente</option>
           ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
         </select>
         <input id="autoName" placeholder="Nome da automação">
@@ -1304,7 +1304,7 @@ function renderReportCenter(){
       <h2>Novo Relatório</h2>
       <div class="form-grid">
         <select id="reportCompany">
-          <option value="">Empresa</option>
+          <option value="">Cliente</option>
           ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
         </select>
         <input id="reportName" placeholder="Nome do relatório">
@@ -1358,7 +1358,7 @@ function renderMobileReady(){
       <h2>Configuração Mobile</h2>
       <div class="form-grid">
         <select id="mobileCompany">
-          <option value="">Empresa</option>
+          <option value="">Cliente</option>
           ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}
         </select>
         <select id="pwaEnabled"><option value="true">PWA ON</option><option value="false">PWA OFF</option></select>
@@ -1507,7 +1507,7 @@ function renderPwaCenter(){
     <div class="card">
       <h2>PWA Settings</h2>
       <div class="form-grid">
-        <select id="pwaCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="pwaCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="pwaAppName" placeholder="Nome do app" value="DoubleDiamond">
         <input id="pwaShortName" placeholder="Nome curto" value="DD">
         <input id="pwaTheme" placeholder="Theme color" value="#2563eb">
@@ -1519,7 +1519,7 @@ function renderPwaCenter(){
     <div class="card">
       <h2>Cache Offline</h2>
       <div class="form-grid">
-        <select id="cacheCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="cacheCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="cacheKey" placeholder="Cache Key. Ex: projects">
         <select id="cacheModule"><option>Clientes</option><option>Projetos</option><option>Agenda</option><option>Tarefas</option><option>Ordens</option></select>
         <select id="cacheStatus"><option>Ready</option><option>Syncing</option><option>Error</option></select>
@@ -1530,7 +1530,7 @@ function renderPwaCenter(){
     <div class="card">
       <h2>Push Template</h2>
       <div class="form-grid">
-        <select id="pushCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="pushCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="pushName" placeholder="Nome template">
         <input id="pushTrigger" placeholder="Trigger. Ex: Task Assigned">
         <input id="pushTitle" placeholder="Título">
@@ -1616,7 +1616,7 @@ function renderRoutePlanning(){
     <div class="card">
       <h2>Nova Rota</h2>
       <div class="form-grid">
-        <select id="routeCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="routeCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="routeName" placeholder="Nome da rota">
         <input id="routeAssigned" placeholder="Responsável">
         <input id="routeDate" type="date">
@@ -1704,7 +1704,7 @@ function renderWeatherCenter(){
     <div class="card">
       <h2>Novo Alerta Climático</h2>
       <div class="form-grid">
-        <select id="weatherCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="weatherCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="weatherLocation" placeholder="Local">
         <select id="weatherType"><option>Rain</option><option>Storm</option><option>Heat</option><option>Snow</option><option>Wind</option></select>
         <select id="weatherSeverity"><option>Low</option><option>Medium</option><option>Critical</option></select>
@@ -1761,7 +1761,7 @@ function renderMobileWorkforce(){
     <div class="card">
       <h2>Nova Tarefa de Campo</h2>
       <div class="form-grid">
-        <select id="mwCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="mwCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="mwEmployee" placeholder="Funcionário">
         <input id="mwTitle" placeholder="Tarefa">
         <input id="mwProject" placeholder="Projeto">
@@ -1774,7 +1774,7 @@ function renderMobileWorkforce(){
     <div class="card">
       <h2>GPS Check-in</h2>
       <div class="form-grid">
-        <select id="gpsCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="gpsCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="gpsEmployee" placeholder="Funcionário">
         <input id="gpsProject" placeholder="Projeto">
         <select id="gpsType"><option>IN</option><option>OUT</option></select>
@@ -1788,7 +1788,7 @@ function renderMobileWorkforce(){
     <div class="card">
       <h2>Foto de Campo</h2>
       <div class="form-grid">
-        <select id="photoCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="photoCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="photoProject" placeholder="Projeto">
         <input id="photoEmployee" placeholder="Funcionário">
         <select id="photoType"><option>Before</option><option>During</option><option>After</option><option>Problem</option><option>Material</option></select>
@@ -1877,7 +1877,7 @@ function renderWorkOrders(){
     <div class="card">
       <h2>Nova Ordem de Serviço</h2>
       <div class="form-grid">
-        <select id="woCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="woCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="woNumber" placeholder="Número OS">
         <input id="woClient" placeholder="Cliente">
         <input id="woProject" placeholder="Projeto">
@@ -2113,7 +2113,7 @@ function renderAnalyticsCenter(){
     <div class="card">
       <h2>Novo Ranking</h2>
       <div class="form-grid">
-        <select id="rankingCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="rankingCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <select id="rankingType"><option>Top Cliente</option><option>Top Serviço</option><option>Top Projeto</option><option>Top Funcionário</option><option>Top Receita</option></select>
         <input id="rankingEntity" placeholder="Nome">
         <input id="rankingValue" type="number" placeholder="Valor">
@@ -2224,7 +2224,7 @@ function renderProfitabilityEngine(){
     <div class="card">
       <h2>Novo Registro de Lucratividade</h2>
       <div class="form-grid">
-        <select id="profitCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="profitCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <select id="profitType"><option>Cliente</option><option>Projeto</option><option>Serviço</option><option>Operação</option></select>
         <input id="profitName" placeholder="Nome">
         <input id="profitRevenue" type="number" placeholder="Receita">
@@ -2409,7 +2409,7 @@ function renderMapsReal(){
     <div class="card">
       <h2>Nova Rota Google Maps</h2>
       <div class="form-grid">
-        <select id="mapsCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="mapsCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <select id="mapsRoutePlan"><option value="">Route Plan opcional</option>${typeof routePlans !== "undefined" ? routePlans.map(r => `<option value="${r.id}">${r.route_name}</option>`).join("") : ""}</select>
         <input id="mapsOrigin" placeholder="Origem">
         <input id="mapsDestination" placeholder="Destino">
@@ -2442,7 +2442,7 @@ function renderWhatsAppReal(){
     <div class="card">
       <h2>Adicionar Mensagem WhatsApp</h2>
       <div class="form-grid">
-        <select id="waCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="waCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="waPhone" placeholder="Telefone com DDI. Ex: 5511999999999">
         <input id="waTemplate" placeholder="Template. Ex: payment_reminder">
       </div>
@@ -2474,7 +2474,7 @@ function renderGmailReal(){
     <div class="card">
       <h2>Novo Email</h2>
       <div class="form-grid">
-        <select id="gmailCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="gmailCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="gmailTo" placeholder="Email destino">
         <input id="gmailSubject" placeholder="Assunto">
       </div>
@@ -2505,7 +2505,7 @@ function renderPushReal(){
     <div class="card">
       <h2>Nova Push Notification</h2>
       <div class="form-grid">
-        <select id="pushRealCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="pushRealCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="pushTarget" placeholder="Usuário alvo">
         <input id="pushRealTitle" placeholder="Título">
       </div>
@@ -2536,7 +2536,7 @@ function renderAutomationFlowsReal(){
     <div class="card">
       <h2>Novo Flow Template</h2>
       <div class="form-grid">
-        <select id="flowCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="flowCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="flowName" placeholder="Nome do fluxo">
         <input id="flowTrigger" placeholder="Trigger. Ex: Quote Approved">
         <select id="flowStatus"><option>Active</option><option>Paused</option><option>Error</option></select>
@@ -2603,7 +2603,7 @@ function renderMapsReal(){
     <div class="card">
       <h2>Nova Rota</h2>
       <div class="form-grid">
-        <select id="mapsCompany"><option value="">Empresa</option>${companyOptionsReal()}</select>
+        <select id="mapsCompany"><option value="">Cliente</option>${companyOptionsReal()}</select>
         <input id="mapsOrigin" placeholder="Origem">
         <input id="mapsDestination" placeholder="Destino">
         <select id="mapsMode"><option>driving</option><option>walking</option><option>bicycling</option><option>transit</option></select>
@@ -2658,7 +2658,7 @@ function renderWhatsAppReal(){
     <div class="card">
       <h2>Nova Mensagem</h2>
       <div class="form-grid">
-        <select id="waCompany"><option value="">Empresa</option>${companyOptionsReal()}</select>
+        <select id="waCompany"><option value="">Cliente</option>${companyOptionsReal()}</select>
         <input id="waPhone" placeholder="Telefone com DDI. Ex: 5511999999999">
         <input id="waTemplate" placeholder="Template. Ex: payment_reminder">
       </div>
@@ -2719,7 +2719,7 @@ function renderGmailReal(){
     <div class="card">
       <h2>Novo Email</h2>
       <div class="form-grid">
-        <select id="gmailCompany"><option value="">Empresa</option>${companyOptionsReal()}</select>
+        <select id="gmailCompany"><option value="">Cliente</option>${companyOptionsReal()}</select>
         <input id="gmailTo" placeholder="Email destino">
         <input id="gmailSubject" placeholder="Assunto">
       </div>
@@ -2779,7 +2779,7 @@ function renderPushReal(){
     <div class="card">
       <h2>Nova Push</h2>
       <div class="form-grid">
-        <select id="pushRealCompany"><option value="">Empresa</option>${companyOptionsReal()}</select>
+        <select id="pushRealCompany"><option value="">Cliente</option>${companyOptionsReal()}</select>
         <input id="pushTarget" placeholder="Usuário alvo">
         <input id="pushRealTitle" placeholder="Título">
       </div>
@@ -2839,7 +2839,7 @@ function renderAutomationFlowsReal(){
     <div class="card">
       <h2>Novo Flow Template</h2>
       <div class="form-grid">
-        <select id="flowCompany"><option value="">Empresa</option>${companyOptionsReal()}</select>
+        <select id="flowCompany"><option value="">Cliente</option>${companyOptionsReal()}</select>
         <input id="flowName" placeholder="Nome do fluxo">
         <input id="flowTrigger" placeholder="Trigger. Ex: Quote Approved">
         <select id="flowStatus"><option>Active</option><option>Paused</option><option>Error</option></select>
@@ -3443,7 +3443,7 @@ function renderAILeadScoring(){
     <div class="card">
       <h2>Gerar Score Manual</h2>
       <div class="form-grid">
-        <select id="leadScoreCompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <select id="leadScoreCompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
         <input id="leadScoreName" placeholder="Nome do lead">
         <input id="leadScoreBudget" type="number" placeholder="Orçamento estimado">
         <select id="leadScoreUrgency"><option>Baixa</option><option>Média</option><option>Alta</option></select>
@@ -3504,7 +3504,7 @@ async function generateAILeadScore(){
 
 async function generateLeadScoresFromExisting(){
   const companyId = getFirstCompanyIdAI();
-  if(!companyId) return alert("Crie uma empresa primeiro.");
+  if(!companyId) return alert("Crie uma cliente primeiro.");
 
   const source = typeof leads !== "undefined" ? leads : [];
   if(!source.length) return alert("Nenhum lead encontrado.");
@@ -3535,7 +3535,7 @@ function renderAIQuoteGenerator(){
     <div class="card">
       <h2>Novo Orçamento AI</h2>
       <div class="form-grid">
-        <select id="quoteAICompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <select id="quoteAICompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
         <input id="quoteAIClient" placeholder="Cliente">
         <input id="quoteAIService" placeholder="Serviço">
         <input id="quoteAIArea" type="number" placeholder="Área/quantidade">
@@ -3592,7 +3592,7 @@ function renderAIProjectRisk(){
     <div class="card">
       <h2>Analisar Projeto</h2>
       <div class="form-grid">
-        <select id="riskCompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <select id="riskCompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
         <input id="riskProject" placeholder="Projeto">
         <input id="riskPending" type="number" placeholder="Pendências">
         <input id="riskDelay" type="number" placeholder="Dias de atraso">
@@ -3664,7 +3664,7 @@ function renderAIFinancialAdvisor(){
 
 async function generateFinancialAdvice(){
   const companyId = getFirstCompanyIdAI();
-  if(!companyId) return alert("Crie uma empresa primeiro.");
+  if(!companyId) return alert("Crie uma cliente primeiro.");
 
   const invoicesTotal = typeof invoices !== "undefined" ? invoices.reduce((s,i) => s + Number(i.amount || 0), 0) : 0;
   const paid = typeof payments !== "undefined" ? payments.filter(p => p.status === "Paid").reduce((s,p) => s + Number(p.amount || 0), 0) : 0;
@@ -3702,7 +3702,7 @@ function renderAIWorkforcePlanner(){
     <div class="card">
       <h2>Nova Sugestão de Equipe</h2>
       <div class="form-grid">
-        <select id="workforceCompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <select id="workforceCompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
         <input id="workforceEmployee" placeholder="Funcionário">
         <input id="workforceFocus" placeholder="Foco/Tarefa">
         <select id="workforcePriority"><option>Normal</option><option>High</option><option>Urgent</option></select>
@@ -3752,7 +3752,7 @@ function renderAIRouteOptimization(){
     <div class="card">
       <h2>Gerar Otimização de Rota</h2>
       <div class="form-grid">
-        <select id="routeOptCompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <select id="routeOptCompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
         <input id="routeOptName" placeholder="Nome da rota">
         <input id="routeOptStops" type="number" placeholder="Quantidade de paradas">
       </div>
@@ -3804,7 +3804,7 @@ function renderAIWeatherImpact(){
     <div class="card">
       <h2>Novo Impacto Climático</h2>
       <div class="form-grid">
-        <select id="weatherAICompany"><option value="">Empresa</option>${getCompanyOptionsAI()}</select>
+        <select id="weatherAICompany"><option value="">Cliente</option>${getCompanyOptionsAI()}</select>
         <input id="weatherAILocation" placeholder="Local">
         <select id="weatherAILevel"><option>Low</option><option>Medium</option><option>High</option></select>
         <input id="weatherAIWork" placeholder="Trabalho afetado">
@@ -3874,7 +3874,7 @@ function renderAIExecutiveReports(){
 
 async function generateExecutiveReportAI(){
   const companyId = getFirstCompanyIdAI();
-  if(!companyId) return alert("Crie uma empresa primeiro.");
+  if(!companyId) return alert("Crie uma cliente primeiro.");
 
   const res = await apiInsert("ai_executive_reports", {
     company_id: companyId,
@@ -3918,7 +3918,7 @@ function renderAIAutomationRecommendations(){
 
 async function generateAutomationRecommendations(){
   const companyId = getFirstCompanyIdAI();
-  if(!companyId) return alert("Crie uma empresa primeiro.");
+  if(!companyId) return alert("Crie uma cliente primeiro.");
 
   const items = [
     ["Cobrança automática", "Invoice Overdue", "Send WhatsApp + Gmail", "Reduz inadimplência e tempo manual.", "High"],
@@ -3977,7 +3977,7 @@ function renderAICommandCenter(){
 
 async function runAICommand(){
   const companyId = getFirstCompanyIdAI();
-  if(!companyId) return alert("Crie uma empresa primeiro.");
+  if(!companyId) return alert("Crie uma cliente primeiro.");
 
   const command = val("aiCommandText").trim();
   if(!command) return alert("Digite um comando.");
@@ -4066,7 +4066,7 @@ function renderAILeadScoring(){
     <div class="card">
       <h2>Gerar Score</h2>
       <div class="form-grid">
-        <select id="leadScoreCompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <select id="leadScoreCompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
         <input id="leadScoreName" placeholder="Nome do lead">
         <input id="leadScoreBudget" type="number" placeholder="Orçamento estimado">
         <select id="leadScoreUrgency"><option>Baixa</option><option>Média</option><option>Alta</option></select>
@@ -4110,7 +4110,7 @@ function renderAIQuoteGenerator(){
     <div class="card">
       <h2>Novo Orçamento AI</h2>
       <div class="form-grid">
-        <select id="quoteAICompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <select id="quoteAICompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
         <input id="quoteAIClient" placeholder="Cliente">
         <input id="quoteAIService" placeholder="Serviço">
         <input id="quoteAIArea" type="number" placeholder="Área/quantidade">
@@ -4154,7 +4154,7 @@ function renderAIProjectRisk(){
     <div class="card">
       <h2>Analisar Projeto</h2>
       <div class="form-grid">
-        <select id="riskCompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <select id="riskCompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
         <input id="riskProject" placeholder="Projeto">
         <input id="riskPending" type="number" placeholder="Pendências">
         <input id="riskDelay" type="number" placeholder="Dias de atraso">
@@ -4209,7 +4209,7 @@ function renderAIFinancialAdvisor(){
 
 async function generateFinancialAdvice(){
   const companyId = ddAIFirstCompany();
-  if(!companyId) return alert("Crie uma empresa primeiro.");
+  if(!companyId) return alert("Crie uma cliente primeiro.");
   const invoicesTotal = typeof invoices !== "undefined" ? invoices.reduce((s,i) => s + Number(i.amount || 0), 0) : 0;
   const paid = typeof payments !== "undefined" ? payments.filter(p => p.status === "Paid").reduce((s,p) => s + Number(p.amount || 0), 0) : 0;
   const open = invoicesTotal - paid;
@@ -4233,7 +4233,7 @@ function renderAIWorkforcePlanner(){
     <div class="card">
       <h2>Nova Sugestão</h2>
       <div class="form-grid">
-        <select id="workforceCompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <select id="workforceCompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
         <input id="workforceEmployee" placeholder="Funcionário">
         <input id="workforceFocus" placeholder="Foco/Tarefa">
         <select id="workforcePriority"><option>Normal</option><option>High</option><option>Urgent</option></select>
@@ -4268,7 +4268,7 @@ function renderAIRouteOptimization(){
     <div class="card">
       <h2>Nova Otimização</h2>
       <div class="form-grid">
-        <select id="routeOptCompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <select id="routeOptCompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
         <input id="routeOptName" placeholder="Nome da rota">
         <input id="routeOptStops" type="number" placeholder="Quantidade de paradas">
       </div>
@@ -4303,7 +4303,7 @@ function renderAIWeatherImpact(){
     <div class="card">
       <h2>Novo Impacto</h2>
       <div class="form-grid">
-        <select id="weatherAICompany"><option value="">Empresa</option>${ddAICompanyOptions()}</select>
+        <select id="weatherAICompany"><option value="">Cliente</option>${ddAICompanyOptions()}</select>
         <input id="weatherAILocation" placeholder="Local">
         <select id="weatherAILevel"><option>Low</option><option>Medium</option><option>High</option></select>
         <input id="weatherAIWork" placeholder="Trabalho afetado">
@@ -4342,7 +4342,7 @@ function renderAIExecutiveReports(){
 
 async function generateExecutiveReportAI(){
   const companyId = ddAIFirstCompany();
-  if(!companyId) return alert("Crie uma empresa primeiro.");
+  if(!companyId) return alert("Crie uma cliente primeiro.");
   const res = await apiInsert("ai_executive_reports", {
     company_id: companyId,
     report_title:"AI Executive Report",
@@ -4368,7 +4368,7 @@ function renderAIAutomationRecommendations(){
 
 async function generateAutomationRecommendations(){
   const companyId = ddAIFirstCompany();
-  if(!companyId) return alert("Crie uma empresa primeiro.");
+  if(!companyId) return alert("Crie uma cliente primeiro.");
   const items = [
     ["Cobrança automática", "Invoice Overdue", "Send WhatsApp + Gmail", "Reduz inadimplência.", "High"],
     ["Lembrete de visita", "Appointment Tomorrow", "Send Push + WhatsApp", "Reduz esquecimento.", "Medium"],
@@ -4403,7 +4403,7 @@ function renderAICommandCenter(){
 
 async function runAICommand(){
   const companyId = ddAIFirstCompany();
-  if(!companyId) return alert("Crie uma empresa primeiro.");
+  if(!companyId) return alert("Crie uma cliente primeiro.");
   const command = val("aiCommandText").trim();
   if(!command) return alert("Digite um comando.");
   const lower = command.toLowerCase();
@@ -4490,7 +4490,7 @@ function renderRoleExperience(){
     <div class="card">
       <h2>Criar usuário de teste</h2>
       <div class="form-grid">
-        <select id="roleUserCompany"><option value="">Empresa</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        <select id="roleUserCompany"><option value="">Cliente</option>${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join("")}</select>
         <input id="roleUserName" placeholder="Nome">
         <input id="roleUserEmail" placeholder="Email">
         <select id="roleUserRole"><option value="owner">owner</option><option value="employee">employee</option><option value="client">client</option></select>
@@ -4538,7 +4538,7 @@ function renderOwnerHome(){
   setContent(`
     <div class="role-hero">
       <h2>👑 Business Command Center</h2>
-      <p>Como está sua empresa hoje?</p>
+      <p>Como está sua cliente hoje?</p>
     </div>
 
     <div class="cards">
@@ -5683,3 +5683,46 @@ async function s3CreateAIInsight(){
   alert("Insight criado.");
   renderExecutiveDashboard();
 }
+
+
+/* CLIENT LABEL + REPORT LOCK PATCH V1 */
+function ddClientLabelPatch(){
+  try{
+    document.querySelectorAll("option, label, h1, h2, h3, button, span, div, p").forEach(el=>{
+      if(el.childNodes.length===1 && el.childNodes[0].nodeType===3){
+        el.textContent = el.textContent
+          .replace(/\bEmpresa\b/g,"Cliente")
+          .replace(/\bEmpresas\b/g,"Clientes")
+          .replace(/\bempresa\b/g,"cliente")
+          .replace(/\bempresas\b/g,"clientes");
+      }
+    });
+
+    const role = localStorage.getItem("dd_role");
+    if(role === "client"){
+      document.querySelectorAll("select").forEach(sel=>{
+        const txt = (sel.options[sel.selectedIndex]?.textContent || sel.getAttribute("aria-label") || "").toLowerCase();
+        const first = sel.options[0]?.textContent?.toLowerCase() || "";
+        if(first.includes("cliente") || first.includes("empresa")){
+          if(sel.options.length > 1){
+            sel.selectedIndex = 1;
+          }
+          sel.disabled = true;
+          sel.title = "Cliente conectado pelo login";
+        }
+      });
+    }
+  }catch(e){ console.warn("ddClientLabelPatch", e); }
+}
+
+const ddOldChangePageForClientLabels = window.changePage;
+if(typeof ddOldChangePageForClientLabels === "function"){
+  window.changePage = function(){
+    const result = ddOldChangePageForClientLabels.apply(this, arguments);
+    setTimeout(ddClientLabelPatch, 50);
+    setTimeout(ddClientLabelPatch, 500);
+    return result;
+  };
+}
+document.addEventListener("DOMContentLoaded",()=>setTimeout(ddClientLabelPatch,300));
+setTimeout(ddClientLabelPatch,1000);

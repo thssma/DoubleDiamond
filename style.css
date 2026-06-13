@@ -1100,3 +1100,136 @@ body{ background:linear-gradient(180deg,#fbf8f1 0%, #eef2f7 100%); }
 .dd-staff-box{display:none;position:fixed;right:18px;bottom:72px;width:280px;background:#fff;border-radius:22px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.35)}.dd-staff-box.is-visible{display:block}.dd-staff-box h3{margin:0 0 12px}.dd-staff-box small{color:#64748b;display:block;margin-top:8px}
 .dd-session-pill,.dd-back-btn,.dd-logout-btn{border:1px solid #bbf7d0;background:#dcfce7;color:#166534;border-radius:999px;padding:8px 12px;font-weight:900}.dd-back-btn,.dd-logout-btn{cursor:pointer;background:#fff}.dd-logout-btn{border-color:#fecaca;color:#991b1b}
 @media(max-width:760px){.dd-login-card{padding:22px}.dd-login-card h1{font-size:28px}.dd-session-pill{display:none}.top-actions{gap:6px;flex-wrap:wrap}.dd-back-btn,.dd-logout-btn{padding:7px 10px;font-size:12px}}
+
+
+/* LOVABLE MVP INSPIRED DESIGN PATCH V1 - Keeps original app functionality */
+:root{
+  --dd-bg:#f5f3ee;
+  --dd-card:#ffffff;
+  --dd-ink:#172033;
+  --dd-muted:#667085;
+  --dd-line:#e5e7eb;
+  --dd-navy:#10192e;
+  --dd-green:#14532d;
+  --dd-grass:#22c55e;
+  --dd-gold:#a38b5f;
+}
+body{
+  background:var(--dd-bg)!important;
+  color:var(--dd-ink);
+}
+.sidebar{
+  background:linear-gradient(180deg,#0d1728,#0b3b25)!important;
+  box-shadow:8px 0 30px rgba(15,23,42,.12);
+}
+.sidebar .active,.nav-item.active{
+  background:#16a34a!important;
+  color:#fff!important;
+  border-radius:12px!important;
+}
+#pageContent,.main-content,main{
+  background:var(--dd-bg)!important;
+}
+.hero,.executive-hero,.client-hero,.command-hero,.v651-hero{
+  background:linear-gradient(135deg,#10192e,#14532d)!important;
+  border-radius:28px!important;
+  color:#fff!important;
+  box-shadow:0 18px 42px rgba(15,23,42,.18)!important;
+}
+.card,.kpi-card,.metric-card,.report-card,.final-card,.panel,.section-card{
+  background:var(--dd-card)!important;
+  border:1px solid var(--dd-line)!important;
+  border-radius:22px!important;
+  box-shadow:0 14px 32px rgba(15,23,42,.08)!important;
+}
+button,.primary-btn,.success-btn,.secondary-btn{
+  border-radius:14px!important;
+  font-weight:800!important;
+}
+input,select,textarea{
+  border-radius:12px!important;
+  border:1px solid #cbd5e1!important;
+}
+.page-title,h1{
+  color:#111827!important;
+  letter-spacing:-.04em;
+}
+.top-pill,.role-pill,.badge{
+  border-radius:999px!important;
+}
+
+/* Mobile / tablet commercial layout */
+@media(max-width:900px){
+  body{
+    overflow-x:hidden;
+  }
+  .sidebar{
+    position:relative!important;
+    width:100%!important;
+    min-height:auto!important;
+    display:block!important;
+    border-radius:0 0 22px 22px;
+    padding-bottom:10px!important;
+  }
+  .sidebar .brand,.brand{
+    padding:14px 18px!important;
+  }
+  .sidebar nav,.sidebar-menu{
+    display:flex!important;
+    overflow-x:auto!important;
+    gap:8px!important;
+    padding:8px 14px 14px!important;
+    scrollbar-width:none;
+  }
+  .sidebar nav::-webkit-scrollbar,.sidebar-menu::-webkit-scrollbar{
+    display:none;
+  }
+  .nav-section-title,.sidebar .section-title,.sidebar .group-title{
+    display:none!important;
+  }
+  .nav-item,.sidebar a,.sidebar button{
+    white-space:nowrap!important;
+    flex:0 0 auto!important;
+    padding:10px 14px!important;
+    border-radius:14px!important;
+  }
+  .main,.main-content,#app,.content{
+    margin-left:0!important;
+    width:100%!important;
+    padding:16px!important;
+  }
+  .topbar,.header-actions{
+    position:sticky!important;
+    top:0!important;
+    z-index:50!important;
+    background:rgba(245,243,238,.92)!important;
+    backdrop-filter:blur(10px)!important;
+    padding:10px!important;
+  }
+  .grid,.cards-grid,.kpi-grid,.dashboard-grid{
+    grid-template-columns:1fr 1fr!important;
+    gap:12px!important;
+  }
+  .hero,.executive-hero,.client-hero,.command-hero,.v651-hero{
+    border-radius:24px!important;
+    padding:22px!important;
+  }
+  .card,.kpi-card,.metric-card,.report-card,.final-card,.panel,.section-card{
+    border-radius:18px!important;
+    padding:16px!important;
+  }
+}
+@media(max-width:560px){
+  .grid,.cards-grid,.kpi-grid,.dashboard-grid{
+    grid-template-columns:1fr!important;
+  }
+  h1,.page-title{
+    font-size:28px!important;
+  }
+  h2{
+    font-size:22px!important;
+  }
+  .hero h1,.hero h2,.command-hero h1,.command-hero h2{
+    font-size:30px!important;
+  }
+}
