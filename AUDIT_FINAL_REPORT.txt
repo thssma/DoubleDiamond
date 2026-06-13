@@ -1,0 +1,28 @@
+DoubleDiamond V1 Commercial Audit Clean
+
+Correções aplicadas nesta versão:
+1. Corrigido campo de senha do Staff Access dentro de <form>.
+2. Mantida tela de login comercial.
+3. Reduzidos loops/intervalos de 15s para 30s.
+4. Limpeza adicional de textos PT/EN residuais.
+5. Remoção agressiva da URL quebrada do Unsplash.
+6. Mantido Role-Based Access:
+   - Client: Client Portal + Reports
+   - Employee: Operations
+   - Owner: Full Access
+7. Mantido Client Management para Owner.
+8. Mantido Password Reset placeholder.
+9. Mantidas correções de Reports e Client session.
+10. Nenhuma alteração no Supabase.
+11. Nenhuma alteração nas tabelas.
+
+Validação esperada:
+- Console sem erros críticos.
+- Aviso de password field deve desaparecer ou reduzir.
+- Sem Unsplash 404.
+- Login comercial carregando.
+- Owner/Employee/Client funcionando.
+- Back/Logout funcionando.
+
+URL de teste:
+https://doublediamondapp.netlify.app/?v=v1-commercial-audit-clean
