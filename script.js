@@ -607,7 +607,7 @@ async function addCompanyUser(){
   const companyId = val("companyUserCompany");
   const name = val("companyUserName").trim();
 
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   if(!name) return alert("Digite o nome do usuário.");
 
   const res = await apiInsert("company_users", {
@@ -683,7 +683,7 @@ async function addIntegrationConnection(){
   const companyId = val("integrationCompany");
   const provider = val("integrationProvider");
 
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   if(!provider) return alert("Selecione o provider.");
 
   const res = await apiInsert("integration_connections", {
@@ -893,7 +893,7 @@ function renderRealIntegrations(){
 
 async function addIntegrationQueue(){
   const companyId = val("queueCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   let payload = {};
   try{
@@ -983,7 +983,7 @@ function renderCredentialManager(){
 
 async function addCredential(){
   const companyId = val("credCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("integration_credentials", {
     company_id: companyId,
@@ -1275,7 +1275,7 @@ function renderAutomationCenter(){
 
 async function addAutomationCenterItem(){
   const companyId = val("autoCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("automation_center_items", {
     company_id: companyId,
@@ -1329,7 +1329,7 @@ function renderReportCenter(){
 
 async function createReportExport(){
   const companyId = val("reportCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("report_center_exports", {
     company_id: companyId,
@@ -1394,7 +1394,7 @@ function renderMobileReady(){
 
 async function saveMobileSettings(){
   const companyId = val("mobileCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("mobile_app_settings", {
     company_id: companyId,
@@ -1549,7 +1549,7 @@ function renderPwaCenter(){
 
 async function savePwaSettings(){
   const companyId = val("pwaCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("pwa_settings", {
     company_id: companyId,
@@ -1569,7 +1569,7 @@ async function savePwaSettings(){
 
 async function saveOfflineCache(){
   const companyId = val("cacheCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("offline_cache_items", {
     company_id: companyId,
@@ -1587,7 +1587,7 @@ async function saveOfflineCache(){
 
 async function savePushTemplate(){
   const companyId = val("pushCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("push_notification_templates", {
     company_id: companyId,
@@ -1656,7 +1656,7 @@ function renderRoutePlanning(){
 
 async function createRoutePlan(){
   const companyId = val("routeCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("route_plans", {
     company_id: companyId,
@@ -1731,7 +1731,7 @@ function renderWeatherCenter(){
 
 async function addWeatherAlert(){
   const companyId = val("weatherCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("weather_alerts", {
     company_id: companyId,
@@ -1808,7 +1808,7 @@ function renderMobileWorkforce(){
 
 async function addMobileWorkforceTask(){
   const companyId = val("mwCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("mobile_workforce_tasks", {
     company_id: companyId,
@@ -1827,7 +1827,7 @@ async function addMobileWorkforceTask(){
 
 async function addGpsCheckin(){
   const companyId = val("gpsCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("gps_checkins", {
     company_id: companyId,
@@ -1848,7 +1848,7 @@ async function addGpsCheckin(){
 
 async function addFieldPhoto(){
   const companyId = val("photoCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("field_photos", {
     company_id: companyId,
@@ -1927,7 +1927,7 @@ function renderWorkOrders(){
 
 async function createWorkOrder(){
   const companyId = val("woCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("work_orders", {
     company_id: companyId,
@@ -2137,7 +2137,7 @@ function renderAnalyticsCenter(){
 
 async function addAnalyticsRanking(){
   const companyId = val("rankingCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("analytics_rankings", {
     company_id: companyId,
@@ -2250,7 +2250,7 @@ function renderProfitabilityEngine(){
 
 async function addProfitabilityRecord(){
   const companyId = val("profitCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const revenue = Number(val("profitRevenue") || 0);
   const cost = Number(val("profitCost") || 0);
@@ -2424,7 +2424,7 @@ function renderMapsReal(){
 }
 async function createMapsRouteRequest(){
   const companyId = val("mapsCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   const origin = val("mapsOrigin");
   const destination = val("mapsDestination");
   if(!origin || !destination) return alert("Preencha origem e destino.");
@@ -2454,7 +2454,7 @@ function renderWhatsAppReal(){
 }
 async function queueWhatsAppMessage(){
   const companyId = val("waCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   const res = await apiInsert("whatsapp_message_queue", {company_id:companyId,phone_number:val("waPhone"),template_name:val("waTemplate"),message_body:val("waBody"),provider_status:"Pending"});
   if(!res.ok) return alert("Erro ao adicionar mensagem.");
   whatsappMessageQueue = await apiGet("whatsapp_message_queue");
@@ -2486,7 +2486,7 @@ function renderGmailReal(){
 }
 async function queueGmailMessage(){
   const companyId = val("gmailCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   const res = await apiInsert("gmail_message_queue", {company_id:companyId,to_email:val("gmailTo"),subject:val("gmailSubject"),body:val("gmailBody"),provider_status:"Pending"});
   if(!res.ok) return alert("Erro ao adicionar email.");
   gmailMessageQueue = await apiGet("gmail_message_queue");
@@ -2517,7 +2517,7 @@ function renderPushReal(){
 }
 async function queuePushNotification(){
   const companyId = val("pushRealCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   const res = await apiInsert("push_notification_queue", {company_id:companyId,target_user:val("pushTarget"),title:val("pushRealTitle"),body:val("pushRealBody"),push_status:"Pending"});
   if(!res.ok) return alert("Erro ao adicionar push.");
   pushNotificationQueue = await apiGet("push_notification_queue");
@@ -2556,7 +2556,7 @@ function renderFlowSteps(steps){
 }
 async function createAutomationFlowTemplate(){
   const companyId = val("flowCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   let steps = [];
   try{ steps = val("flowSteps") ? JSON.parse(val("flowSteps")) : []; }catch(e){ return alert("Steps JSON inválido."); }
   const res = await apiInsert("automation_flow_templates", {company_id:companyId,flow_name:val("flowName"),trigger_name:val("flowTrigger"),steps,status:val("flowStatus")});
@@ -2629,7 +2629,7 @@ async function createMapsRouteRequest(){
   const origin = val("mapsOrigin").trim();
   const destination = val("mapsDestination").trim();
 
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   if(!origin || !destination) return alert("Preencha origem e destino.");
 
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=${encodeURIComponent(val("mapsMode"))}`;
@@ -2682,7 +2682,7 @@ function renderWhatsAppReal(){
 
 async function queueWhatsAppMessage(){
   const companyId = val("waCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("whatsapp_message_queue", {
     company_id: companyId,
@@ -2743,7 +2743,7 @@ function renderGmailReal(){
 
 async function queueGmailMessage(){
   const companyId = val("gmailCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("gmail_message_queue", {
     company_id: companyId,
@@ -2803,7 +2803,7 @@ function renderPushReal(){
 
 async function queuePushNotification(){
   const companyId = val("pushRealCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("push_notification_queue", {
     company_id: companyId,
@@ -2884,7 +2884,7 @@ function renderFlowSteps(steps){
 
 async function createAutomationFlowTemplate(){
   const companyId = val("flowCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   let steps = [];
   try{
@@ -3471,7 +3471,7 @@ function renderAILeadScoring(){
 
 async function generateAILeadScore(){
   const companyId = val("leadScoreCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const budget = Number(val("leadScoreBudget") || 0);
   const urgency = val("leadScoreUrgency");
@@ -3561,7 +3561,7 @@ function renderAIQuoteGenerator(){
 
 async function generateAIQuoteDraft(){
   const companyId = val("quoteAICompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const area = Number(val("quoteAIArea") || 1);
   const complexity = Math.max(1, Number(val("quoteAIComplexity") || 1));
@@ -3616,7 +3616,7 @@ function renderAIProjectRisk(){
 
 async function generateProjectRisk(){
   const companyId = val("riskCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const pending = Number(val("riskPending") || 0);
   const delay = Number(val("riskDelay") || 0);
@@ -3725,7 +3725,7 @@ function renderAIWorkforcePlanner(){
 
 async function generateWorkforcePlan(){
   const companyId = val("workforceCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("ai_workforce_plans", {
     company_id: companyId,
@@ -3775,7 +3775,7 @@ function renderAIRouteOptimization(){
 
 async function generateRouteOptimization(){
   const companyId = val("routeOptCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const stops = Number(val("routeOptStops") || 1);
   const score = Math.min(100, 50 + stops * 5);
@@ -3827,7 +3827,7 @@ function renderAIWeatherImpact(){
 
 async function generateWeatherImpact(){
   const companyId = val("weatherAICompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const level = val("weatherAILevel");
 
@@ -4084,7 +4084,7 @@ function renderAILeadScoring(){
 
 async function generateAILeadScore(){
   const companyId = val("leadScoreCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   const budget = Number(val("leadScoreBudget") || 0);
   const urgency = val("leadScoreUrgency");
   let score = 35 + (budget >= 10000 ? 30 : budget >= 3000 ? 18 : 8) + (urgency === "Alta" ? 25 : urgency === "Média" ? 12 : 0);
@@ -4129,7 +4129,7 @@ function renderAIQuoteGenerator(){
 
 async function generateAIQuoteDraft(){
   const companyId = val("quoteAICompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   const area = Number(val("quoteAIArea") || 1);
   const complexity = Math.max(1, Number(val("quoteAIComplexity") || 1));
   const estimated = area * complexity * 180;
@@ -4173,7 +4173,7 @@ function renderAIProjectRisk(){
 
 async function generateProjectRisk(){
   const companyId = val("riskCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   const pending = Number(val("riskPending") || 0);
   const delay = Number(val("riskDelay") || 0);
   const score = Math.min(100, pending * 12 + delay * 8);
@@ -4246,7 +4246,7 @@ function renderAIWorkforcePlanner(){
 
 async function generateWorkforcePlan(){
   const companyId = val("workforceCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   const res = await apiInsert("ai_workforce_plans", {
     company_id: companyId,
     plan_name:"AI Workforce Plan",
@@ -4280,7 +4280,7 @@ function renderAIRouteOptimization(){
 
 async function generateRouteOptimization(){
   const companyId = val("routeOptCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   const stops = Number(val("routeOptStops") || 1);
   const score = Math.min(100, 50 + stops * 5);
   const res = await apiInsert("ai_route_optimizations", {
@@ -4316,7 +4316,7 @@ function renderAIWeatherImpact(){
 
 async function generateWeatherImpact(){
   const companyId = val("weatherAICompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
   const level = val("weatherAILevel");
   const res = await apiInsert("ai_weather_impacts", {
     company_id: companyId,
@@ -4512,7 +4512,7 @@ function renderRoleExperience(){
 
 async function createRoleUser(){
   const companyId = val("roleUserCompany");
-  if(!companyId) return alert("Selecione a client.");
+  if(!companyId) return alert("Select a client.");
 
   const res = await apiInsert("user_profiles", {
     company_id: companyId,
@@ -5750,7 +5750,7 @@ setTimeout(ddClientLabelPatch,1000);
       [/Centro de Relatórios/g, "Report Center"],
       [/Novo Relatório/g, "New Report"],
       [/Preparar Relatório/g, "Prepare Report"],
-      [/Relatório Cliente/g, "Client Report"],
+      [/Relatório Client/g, "Client Report"],
       [/Relatórios/g, "Reports"],
       [/Relatório/g, "Report"],
       [/Voltar/g, "Back"],
@@ -5818,4 +5818,77 @@ setTimeout(ddClientLabelPatch,1000);
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runEnglishPatch,200));
   setInterval(runEnglishPatch,1500);
+})();
+
+
+/* REPORT CLIENT AUTOSELECT + ENGLISH CLEANUP V2 */
+(function(){
+  function cleanEnglish(){
+    document.querySelectorAll("body *").forEach(el=>{
+      if(el.childNodes && el.childNodes.length===1 && el.childNodes[0].nodeType===3){
+        el.textContent = el.textContent
+          .replace(/\bCliente\b/g,"Client")
+          .replace(/\bClientes\b/g,"Clients")
+          .replace(/\bRelatorio\b/g,"Report")
+          .replace(/\bRelatórios\b/g,"Reports")
+          .replace(/\bAssinatura\b/g,"Signature");
+      }
+      if(el.placeholder){
+        el.placeholder = el.placeholder
+          .replace(/\bCliente\b/g,"Client")
+          .replace(/\bEmpresa\b/g,"Client");
+      }
+    });
+  }
+
+  function autoSelectClientFields(){
+    document.querySelectorAll("select").forEach(sel=>{
+      const firstText = (sel.options[0]?.textContent || "").toLowerCase();
+      const looksClient = firstText.includes("client") || firstText.includes("empresa") || firstText.includes("cliente");
+      if(looksClient && (!sel.value || sel.selectedIndex === 0)){
+        for(let i=1;i<sel.options.length;i++){
+          if(sel.options[i].value){
+            sel.selectedIndex = i;
+            sel.dispatchEvent(new Event("change", {bubbles:true}));
+            break;
+          }
+        }
+      }
+    });
+  }
+
+  const originalAlert2 = window.alert;
+  window.alert = function(msg){
+    let t = String(msg || "")
+      .replace(/Selecione a empresa\./gi,"Select a client.")
+      .replace(/Selecione a cliente\./gi,"Select a client.")
+      .replace(/Selecione o cliente\./gi,"Select a client.")
+      .replace(/Selecione a client\./gi,"Select a client.")
+      .replace(/Cliente/g,"Client")
+      .replace(/Relatorio/g,"Report");
+    return originalAlert2(t);
+  };
+
+  // Try to auto-select before common report actions
+  document.addEventListener("click", function(e){
+    const text = (e.target?.textContent || "").toLowerCase();
+    if(text.includes("prepare report") || text.includes("preparar")){
+      autoSelectClientFields();
+      cleanEnglish();
+    }
+  }, true);
+
+  function run(){
+    cleanEnglish();
+    autoSelectClientFields();
+    document.querySelectorAll("img").forEach(img=>{
+      img.onerror = function(){
+        this.onerror = null;
+        this.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='800' height='450'><rect width='100%' height='100%' fill='#eef2f7'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#64748b' font-family='Arial' font-size='28'>Image unavailable</text></svg>");
+      };
+    });
+  }
+
+  setInterval(run, 1200);
+  document.addEventListener("DOMContentLoaded",()=>setTimeout(run,250));
 })();
