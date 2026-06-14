@@ -41,6 +41,7 @@ These PINs are demo-only. Production authentication belongs in the security/back
 - `docs/MVP_SCOPE.md`: role-based MVP scope for Product/UX work.
 - `docs/BLOCK2_QA_CHECKLIST.md`: QA checklist for the Product/UX block.
 - `docs/BLOCK3_SECURITY_DATA.md`: security/data guardrails and backend readiness scope.
+- `docs/DATA_ACCESS_MATRIX.md`: MVP table access map for frontend, RLS, and backend work.
 - `docs/archive/`: historical phase notes retained for reference.
 
 ## Block Plan
@@ -59,6 +60,7 @@ node --check script.js
 Get-ChildItem js -Recurse -Filter *.js | ForEach-Object { node --check $_.FullName }
 node tools/validate-mvp-scope.js
 node tools/validate-security-scope.js
+node tools/validate-data-contract.js
 ```
 
 Manual browser smoke checks:
