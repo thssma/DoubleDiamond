@@ -1,9 +1,9 @@
-const CACHE_NAME = 'doublediamond-sprint3-notifications-ai-20260613-phase1';
+const CACHE_NAME = 'doublediamond-sprint3-notifications-ai-20260613-roleui';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll([
-    './','./index.html','./style.css','./script.js','./manifest.json'
+    './','./index.html','./style.css','./script.js','./js/dd-config.js','./js/dd-api.js','./js/dd-data.js','./js/dd-core.js','./js/dd-auth.js','./js/dd-alerts.js','./js/dd-text.js','./js/dd-images.js','./js/dd-role-ui.js','./js/dd-postprocess.js','./js/dd-shell.js','./manifest.json'
   ])));
 });
 
