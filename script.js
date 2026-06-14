@@ -4630,6 +4630,10 @@ function renderEmployeeHome(){
 }
 
 function renderClientHome(){
+  if(window.DDClientHomeScreen && typeof window.DDClientHomeScreen.renderBase === "function"){
+    return window.DDClientHomeScreen.renderBase({fieldPhotos, reportCenterExports, workOrderLogs, workOrders, teamCheckins, projectTimeline, fieldSignatures});
+  }
+
   setTitle("My Project");
 
   const latestPhoto = typeof fieldPhotos !== "undefined" && fieldPhotos.length ? fieldPhotos[0] : null;
@@ -6546,3 +6550,12 @@ setTimeout(ddClientLabelPatch,1000);
   document.addEventListener("DOMContentLoaded", function(){ setTimeout(ddAuditCleanFixed, 500); });
   setTimeout(ddAuditCleanFixed, 1000);
 })();
+
+if(window.DDClientHomeScreen && typeof window.DDClientHomeScreen.renderBase === "function"){
+  window.renderClientHome = function(){
+    return window.DDClientHomeScreen.renderBase({fieldPhotos, reportCenterExports, workOrderLogs, workOrders, teamCheckins, projectTimeline, fieldSignatures});
+  };
+}else{
+  window.renderClientHome = renderClientHome;
+}
+window.renderReportCenter = renderReportCenter;
