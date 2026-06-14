@@ -1321,6 +1321,10 @@ async function addAutomationCenterItem(){
 }
 
 function renderReportCenter(){
+  if(window.DDReportCenterScreen && typeof window.DDReportCenterScreen.render === "function"){
+    return window.DDReportCenterScreen.render({companies, reportCenterExports});
+  }
+
   setTitle("Report Center");
 
   setContent(`
