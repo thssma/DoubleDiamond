@@ -1,24 +1,11 @@
 
 /* HARD REMOVE UNSPLASH SOURCE V6 */
 (function(){
-  const SAFE_PROJECT_PHOTO = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E";
-  const BAD_PHOTO_RE = /images\.unsplash\.com\/photo-1599598425947-5b1a1cfacd57|photo-1599598425947-5b1a1cfacd57/i;
-
   function scrubNode(el){
     try{
-      if(el.tagName === "IMG"){
-        const src = el.getAttribute("src") || "";
-        if(BAD_PHOTO_RE.test(src)) el.setAttribute("src", SAFE_PROJECT_PHOTO);
-        el.onerror = function(){ this.onerror=null; this.src=SAFE_PROJECT_PHOTO; };
-      }
-      const style = el.getAttribute && (el.getAttribute("style") || "");
-      if(style && BAD_PHOTO_RE.test(style)){
-        el.setAttribute("style", style.replace(BAD_PHOTO_RE, SAFE_PROJECT_PHOTO));
-        if(el.style) el.style.backgroundImage = `url("${SAFE_PROJECT_PHOTO}")`;
-      }
-      if(el.style && BAD_PHOTO_RE.test(el.style.backgroundImage || "")){
-        el.style.backgroundImage = `url("${SAFE_PROJECT_PHOTO}")`;
-      }
+      if(!window.DDImages) return;
+      if(el.tagName === "IMG") window.DDImages.fixImageElement(el);
+      if(el.getAttribute && el.getAttribute("style")) window.DDImages.fixBackgroundElement(el);
     }catch(e){}
   }
 
@@ -47,8 +34,8 @@
   setTimeout(scrubAll,1500);
 })();
 
-const SUPABASE_URL = "https://phpphqcxzwpuiglkqkls.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBocHBocWN4endwdWlnbGtxa2xzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNDE0NTAsImV4cCI6MjA5NjYxNzQ1MH0.z0F0KAHCWKdRTyg5JeNDzAWEbIdFEknT_kmx4QyMz3I";
+const SUPABASE_URL = (window.DDConfig && window.DDConfig.SUPABASE_URL) || "";
+const SUPABASE_ANON_KEY = (window.DDConfig && window.DDConfig.SUPABASE_ANON_KEY) || "";
 
 let companies = [];
 let projects = [];
@@ -115,52 +102,78 @@ let roleActivityLogs = [];
 let currentRoleExperience = localStorage.getItem("dd_role") || "owner";
 
 
-
-
-
-
-const headers = {
-  "apikey": SUPABASE_ANON_KEY,
-  "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-  "Content-Type": "application/json"
-};
-
 window.onload = async () => {
   ddCurrentPageV642 = "dashboard";
   renderDashboard();
   ddStartBackgroundLoadV642();
 };
 
-async function apiGet(table){
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*&order=created_at.desc`, { headers });
-  if(!res.ok) return [];
-  return await res.json();
-}
-
-async function apiInsert(table, data){
-  return await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-    method:"POST",
-    headers:{...headers, "Prefer":"return=representation"},
-    body:JSON.stringify(data)
-  });
-}
-
-async function apiPatch(table, id, data){
-  return await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-    method:"PATCH",
-    headers:{...headers, "Prefer":"return=representation"},
-    body:JSON.stringify(data)
-  });
-}
-
-async function apiDelete(table, id){
-  return await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-    method:"DELETE",
-    headers
-  });
-}
-
 async function loadData(){
+  if(window.DDData && typeof window.DDData.loadTables === "function"){
+    ({
+      companies,
+      projects,
+      companyUsers,
+      integrationProviders,
+      integrationConnections,
+      integrationLogs,
+      aiAgents,
+      aiInsights,
+      integrationCredentials,
+      integrationQueue,
+      integrationWebhooks,
+      copilotConversations,
+      copilotMessages,
+      promptTemplates,
+      executiveKpiSnapshots,
+      reportCenterExports,
+      automationCenterItems,
+      mobileAppSettings,
+      pwaSettings,
+      offlineCacheItems,
+      pushNotificationTemplates,
+      routePlans,
+      routeStops,
+      weatherAlerts,
+      mobileWorkforceTasks,
+      gpsCheckins,
+      teamCheckins,
+      fieldPhotos,
+      fieldSignatures,
+      workOrders,
+      workOrderLogs,
+      projectTimeline,
+      biSnapshots,
+      analyticsRankings,
+      forecastScenarios,
+      profitabilityRecords,
+      executiveIntelligenceItems,
+      mapsRouteRequests,
+      whatsappMessageQueue,
+      gmailMessageQueue,
+      pushNotificationQueue,
+      automationFlowTemplates,
+      automationFlowRuns,
+      architectureAuditLogs,
+      moduleRegistry,
+      aiOperationsReadiness,
+      aiLeadScores,
+      aiQuoteDrafts,
+      aiProjectRisks,
+      aiFinancialAdvice,
+      aiWorkforcePlans,
+      aiRouteOptimizations,
+      aiWeatherImpacts,
+      aiExecutiveReports,
+      aiAutomationRecommendations,
+      aiCommandCenterLogs,
+      userProfiles,
+      roleExperienceSettings,
+      roleActivityLogs
+    } = await window.DDData.loadTables(apiGet));
+    return;
+  }
+
   companies = await apiGet("companies");
   projects = await apiGet("projects");
   companyUsers = await apiGet("company_users");
@@ -227,15 +240,10 @@ async function loadData(){
 }
 
 function normalizeRoute(page){
-  const aliases = {
-    home: "dashboard",
-    clientPortal: "clientHome",
-    field: "mobileWorkforce",
-    billingDashboard: "profitabilityEngine",
-    saasDashboard: "dashboard",
-    marketplaceDashboard: "integrationHub"
-  };
-  return aliases[page] || page;
+  if(window.DDCore && typeof window.DDCore.normalizeRoute === "function"){
+    return window.DDCore.normalizeRoute(page);
+  }
+  return page;
 }
 
 function changePage(page, event){
@@ -246,55 +254,11 @@ function changePage(page, event){
     if(activeBtn) activeBtn.classList.add("active");
   }
 
-  const routes = {
-    dashboard: renderDashboard,
-    clients: renderClients,
-    integrationHub: renderIntegrationHub,
-    aiFoundation: renderAIFoundation,
-    realIntegrations: renderRealIntegrations,
-    copilot: renderCopilot,
-    credentialManager: renderCredentialManager,
-    executiveDashboard: renderExecutiveDashboard,
-    kpiCenter: renderKpiCenter,
-    automationCenter: renderAutomationCenter,
-    reportCenter: renderReportCenter,
-    mobileReady: renderMobileReady,
-    fieldDashboard: renderFieldDashboard,
-    pwaCenter: renderPwaCenter,
-    routePlanning: renderRoutePlanning,
-    weatherCenter: renderWeatherCenter,
-    mobileWorkforce: renderMobileWorkforce,
-    workOrders: renderWorkOrders,
-    biDashboard: renderBIDashboard,
-    analyticsCenter: renderAnalyticsCenter,
-    forecastEngine: renderForecastEngine,
-    profitabilityEngine: renderProfitabilityEngine,
-    executiveIntelligence: renderExecutiveIntelligence,
-    mapsReal: renderMapsReal,
-    whatsappReal: renderWhatsAppReal,
-    gmailReal: renderGmailReal,
-    pushReal: renderPushReal,
-    automationFlowsReal: renderAutomationFlowsReal,
-    architectureHardening: renderArchitectureHardening,
-    aiReadiness: renderAIReadiness,
-    aiLeadScoring: renderAILeadScoring,
-    aiQuoteGenerator: renderAIQuoteGenerator,
-    aiProjectRisk: renderAIProjectRisk,
-    aiFinancialAdvisor: renderAIFinancialAdvisor,
-    aiWorkforcePlanner: renderAIWorkforcePlanner,
-    aiRouteOptimization: renderAIRouteOptimization,
-    aiWeatherImpact: renderAIWeatherImpact,
-    aiExecutiveReports: renderAIExecutiveReports,
-    aiAutomationRecommendations: renderAIAutomationRecommendations,
-    aiOperationsCommand: renderAICommandCenter,
-    roleExperience: renderRoleExperience,
-    ownerHome: renderOwnerHome,
-    employeeHome: renderEmployeeHome,
-    clientHome: renderClientHome,
-    configuracoes: renderConfiguracoes
-  };
+  const renderer = window.DDCore && typeof window.DDCore.getRouteRenderer === "function"
+    ? window.DDCore.getRouteRenderer(page, window)
+    : null;
 
-  (routes[page] || renderDashboard)();
+  (renderer || renderDashboard)();
 }
 
 function setTitle(title){
@@ -5548,17 +5512,25 @@ renderClientHome = function(){
 
 /* ROLE-BASED LOGIN V1 - CLIENT FIRST, HIDDEN STAFF ACCESS */
 (function(){
-  const SESSION_KEY = "dd_auth_session_v1";
-  const DEFAULT_OWNER_PIN = "owner123";
-  const DEFAULT_EMPLOYEE_PIN = "field123";
   let ddHistoryV1 = [];
 
   function ddGetSession(){
-    try{return JSON.parse(localStorage.getItem(SESSION_KEY)||"null");}catch(e){return null;}
+    if(window.DDAuth) return window.DDAuth.getSession();
+    try{return JSON.parse(localStorage.getItem("dd_auth_session_v1")||"null");}catch(e){return null;}
   }
-  function ddSetSession(session){localStorage.setItem(SESSION_KEY, JSON.stringify(session));}
-  function ddClearSession(){localStorage.removeItem(SESSION_KEY);}
-  function ddSessionRole(){return (ddGetSession()||{}).role || "client";}
+  function ddSetSession(session){
+    if(window.DDAuth) return window.DDAuth.setSession(session);
+    localStorage.setItem("dd_auth_session_v1", JSON.stringify(session));
+  }
+  function ddClearSession(){
+    if(window.DDAuth) return window.DDAuth.clearSession();
+    localStorage.removeItem("dd_auth_session_v1");
+    localStorage.removeItem("dd_role");
+  }
+  function ddSessionRole(){
+    if(window.DDAuth) return window.DDAuth.getRole("client");
+    return (ddGetSession()||{}).role || "client";
+  }
 
   function ddLoginClient(){
     const name=(document.getElementById("ddClientName")||{}).value || "Client";
@@ -5569,14 +5541,13 @@ renderClientHome = function(){
   function ddLoginStaff(){
     const role=(document.getElementById("ddStaffRole")||{}).value || "employee";
     const pin=(document.getElementById("ddStaffPin")||{}).value || "";
-    if(role==="owner" && pin!==DEFAULT_OWNER_PIN) return alert("Owner PIN inválido.");
-    if(role==="employee" && pin!==DEFAULT_EMPLOYEE_PIN) return alert("Employee PIN inválido.");
+    const validPin = window.DDAuth ? window.DDAuth.validateStaffPin(role, pin) : (role==="owner" && pin==="owner123") || (role==="employee" && pin==="field123");
+    if(!validPin) return alert(role==="owner" ? "Owner PIN inválido." : "Employee PIN inválido.");
     ddSetSession({role, name: role==="owner"?"Owner":"Employee", logged_at:new Date().toISOString()});
     ddBootAuthenticated(role);
   }
   function ddLogout(){
     ddClearSession();
-    localStorage.removeItem("dd_role");
     ddShowLogin();
   }
   function ddRevealStaff(){
@@ -5622,30 +5593,49 @@ renderClientHome = function(){
   }
 
   function ddRoleAllowedPage(role, page){
+    if(window.DDRoleUI && typeof window.DDRoleUI.isPageAllowed === "function"){
+      return window.DDRoleUI.isPageAllowed(role, page);
+    }
+    if(window.DDCore && typeof window.DDCore.isPageAllowed === "function"){
+      return window.DDCore.isPageAllowed(role, page);
+    }
     page = typeof normalizeRoute === "function" ? normalizeRoute(page) : page;
-    const client=["clientHome","reportCenter"];
-    const employee=["dashboard","workOrders","routePlanning","fieldDashboard","mobileWorkforce","weatherCenter","mobileReady","pwaCenter","clientHome","reportCenter"];
-    if(role==="owner") return true;
-    if(role==="employee") return employee.includes(page);
-    return client.includes(page);
+    return role === "owner" || page === "clientHome" || page === "reportCenter";
   }
   function ddDefaultPage(role){
-    if(role==="owner") return "dashboard";
-    if(role==="employee") return "mobileWorkforce";
-    return "clientHome";
+    if(window.DDRoleUI && typeof window.DDRoleUI.defaultPage === "function"){
+      return window.DDRoleUI.defaultPage(role);
+    }
+    if(window.DDCore && typeof window.DDCore.defaultPageForRole === "function"){
+      return window.DDCore.defaultPageForRole(role);
+    }
+    return role === "owner" ? "dashboard" : role === "employee" ? "mobileWorkforce" : "clientHome";
   }
   function ddApplyRoleUI(role){
+    if(window.DDRoleUI && typeof window.DDRoleUI.applyMenuAccess === "function"){
+      window.DDRoleUI.applyMenuAccess(role, {sessionControls:true, backHandler:"ddGoBack", logoutHandler:"ddLogout"});
+      return;
+    }
     document.body.setAttribute("data-dd-role", role);
     const top=document.querySelector(".top-actions");
     if(top && !top.querySelector(".dd-session-pill")){
       top.insertAdjacentHTML("beforeend", `<button class="dd-back-btn" onclick="ddGoBack()">← Back</button><span class="dd-session-pill">${role.toUpperCase()}</span><button class="dd-logout-btn" onclick="ddLogout()">Logout</button>`);
     }
+    const pill = top && top.querySelector(".dd-session-pill");
+    if(pill) pill.textContent = role.toUpperCase();
     document.querySelectorAll(".menu-btn").forEach(btn=>{
       const onclick=btn.getAttribute("onclick")||"";
       const m=onclick.match(/changePage\('([^']+)'/);
       if(!m) return;
       const page=m[1];
-      btn.style.display=ddRoleAllowedPage(role,page)?"":"none";
+      const allowed = ddRoleAllowedPage(role,page);
+      if(allowed){
+        btn.style.display="";
+        delete btn.dataset.ddBlocked;
+        btn.removeAttribute("data-role-hidden");
+      }else{
+        btn.style.display="none";
+      }
     });
     document.querySelectorAll(".nav-group").forEach(group=>{
       const visible=[...group.querySelectorAll(".menu-btn")].some(b=>b.style.display!=="none");
@@ -5784,31 +5774,21 @@ function ddClientLabelPatch(){
   }catch(e){ console.warn("ddClientLabelPatch", e); }
 }
 
-const ddOldChangePageForClientLabels = window.changePage;
-if(typeof ddOldChangePageForClientLabels === "function"){
-  window.changePage = function(){
-    const result = ddOldChangePageForClientLabels.apply(this, arguments);
-    setTimeout(ddClientLabelPatch, 50);
-    setTimeout(ddClientLabelPatch, 500);
-    return result;
-  };
-}
+if(window.DDPostProcess) window.DDPostProcess.onPageChange("clientLabels", ddClientLabelPatch, [50, 500]);
 document.addEventListener("DOMContentLoaded",()=>setTimeout(ddClientLabelPatch,300));
 setTimeout(ddClientLabelPatch,1000);
 
 
 /* ENGLISH ROLE CONSOLIDATION PATCH V1 */
 (function(){
-  const originalAlert = window.alert;
-  window.alert = function(msg){
-    const text = String(msg || "")
+  if(window.DDAlerts) window.DDAlerts.registerTransform(function(msg){
+    return String(msg || "")
       .replace(/Selecione a empresa\./gi, "Select a client.")
       .replace(/Selecione o cliente\./gi, "Select a client.")
       .replace(/Empresa/gi, "Client")
       .replace(/Relatório/gi, "Report")
       .replace(/Assinatura/gi, "Signature");
-    return originalAlert(text);
-  };
+  });
 
   function translateVisibleText(){
     const map = [
@@ -5826,33 +5806,10 @@ setTimeout(ddClientLabelPatch,1000);
       [/Sair/g, "Logout"]
     ];
 
-    document.querySelectorAll("body *").forEach(el=>{
-      if(el.childNodes && el.childNodes.length===1 && el.childNodes[0].nodeType===3){
-        let t = el.textContent;
-        map.forEach(([re, rep])=> t = t.replace(re, rep));
-        el.textContent = t;
-      }
-
-      if(el.placeholder){
-        let p = el.placeholder;
-        map.forEach(([re, rep])=> p = p.replace(re, rep));
-        el.placeholder = p;
-      }
-
-      if(el.title){
-        let p = el.title;
-        map.forEach(([re, rep])=> p = p.replace(re, rep));
-        el.title = p;
-      }
-    });
-
-    document.querySelectorAll("option").forEach(opt=>{
-      opt.textContent = opt.textContent
-        .replace(/Empresa/g,"Client")
-        .replace(/Empresas/g,"Clients")
-        .replace(/empresa/g,"client")
-        .replace(/empresas/g,"clients");
-    });
+    if(window.DDText){
+      window.DDText.registerRules("englishRole", map);
+      window.DDText.applyRuleSet("englishRole");
+    }
   }
 
   function lockClientSelectsForClientRole(){
@@ -5875,39 +5832,28 @@ setTimeout(ddClientLabelPatch,1000);
     lockClientSelectsForClientRole();
   }
 
-  const oldChangePage = window.changePage;
-  if(typeof oldChangePage === "function"){
-    window.changePage = function(){
-      const result = oldChangePage.apply(this, arguments);
-      setTimeout(runEnglishPatch, 50);
-      setTimeout(runEnglishPatch, 300);
-      return result;
-    };
-  }
+  if(window.DDPostProcess) window.DDPostProcess.onPageChange("englishPatch", runEnglishPatch, [50, 300]);
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runEnglishPatch,200));
-  setInterval(runEnglishPatch,15000);
+  if(window.DDPostProcess) window.DDPostProcess.register("englishPatch", runEnglishPatch, {everyMs:15000});
 })();
 
 
 /* REPORT CLIENT AUTOSELECT + ENGLISH CLEANUP V2 */
 (function(){
   function cleanEnglish(){
-    document.querySelectorAll("body *").forEach(el=>{
-      if(el.childNodes && el.childNodes.length===1 && el.childNodes[0].nodeType===3){
-        el.textContent = el.textContent
-          .replace(/\bCliente\b/g,"Client")
-          .replace(/\bClientes\b/g,"Clients")
-          .replace(/\bReport\b/g,"Report")
-          .replace(/\bRelatórios\b/g,"Reports")
-          .replace(/\bAssinatura\b/g,"Signature");
-      }
-      if(el.placeholder){
-        el.placeholder = el.placeholder
-          .replace(/\bCliente\b/g,"Client")
-          .replace(/\bEmpresa\b/g,"Client");
-      }
-    });
+    const rules = [
+      [/\bCliente\b/g,"Client"],
+      [/\bClientes\b/g,"Clients"],
+      [/\bReport\b/g,"Report"],
+      [/\bRelatórios\b/g,"Reports"],
+      [/\bAssinatura\b/g,"Signature"],
+      [/\bEmpresa\b/g,"Client"]
+    ];
+    if(window.DDText){
+      window.DDText.registerRules("reportEnglish", rules);
+      window.DDText.applyRuleSet("reportEnglish");
+    }
   }
 
   function autoSelectClientFields(){
@@ -5926,17 +5872,15 @@ setTimeout(ddClientLabelPatch,1000);
     });
   }
 
-  const originalAlert2 = window.alert;
-  window.alert = function(msg){
-    let t = String(msg || "")
+  if(window.DDAlerts) window.DDAlerts.registerTransform(function(msg){
+    return String(msg || "")
       .replace(/Selecione a empresa\./gi,"Select a client.")
       .replace(/Selecione a cliente\./gi,"Select a client.")
       .replace(/Selecione o cliente\./gi,"Select a client.")
       .replace(/Selecione a client\./gi,"Select a client.")
       .replace(/Cliente/g,"Client")
       .replace(/Report/g,"Report");
-    return originalAlert2(t);
-  };
+  });
 
   // Try to auto-select before common report actions
   document.addEventListener("click", function(e){
@@ -5950,15 +5894,10 @@ setTimeout(ddClientLabelPatch,1000);
   function run(){
     cleanEnglish();
     autoSelectClientFields();
-    document.querySelectorAll("img").forEach(img=>{
-      img.onerror = function(){
-        this.onerror = null;
-        this.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='800' height='450'><rect width='100%' height='100%' fill='#eef2f7'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#64748b' font-family='Arial' font-size='28'>Image unavailable</text></svg>");
-      };
-    });
+    if(window.DDImages) window.DDImages.installGenericImageFallbacks();
   }
 
-  setInterval(run, 15000);
+  if(window.DDPostProcess) window.DDPostProcess.register("reportCleanup", run, {everyMs:15000});
   document.addEventListener("DOMContentLoaded",()=>setTimeout(run,250));
 })();
 
@@ -5966,6 +5905,7 @@ setTimeout(ddClientLabelPatch,1000);
 /* CLIENT SESSION REPORT FIX V3 */
 (function(){
   function getDDSession(){
+    if(window.DDAuth) return window.DDAuth.getSession() || {};
     try{
       return JSON.parse(localStorage.getItem("dd_auth_session_v1") || "{}");
     }catch(e){
@@ -5975,7 +5915,7 @@ setTimeout(ddClientLabelPatch,1000);
 
   function ensureClientOptionFromSession(){
     const session = getDDSession();
-    const role = localStorage.getItem("dd_role") || session.role;
+    const role = window.DDAuth ? window.DDAuth.getRole(session.role || "client") : localStorage.getItem("dd_role") || session.role;
     const clientName = session.name || session.email || "Logged Client";
     const clientValue = session.email || session.name || "client-session";
 
@@ -6008,27 +5948,22 @@ setTimeout(ddClientLabelPatch,1000);
   }
 
   function englishCleanupV3(){
-    document.querySelectorAll("body *").forEach(el=>{
-      if(el.childNodes && el.childNodes.length===1 && el.childNodes[0].nodeType===3){
-        el.textContent = el.textContent
-          .replace(/\bCliente\b/g,"Client")
-          .replace(/\bClientes\b/g,"Clients")
-          .replace(/\bRelatorio\b/g,"Report")
-          .replace(/\bReporte\b/g,"Report")
-          .replace(/\bFinanceiro\b/g,"Financial")
-          .replace(/\bNome do relatório\b/g,"Report name");
-      }
-      if(el.placeholder){
-        el.placeholder = el.placeholder
-          .replace(/\bNome do relatório\b/g,"Report name")
-          .replace(/\bCliente\b/g,"Client")
-          .replace(/\bEmpresa\b/g,"Client");
-      }
-    });
+    const rules = [
+      [/\bCliente\b/g,"Client"],
+      [/\bClientes\b/g,"Clients"],
+      [/\bRelatorio\b/g,"Report"],
+      [/\bReporte\b/g,"Report"],
+      [/\bFinanceiro\b/g,"Financial"],
+      [/\bNome do relatório\b/g,"Report name"],
+      [/\bEmpresa\b/g,"Client"]
+    ];
+    if(window.DDText){
+      window.DDText.registerRules("clientSessionEnglish", rules);
+      window.DDText.applyRuleSet("clientSessionEnglish");
+    }
   }
 
-  const originalAlertV3 = window.alert;
-  window.alert = function(msg){
+  if(window.DDAlerts) window.DDAlerts.registerBeforeAlert(function(msg){
     const m = String(msg || "");
     if(m.match(/select a client|selecione/i)){
       ensureClientOptionFromSession();
@@ -6037,19 +5972,22 @@ setTimeout(ddClientLabelPatch,1000);
         return first.includes("client") && sel.value && sel.selectedIndex > 0;
       });
       if(hasClient){
-        return;
+        return false;
       }
     }
-    return originalAlertV3(
-      m.replace(/Selecione a empresa\./gi,"Select a client.")
+    return m;
+  });
+
+  if(window.DDAlerts) window.DDAlerts.registerTransform(function(msg){
+    return String(msg || "")
+       .replace(/Selecione a empresa\./gi,"Select a client.")
        .replace(/Selecione o cliente\./gi,"Select a client.")
        .replace(/Selecione a client\./gi,"Select a client.")
        .replace(/Cliente/g,"Client")
        .replace(/Relatorio/g,"Report")
        .replace(/Reporte/g,"Report")
-       .replace(/Financeiro/g,"Financial")
-    );
-  };
+       .replace(/Financeiro/g,"Financial");
+  });
 
   document.addEventListener("click", function(e){
     const text = (e.target?.textContent || "").toLowerCase();
@@ -6066,13 +6004,13 @@ setTimeout(ddClientLabelPatch,1000);
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runV3,250));
   setTimeout(runV3,500);
-  setInterval(runV3,15000);
+  if(window.DDPostProcess) window.DDPostProcess.register("clientSessionReport", runV3, {everyMs:15000});
 })();
 
 
 /* ROLE BASED ACCESS FINAL V4 */
 (function(){
-  const ROLE_ALLOWED = {
+  const ROLE_ALLOWED = (window.DDCore && window.DDCore.ROLE_NAV_LABELS) || {
     client: [
       "Client Portal",
       "Reports"
@@ -6092,6 +6030,10 @@ setTimeout(ddClientLabelPatch,1000);
   };
 
   function getRole(){
+    if(window.DDRoleUI && typeof window.DDRoleUI.getRole === "function"){
+      return window.DDRoleUI.getRole("client");
+    }
+    if(window.DDAuth) return window.DDAuth.getRole("client");
     try{
       const s = JSON.parse(localStorage.getItem("dd_auth_session_v1") || "{}");
       return localStorage.getItem("dd_role") || s.role || "client";
@@ -6101,16 +6043,32 @@ setTimeout(ddClientLabelPatch,1000);
   }
 
   function normalizeText(t){
+    if(window.DDRoleUI && typeof window.DDRoleUI.normalizeText === "function"){
+      return window.DDRoleUI.normalizeText(t);
+    }
+    if(window.DDCore && typeof window.DDCore.normalizeText === "function"){
+      return window.DDCore.normalizeText(t);
+    }
     return String(t || "").replace(/\s+/g," ").trim();
   }
 
   function isAllowedNav(text, role){
+    if(window.DDRoleUI && typeof window.DDRoleUI.isNavLabelAllowed === "function"){
+      return window.DDRoleUI.isNavLabelAllowed(role, text);
+    }
+    if(window.DDCore && typeof window.DDCore.isNavLabelAllowed === "function"){
+      return window.DDCore.isNavLabelAllowed(role, text);
+    }
     if(role === "owner") return true;
     const allowed = ROLE_ALLOWED[role] || ROLE_ALLOWED.client;
     return allowed.some(name => normalizeText(text).toLowerCase().includes(name.toLowerCase()));
   }
 
   function hideBlockedNav(){
+    if(window.DDRoleUI && typeof window.DDRoleUI.hideDisallowedNavigation === "function"){
+      window.DDRoleUI.hideDisallowedNavigation(getRole());
+      return;
+    }
     const role = getRole();
     document.body.setAttribute("data-dd-role", role);
 
@@ -6159,6 +6117,10 @@ setTimeout(ddClientLabelPatch,1000);
   }
 
   function protectCurrentPage(){
+    if(window.DDRoleUI && typeof window.DDRoleUI.protectCurrentPage === "function"){
+      window.DDRoleUI.protectCurrentPage(getRole());
+      return;
+    }
     const role = getRole();
     if(role === "owner") return;
 
@@ -6194,6 +6156,10 @@ setTimeout(ddClientLabelPatch,1000);
   }
 
   function roleBadge(){
+    if(window.DDRoleUI && typeof window.DDRoleUI.ensureRoleBadge === "function"){
+      window.DDRoleUI.ensureRoleBadge(getRole());
+      return;
+    }
     const role = getRole().toUpperCase();
     const existing = document.querySelector("[data-role-final-badge]");
     if(existing){
@@ -6228,28 +6194,16 @@ setTimeout(ddClientLabelPatch,1000);
     clientLanding();
   }
 
-  const oldChangePageRoleFinal = window.changePage;
-  if(typeof oldChangePageRoleFinal === "function"){
-    window.changePage = function(){
-      const result = oldChangePageRoleFinal.apply(this, arguments);
-      setTimeout(runRoleAccess, 50);
-      setTimeout(runRoleAccess, 300);
-      return result;
-    };
-  }
+  if(window.DDPostProcess) window.DDPostProcess.onPageChange("roleAccess", runRoleAccess, [50, 300]);
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runRoleAccess,300));
   setTimeout(runRoleAccess,800);
-  setInterval(runRoleAccess,15000);
+  if(window.DDPostProcess) window.DDPostProcess.register("roleAccess", runRoleAccess, {everyMs:15000});
 })();
 
 
 /* CLIENT PORTAL POLISH + ROLE GUARD V5 */
 (function(){
-  const DD_IMG_FALLBACK = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
-    "<svg xmlns='http://www.w3.org/2000/svg' width='900' height='500'><defs><linearGradient id='g' x1='0' x2='1'><stop stop-color='#dcfce7'/><stop offset='1' stop-color='#fef3c7'/></linearGradient></defs><rect width='100%' height='100%' fill='url(#g)'/><text x='50%' y='48%' dominant-baseline='middle' text-anchor='middle' fill='#14532d' font-family='Arial' font-size='32' font-weight='700'>Project Photo</text><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' fill='#64748b' font-family='Arial' font-size='20'>Image unavailable</text></svg>"
-  );
-
   const translationsV5 = [
     [/Dentro do prazo/g, "On Schedule"],
     [/72% concluído/g, "72% completed"],
@@ -6279,6 +6233,10 @@ setTimeout(ddClientLabelPatch,1000);
   ];
 
   function getRoleV5(){
+    if(window.DDRoleUI && typeof window.DDRoleUI.getRole === "function"){
+      return window.DDRoleUI.getRole("client");
+    }
+    if(window.DDAuth) return window.DDAuth.getRole("client");
     try{
       const s = JSON.parse(localStorage.getItem("dd_auth_session_v1") || "{}");
       return localStorage.getItem("dd_role") || s.role || "client";
@@ -6288,23 +6246,17 @@ setTimeout(ddClientLabelPatch,1000);
   }
 
   function translateV5(){
-    document.querySelectorAll("body *").forEach(el=>{
-      if(el.childNodes && el.childNodes.length===1 && el.childNodes[0].nodeType===3){
-        let t = el.textContent;
-        translationsV5.forEach(([re, rep]) => t = t.replace(re, rep));
-        el.textContent = t;
-      }
-      ["placeholder","title","aria-label"].forEach(attr=>{
-        if(el.getAttribute && el.getAttribute(attr)){
-          let v = el.getAttribute(attr);
-          translationsV5.forEach(([re, rep]) => v = v.replace(re, rep));
-          el.setAttribute(attr, v);
-        }
-      });
-    });
+    if(window.DDText){
+      window.DDText.registerRules("clientPortalV5", translationsV5);
+      window.DDText.applyRuleSet("clientPortalV5");
+    }
   }
 
   function removeDuplicateRoleBadgesV5(){
+    if(window.DDRoleUI && typeof window.DDRoleUI.removeDuplicateRoleBadges === "function"){
+      window.DDRoleUI.removeDuplicateRoleBadges();
+      return;
+    }
     const badges = [...document.querySelectorAll("[data-role-final-badge], .role-pill, .top-pill, span, button")]
       .filter(el => ["CLIENT","OWNER","EMPLOYEE"].includes((el.textContent || "").trim().toUpperCase()));
     const seen = {};
@@ -6321,30 +6273,16 @@ setTimeout(ddClientLabelPatch,1000);
   }
 
   function fixImagesV5(){
-    document.querySelectorAll("img").forEach(img=>{
-      if(!img.dataset.ddFallbackV5){
-        img.dataset.ddFallbackV5 = "true";
-        img.onerror = function(){
-          this.onerror = null;
-          this.src = DD_IMG_FALLBACK;
-        };
-      }
-      const src = img.getAttribute("src") || "";
-      if(src.includes("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E") || src.includes("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E")){
-        img.src = DD_IMG_FALLBACK;
-      }
-    });
-
-    document.querySelectorAll("[style*='background-image']").forEach(el=>{
-      const st = el.getAttribute("style") || "";
-      if(st.includes("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E")){
-        el.style.backgroundImage = `url("${DD_IMG_FALLBACK}")`;
-      }
-    });
+    if(window.DDImages) window.DDImages.fixProjectImages();
   }
 
   function roleGuardV5(){
     const role = getRoleV5();
+    if(window.DDRoleUI && typeof window.DDRoleUI.hideBlockedKeywords === "function"){
+      window.DDRoleUI.hideBlockedKeywords(role);
+      return;
+    }
+
     document.body.setAttribute("data-dd-role", role);
 
     if(role === "client"){
@@ -6398,67 +6336,25 @@ setTimeout(ddClientLabelPatch,1000);
     improveBackV5();
   }
 
-  const oldChangePageV5 = window.changePage;
-  if(typeof oldChangePageV5 === "function"){
-    window.changePage = function(){
-      const result = oldChangePageV5.apply(this, arguments);
-      setTimeout(runV5,50);
-      setTimeout(runV5,300);
-      return result;
-    };
-  }
+  if(window.DDPostProcess) window.DDPostProcess.onPageChange("clientPortalPolish", runV5, [50, 300]);
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(runV5,300));
   setTimeout(runV5,800);
-  setInterval(runV5,30000);
+  if(window.DDPostProcess) window.DDPostProcess.register("clientPortalPolish", runV5, {everyMs:30000});
 })();
 
 
 /* FINAL UNSPLASH 404 FIX */
 (function(){
-  const DD_PROJECT_PHOTO_PLACEHOLDER = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
-    "<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'><defs><linearGradient id='g' x1='0' x2='1'><stop stop-color='#dcfce7'/><stop offset='1' stop-color='#fef3c7'/></linearGradient></defs><rect width='100%' height='100%' fill='url(#g)'/><text x='50%' y='48%' dominant-baseline='middle' text-anchor='middle' fill='#14532d' font-family='Arial' font-size='42' font-weight='700'>Project Photo</text><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' fill='#64748b' font-family='Arial' font-size='24'>Image unavailable</text></svg>"
-  );
-
   function fixUnsplash404(){
-    document.querySelectorAll(".v66-photo-preview, [style*='unsplash'], img").forEach(el=>{
-      if(el.tagName === "IMG"){
-        const src = el.getAttribute("src") || "";
-        if(src.includes("images.unsplash.com") || src.includes("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E")){
-          el.src = DD_PROJECT_PHOTO_PLACEHOLDER;
-        }
-        if(!el.dataset.ddNo404){
-          el.dataset.ddNo404 = "true";
-          el.onerror = function(){
-            this.onerror = null;
-            this.src = DD_PROJECT_PHOTO_PLACEHOLDER;
-          };
-        }
-        return;
-      }
-
-      const bg = el.style && el.style.backgroundImage ? el.style.backgroundImage : "";
-      if(bg.includes("images.unsplash.com") || bg.includes("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E")){
-        el.style.backgroundImage = `url("${DD_PROJECT_PHOTO_PLACEHOLDER}")`;
-        el.style.backgroundSize = "cover";
-        el.style.backgroundPosition = "center";
-      }
-    });
+    if(window.DDImages) window.DDImages.fixProjectImages();
   }
 
-  const oldChangePageNo404 = window.changePage;
-  if(typeof oldChangePageNo404 === "function"){
-    window.changePage = function(){
-      const r = oldChangePageNo404.apply(this, arguments);
-      setTimeout(fixUnsplash404, 50);
-      setTimeout(fixUnsplash404, 300);
-      return r;
-    };
-  }
+  if(window.DDPostProcess) window.DDPostProcess.onPageChange("imageFallbacks", fixUnsplash404, [50, 300]);
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(fixUnsplash404,200));
   setTimeout(fixUnsplash404,500);
-  setInterval(fixUnsplash404,30000);
+  if(window.DDPostProcess) window.DDPostProcess.register("imageFallbacks", fixUnsplash404, {everyMs:30000});
 })();
 
 
@@ -6499,26 +6395,20 @@ setTimeout(ddClientLabelPatch,1000);
   document.addEventListener("DOMContentLoaded",()=>setTimeout(wrapLoosePasswordInputs,300));
   setTimeout(wrapLoosePasswordInputs,1000);
 
-  const oldChangePagePerf = window.changePage;
-  if(typeof oldChangePagePerf === "function"){
-    window.changePage = function(){
-      const r = oldChangePagePerf.apply(this, arguments);
-      setTimeout(wrapLoosePasswordInputs,300);
-      return r;
-    };
-  }
+  if(window.DDPostProcess) window.DDPostProcess.onPageChange("passwordFormFix", wrapLoosePasswordInputs, [300]);
 })();
 
 
 /* DOUBLEDIAMOND V1 COMMERCIAL FINAL */
 (function(){
-  function session(){ try{return JSON.parse(localStorage.getItem("dd_auth_session_v1")||"{}")}catch(e){return {}} }
-  function role(){ const s=session(); return localStorage.getItem("dd_role") || s.role || "client"; }
-  function setRole(r,n,e){ localStorage.setItem("dd_role",r); localStorage.setItem("dd_auth_session_v1",JSON.stringify({role:r,name:n||r,email:e||"",logged_at:new Date().toISOString()})); }
+  function session(){ return window.DDAuth ? (window.DDAuth.getSession() || {}) : (function(){ try{return JSON.parse(localStorage.getItem("dd_auth_session_v1")||"{}")}catch(e){return {}} })(); }
+  function role(){ return window.DDAuth ? window.DDAuth.getRole("client") : (localStorage.getItem("dd_role") || session().role || "client"); }
+  function setRole(r,n,e){ if(window.DDAuth) return window.DDAuth.setRoleSession(r,n,e); localStorage.setItem("dd_role",r); localStorage.setItem("dd_auth_session_v1",JSON.stringify({role:r,name:n||r,email:e||"",logged_at:new Date().toISOString()})); }
   function toast(m){ let x=document.getElementById("dd-toast"); if(!x){x=document.createElement("div");x.id="dd-toast";x.style.cssText="position:fixed;right:22px;bottom:22px;background:#10192e;color:#fff;padding:14px 18px;border-radius:16px;z-index:999999;font-weight:800";document.body.appendChild(x)} x.textContent=m; x.style.display="block"; clearTimeout(x.t); x.t=setTimeout(()=>x.style.display="none",2500); }
 
   function loginScreen(){
-    if(typeof window.ddLoginClient === "function" || localStorage.getItem("dd_auth_session_v1") || document.getElementById("dd-commercial-login") || document.getElementById("ddLoginShell")) return;
+    const hasSession = window.DDAuth ? !!window.DDAuth.getSession() : !!localStorage.getItem("dd_auth_session_v1");
+    if(typeof window.ddLoginClient === "function" || hasSession || document.getElementById("dd-commercial-login") || document.getElementById("ddLoginShell")) return;
     const div=document.createElement("div");
     div.id="dd-commercial-login";
     div.innerHTML=`<div class="dd-login-card">
@@ -6544,19 +6434,36 @@ setTimeout(ddClientLabelPatch,1000);
   }
 
   function brand(){
-    document.querySelectorAll("body *").forEach(el=>{
-      if(el.childNodes&&el.childNodes.length===1&&el.childNodes[0].nodeType===3){
-        el.textContent=el.textContent.replace(/DoubleDiamond Platform/g,"DoubleDiamond Command Center").replace(/Field Service Platform/g,"Landscaping Operations Platform").replace(/Cliente/g,"Client").replace(/Relatorio|Reporte/g,"Report").replace(/Financeiro/g,"Financial");
-      }
-    });
+    if(window.DDText){
+      window.DDText.registerRules("commercialBrand", [
+        [/DoubleDiamond Platform/g,"DoubleDiamond Command Center"],
+        [/Field Service Platform/g,"Landscaping Operations Platform"],
+        [/Cliente/g,"Client"],
+        [/Relatorio|Reporte/g,"Report"],
+        [/Financeiro/g,"Financial"]
+      ]);
+      window.DDText.applyRuleSet("commercialBrand");
+    }
     const badges=[...document.querySelectorAll("span,button,[data-role-final-badge]")].filter(el=>["CLIENT","OWNER","EMPLOYEE"].includes((el.textContent||"").trim().toUpperCase()));
     const seen={}; badges.forEach(el=>{let k=el.textContent.trim().toUpperCase(); if(seen[k]) el.style.display="none"; else seen[k]=1;});
   }
 
   function permissions(){
     const r=role(); document.body.dataset.ddRole=r;
-    const blocked={client:["work orders","routes","field","workforce","weather","mobile ready","pwa","finance","intelligence","administration","command center","owner"],employee:["finance","intelligence","administration","owner"]};
+    const blocked=(window.DDCore && window.DDCore.ROLE_BLOCKED_KEYWORDS) || {client:["work orders","routes","field","workforce","weather","mobile ready","pwa","finance","intelligence","administration","command center","owner"],employee:["finance","intelligence","administration","owner"]};
     document.querySelectorAll("a,button,.nav-item,[onclick]").forEach(el=>{
+      const onclick = el.getAttribute && (el.getAttribute("onclick") || "");
+      const routeMatch = onclick.match(/changePage\('([^']+)'/);
+      if(routeMatch && window.DDCore && typeof window.DDCore.isPageAllowed === "function"){
+        if(!window.DDCore.isPageAllowed(r, routeMatch[1])){
+          el.style.display="none";
+          el.dataset.ddBlocked="true";
+        }else if(el.dataset.ddBlocked==="true"){
+          el.style.display="";
+          delete el.dataset.ddBlocked;
+        }
+        return;
+      }
       const t=(el.textContent||"").toLowerCase();
       if((blocked[r]||[]).some(w=>t.includes(w))){
         el.style.display="none";
@@ -6583,12 +6490,12 @@ setTimeout(ddClientLabelPatch,1000);
   }
 
   function logout(){
-    document.querySelectorAll("button,a").forEach(el=>{if((el.textContent||"").trim().toLowerCase()==="logout"&&!el.dataset.ddLogoutFinal){el.dataset.ddLogoutFinal=1;el.addEventListener("click",e=>{e.preventDefault();localStorage.removeItem("dd_role");localStorage.removeItem("dd_auth_session_v1");location.href=location.pathname+"?v=v1-commercial-final"},true)}});
+    document.querySelectorAll("button,a").forEach(el=>{if((el.textContent||"").trim().toLowerCase()==="logout"&&!el.dataset.ddLogoutFinal){el.dataset.ddLogoutFinal=1;el.addEventListener("click",e=>{e.preventDefault();if(window.DDAuth){window.DDAuth.clearSession();}else{localStorage.removeItem("dd_role");localStorage.removeItem("dd_auth_session_v1");}location.href=location.pathname+"?v=v1-commercial-final"},true)}});
   }
   function apply(){permissions();brand();clientManagement();logout();}
-  const old=window.changePage; if(typeof old==="function"){window.changePage=function(){let r=old.apply(this,arguments);setTimeout(apply,100);setTimeout(apply,500);return r}}
+  if(window.DDPostProcess) window.DDPostProcess.onPageChange("commercialFinal", apply, [100, 500]);
   document.addEventListener("DOMContentLoaded",()=>{setTimeout(loginScreen,100);setTimeout(apply,400)});
-  setTimeout(apply,1000); setInterval(apply,30000);
+  setTimeout(apply,1000); if(window.DDPostProcess) window.DDPostProcess.register("commercialFinal", apply, {everyMs:30000, delayMs:1000});
 })();
 
 
@@ -6613,41 +6520,24 @@ setTimeout(ddClientLabelPatch,1000);
         });
       });
 
-      document.querySelectorAll("body *").forEach(function(el){
-        if(el.childNodes && el.childNodes.length === 1 && el.childNodes[0].nodeType === 3){
-          el.textContent = el.textContent
-            .replace(/Cliente/g, "Client")
-            .replace(/Empresa/g, "Client")
-            .replace(/Relatorio/g, "Report")
-            .replace(/Reporte/g, "Report")
-            .replace(/Financeiro/g, "Financial");
-        }
-      });
+      if(window.DDText){
+        window.DDText.registerRules("auditCleanText", [
+          [/Cliente/g, "Client"],
+          [/Empresa/g, "Client"],
+          [/Relatorio/g, "Report"],
+          [/Reporte/g, "Report"],
+          [/Financeiro/g, "Financial"]
+        ]);
+        window.DDText.applyRuleSet("auditCleanText");
+      }
 
-      var bad = "photo-1599598425947-5b1a1cfacd57";
-      var fallback = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27700%27%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20fill%3D%27%23eef7ee%27/%3E%3Ctext%20x%3D%2750%25%27%20y%3D%2750%25%27%20text-anchor%3D%27middle%27%20fill%3D%27%2314532d%27%20font-family%3D%27Arial%27%20font-size%3D%2738%27%20font-weight%3D%27700%27%3EProject%20Photo%3C/text%3E%3C/svg%3E";
-      document.querySelectorAll("img,[style]").forEach(function(el){
-        if(el.tagName === "IMG" && (el.src || "").indexOf(bad) !== -1){
-          el.src = fallback;
-        }
-        var bg = el.style && el.style.backgroundImage;
-        if(bg && bg.indexOf(bad) !== -1){
-          el.style.backgroundImage = "url('" + fallback + "')";
-        }
-      });
+      if(window.DDImages) window.DDImages.fixProjectImages();
     }catch(e){
       console.warn("Audit clean fixed skipped:", e);
     }
   }
 
-  var oldChangePageAuditFixed = window.changePage;
-  if(typeof oldChangePageAuditFixed === "function"){
-    window.changePage = function(){
-      var r = oldChangePageAuditFixed.apply(this, arguments);
-      setTimeout(ddAuditCleanFixed, 200);
-      return r;
-    };
-  }
+  if(window.DDPostProcess) window.DDPostProcess.onPageChange("auditCleanFixed", ddAuditCleanFixed, [200]);
 
   document.addEventListener("DOMContentLoaded", function(){ setTimeout(ddAuditCleanFixed, 500); });
   setTimeout(ddAuditCleanFixed, 1000);

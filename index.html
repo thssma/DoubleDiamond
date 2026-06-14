@@ -125,16 +125,17 @@
     </main>
   </div>
 
+  <script src="js/dd-config.js"></script>
+  <script src="js/dd-api.js"></script>
+  <script src="js/dd-data.js"></script>
+  <script src="js/dd-core.js"></script>
+  <script src="js/dd-auth.js"></script>
+  <script src="js/dd-alerts.js"></script>
+  <script src="js/dd-text.js"></script>
+  <script src="js/dd-images.js"></script>
+  <script src="js/dd-role-ui.js"></script>
+  <script src="js/dd-postprocess.js"></script>
   <script src="script.js"></script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js').catch(() => {});
-}
-// Auto-close mobile nav when picking an item
-document.addEventListener('click', (e)=>{
-  const btn = e.target.closest('.menu-btn');
-  if(btn && document.body.classList.contains('nav-open')) document.body.classList.remove('nav-open');
-});
-</script>
+  <script src="js/dd-shell.js"></script>
 </body>
 </html>
