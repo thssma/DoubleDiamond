@@ -5549,7 +5549,8 @@ renderClientHome = function(){
   function ddLoginStaff(){
     const role=(document.getElementById("ddStaffRole")||{}).value || "employee";
     const pin=(document.getElementById("ddStaffPin")||{}).value || "";
-    const validPin = window.DDAuth ? window.DDAuth.validateStaffPin(role, pin) : (role==="owner" && pin==="owner123") || (role==="employee" && pin==="field123");
+    const demoPins = (window.DDConfig && window.DDConfig.DEMO_PINS) || {};
+    const validPin = window.DDAuth ? window.DDAuth.validateStaffPin(role, pin) : (role==="owner" && pin===(demoPins.owner || "owner123")) || (role==="employee" && pin===(demoPins.employee || "field123"));
     if(!validPin) return alert(role==="owner" ? "Owner PIN inválido." : "Employee PIN inválido.");
     ddSetSession({role, name: role==="owner"?"Owner":"Employee", logged_at:new Date().toISOString()});
     ddBootAuthenticated(role);
@@ -5594,7 +5595,7 @@ renderClientHome = function(){
           <select id="ddStaffRole"><option value="employee">Employee</option><option value="owner">Owner</option></select>
           <input id="ddStaffPin" type="password" placeholder="Access PIN">
           <button onclick="ddLoginStaff()">Enter Internal App</button>
-          <small>Owner PIN: owner123 · Employee PIN: field123</small>
+          <small>Demo staff PINs are configured in DDConfig.</small>
         </section>
       </main>
     `);

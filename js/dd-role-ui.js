@@ -18,8 +18,10 @@
       return window.DDAuth.getRole(defaultRole || "client");
     }
     try{
-      const session = JSON.parse(localStorage.getItem("dd_auth_session_v1") || "{}");
-      return localStorage.getItem("dd_role") || session.role || defaultRole || "client";
+      const storage = window.DDStorage;
+      const session = storage ? storage.getJson("dd_auth_session_v1", {}) : JSON.parse(localStorage.getItem("dd_auth_session_v1") || "{}");
+      const role = storage ? storage.get("dd_role", null) : localStorage.getItem("dd_role");
+      return role || session.role || defaultRole || "client";
     }catch(e){
       return localStorage.getItem("dd_role") || defaultRole || "client";
     }
