@@ -34,6 +34,21 @@
     "Administration": "Administration"
   };
 
+  const ROLE_CONTEXT = {
+    client: {
+      title: "Client workspace",
+      detail: "Project status, reports, photos, approvals, and documents."
+    },
+    employee: {
+      title: "Field workspace",
+      detail: "Daily work, routes, field updates, weather, and mobile execution."
+    },
+    owner: {
+      title: "Owner workspace",
+      detail: "Operations, clients, field performance, reporting, and business controls."
+    }
+  };
+
   function getRole(){
     if(window.DDRoleUI && typeof window.DDRoleUI.getRole === "function") return window.DDRoleUI.getRole("client");
     if(window.DDAuth && typeof window.DDAuth.getRole === "function") return window.DDAuth.getRole("client");
@@ -121,10 +136,62 @@
     if(subtitle) subtitle.textContent = "Focused landscaping operations by role.";
   }
 
+  function hideOutOfScopeActions(){
+    const role = getRole();
+    const allowed = MVP_ROUTES[role] || MVP_ROUTES.client;
+    document.querySelectorAll("#pageContent [onclick*=\"changePage\"]").forEach(function(element){
+      const route = getRouteFromElement(element);
+      if(!route) return;
+      if(allowed.includes(route)){
+        if(element.dataset.mvpActionHidden === "true"){
+          element.style.display = "";
+          delete element.dataset.mvpActionHidden;
+        }
+      }else{
+        element.style.display = "none";
+        element.dataset.mvpActionHidden = "true";
+      }
+    });
+  }
+
+  function improveEmptyStates(){
+    document.querySelectorAll("#pageContent .card, #pageContent .report-card, #pageContent .enterprise-card, #pageContent .v651-card").forEach(function(card){
+      const text = (card.textContent || "").trim();
+      if(!text) return;
+      const isEmpty = /Nenhum|Nenhuma|No photos|No reports|Nothing/i.test(text);
+      if(isEmpty){
+        card.classList.add("dd-empty-state");
+        if(!card.querySelector(".dd-empty-state-note")){
+          const note = document.createElement("small");
+          note.className = "dd-empty-state-note";
+          note.textContent = "This area is ready. Add real records to populate it.";
+          card.appendChild(note);
+        }
+      }
+    });
+  }
+
+  function ensureRoleContext(){
+    const content = document.getElementById("pageContent");
+    if(!content) return;
+    const role = getRole();
+    const copy = ROLE_CONTEXT[role] || ROLE_CONTEXT.client;
+    let context = content.querySelector(".dd-role-context");
+    if(!context){
+      context = document.createElement("div");
+      context.className = "dd-role-context";
+      content.prepend(context);
+    }
+    context.innerHTML = `<strong>${copy.title}</strong><span>${copy.detail}</span>`;
+  }
+
   function apply(){
     installRouteGuard();
     applyNavigation();
     applyHeader();
+    hideOutOfScopeActions();
+    improveEmptyStates();
+    ensureRoleContext();
   }
 
   window.DDProductUX = {
@@ -133,13 +200,16 @@
     apply,
     applyNavigation,
     applyHeader,
+    hideOutOfScopeActions,
+    improveEmptyStates,
+    ensureRoleContext,
     guardRoute,
     installRouteGuard
   };
 
   document.addEventListener("DOMContentLoaded", function(){ setTimeout(apply, 250); });
   if(window.DDPostProcess){
-    window.DDPostProcess.onPageChange("productUx", apply, [50, 300]);
+    window.DDPostProcess.onPageChange("productUx", apply, [50, 300, 900]);
     window.DDPostProcess.register("productUx", apply, {everyMs:30000});
   }
 })(window, document);
