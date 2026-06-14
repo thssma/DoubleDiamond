@@ -41,8 +41,8 @@ These PINs are demo-only. Production authentication belongs in the security/back
 
 ## Block Plan
 
-1. Base cleanup: reduce `script.js`, organize docs, centralize text/encoding cleanup, and extract critical screens.
-2. Product and UX: finalize MVP screens by role and remove prototype noise.
+1. Base cleanup: reduce `script.js`, organize docs, centralize text/encoding cleanup, and extract critical screens. Status: merged.
+2. Product and UX: finalize MVP screens by role and remove prototype noise. Status: in progress.
 3. Security and backend: authentication, Supabase schema/RLS, and API hardening.
 4. QA and deploy: smoke tests, deploy target, service worker validation, and final docs.
 
