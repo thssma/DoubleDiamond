@@ -6559,3 +6559,7 @@ if(window.DDClientHomeScreen && typeof window.DDClientHomeScreen.renderBase === 
   window.renderClientHome = renderClientHome;
 }
 window.renderReportCenter = renderReportCenter;
+
+if(window.DDProductUX && typeof window.DDProductUX.apply === "function"){
+  window.DDProductUX.apply();
+}

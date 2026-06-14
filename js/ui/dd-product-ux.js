@@ -96,6 +96,24 @@
     document.body.dataset.ddMvpUx = "true";
   }
 
+  function guardRoute(page){
+    const role = getRole();
+    const normalized = window.DDCore && typeof window.DDCore.normalizeRoute === "function" ? window.DDCore.normalizeRoute(page) : page;
+    const allowed = MVP_ROUTES[role] || MVP_ROUTES.client;
+    if(allowed.includes(normalized)) return normalized;
+    if(window.DDCore && typeof window.DDCore.defaultPageForRole === "function") return window.DDCore.defaultPageForRole(role);
+    return role === "owner" ? "dashboard" : role === "employee" ? "mobileWorkforce" : "clientHome";
+  }
+
+  function installRouteGuard(){
+    if(window.__ddProductUxRouteGuard || typeof window.changePage !== "function") return;
+    const originalChangePage = window.changePage;
+    window.changePage = function(page, event){
+      return originalChangePage.call(this, guardRoute(page), event);
+    };
+    window.__ddProductUxRouteGuard = true;
+  }
+
   function applyHeader(){
     const eyebrow = document.querySelector(".topbar .eyebrow");
     const subtitle = document.querySelector(".topbar .subtitle");
@@ -104,6 +122,7 @@
   }
 
   function apply(){
+    installRouteGuard();
     applyNavigation();
     applyHeader();
   }
@@ -113,7 +132,9 @@
     ROUTE_LABELS,
     apply,
     applyNavigation,
-    applyHeader
+    applyHeader,
+    guardRoute,
+    installRouteGuard
   };
 
   document.addEventListener("DOMContentLoaded", function(){ setTimeout(apply, 250); });

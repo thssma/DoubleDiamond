@@ -24,7 +24,7 @@
         <section class="v651-premium-hero">
           <div class="v651-hero-top"><div><div class="v651-eyebrow">Client Portal - V66.0</div><h2>My Project</h2><p>Track progress, before/during/after photos, upcoming visits, team, documents e updates.</p></div><div class="v651-status-pill">On Schedule</div></div>
           <div class="v651-progress"><span></span></div><strong>72% completed</strong><p style="color:#d1fae5;margin-top:8px;">Last Update: ${lastUpdate}</p>
-          <div class="v651-hero-actions"><button class="v651-primary" onclick="changePage('reportCenter', event)">View Reports</button><button class="v651-secondary" onclick="changePage('whatsappReal', event)">Contact Team</button><button class="v651-secondary" onclick="changePage('profitabilityEngine', event)">Payments</button></div>
+          <div class="v651-hero-actions"><button id="ddClientViewReports" class="v651-primary" type="button">View Reports</button></div>
         </section>
         <div class="v66-kpis"><div class="v66-kpi">Total Photos<strong>${recentPhotosSafe.length || 4}</strong></div><div class="v66-kpi">Last Update<strong>${lastUpdate}</strong></div><div class="v66-kpi">Visits Completed<strong>${visitsCompleted || 3}</strong></div><div class="v66-kpi">Progress<strong>72%</strong></div></div>
         <div class="v651-grid"><div class="v651-card"><h3>Next Step</h3><p><strong>Irrigation Installation</strong></p><small>Assigned to: Team Verde</small></div><div class="v651-card"><h3>Next Visit</h3><p><strong>12/06 as 08:00</strong></p><small>Irrigation and site preparation</small></div><div class="v651-card"><h3>Project Status</h3><p><strong>${projectName}</strong></p><small>Project in Progress</small></div><div class="v651-card"><h3>Reports</h3><p><strong>${reportsCount}</strong> disponiveis</p><small>Documents preparados para o cliente</small></div></div>
@@ -65,6 +65,13 @@
     setTimeout(function(){
       if(typeof window.ddV66RenderGallery === "function") window.ddV66RenderGallery("Todos");
     }, 0);
+
+    const reportsButton = document.getElementById("ddClientViewReports");
+    if(reportsButton){
+      reportsButton.addEventListener("click", function(){
+        if(typeof window.renderReportCenter === "function") window.renderReportCenter();
+      });
+    }
   }
 
   window.DDClientHomeScreen = { renderBase };
