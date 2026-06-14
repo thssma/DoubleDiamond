@@ -6,7 +6,7 @@ Static frontend for the DoubleDiamond field service and client portal applicatio
 
 - Client portal for project progress, reports, photos, timeline, approvals, and signatures.
 - Employee field workflow for work orders, routes, check-ins, photo upload, and mobile operations.
-- Owner command center for operational, financial, automation, and AI dashboards.
+- Owner command center for operational, client, field, reporting, integration, and business performance controls.
 
 ## Local Run
 
@@ -37,12 +37,15 @@ These PINs are demo-only. Production authentication belongs in the security/back
 - `script.js`: legacy application surface still being reduced.
 - `js/dd-*.js`: shared runtime modules extracted from the legacy script.
 - `js/screens/`: screen-specific modules extracted during cleanup.
+- `js/ui/`: UI behavior modules for role UX, text cleanup, and MVP navigation.
+- `docs/MVP_SCOPE.md`: role-based MVP scope for Product/UX work.
+- `docs/BLOCK2_QA_CHECKLIST.md`: QA checklist for the Product/UX block.
 - `docs/archive/`: historical phase notes retained for reference.
 
 ## Block Plan
 
-1. Base cleanup: reduce `script.js`, organize docs, centralize text/encoding cleanup, and extract critical screens.
-2. Product and UX: finalize MVP screens by role and remove prototype noise.
+1. Base cleanup: reduce `script.js`, organize docs, centralize text/encoding cleanup, and extract critical screens. Status: merged.
+2. Product and UX: finalize MVP screens by role and remove prototype noise. Status: in progress.
 3. Security and backend: authentication, Supabase schema/RLS, and API hardening.
 4. QA and deploy: smoke tests, deploy target, service worker validation, and final docs.
 
@@ -53,10 +56,11 @@ Before merging a branch:
 ```powershell
 node --check script.js
 Get-ChildItem js -Recurse -Filter *.js | ForEach-Object { node --check $_.FullName }
+node tools/validate-mvp-scope.js
 ```
 
 Manual browser smoke checks:
 
 - Client login opens `My Project` and only shows Client Portal/Reports navigation.
 - Employee login opens `Mobile Workforce` and shows operational navigation.
-- Owner login opens `Home` and shows the full menu.
+- Owner login opens `Home` and shows the focused MVP owner menu.
