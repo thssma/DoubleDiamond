@@ -49,7 +49,7 @@ These PINs are demo-only. Production authentication belongs in the security/back
 
 1. Base cleanup: reduce `script.js`, organize docs, centralize text/encoding cleanup, and extract critical screens. Status: merged.
 2. Product and UX: finalize MVP screens by role and remove prototype noise. Status: merged.
-3. Security and backend: authentication, Supabase schema/RLS, and API hardening. Status: in progress.
+3. Security and backend: authentication, Supabase schema/RLS, and API hardening. Status: ready for review.
 4. QA and deploy: smoke tests, deploy target, service worker validation, and final docs.
 
 ## Validation
