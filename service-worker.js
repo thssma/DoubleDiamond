@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doublediamond-block3-security-data-20260614';
+const CACHE_NAME = 'doublediamond-final-release-20260615';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
