@@ -26,6 +26,12 @@ window.DD_RUNTIME_CONFIG = {
 - `js/dd-api.js` sends backend-only writes to `DDBackend` when configured.
 - If no endpoint exists, `DDApi` returns an explicit simulated `202` response and does not write directly to Supabase.
 
+## Auth Boundary
+
+- `js/dd-supabase-auth.js` provides a minimal Supabase Auth REST client for production login wiring.
+- `js/dd-auth.js` keeps demo PIN support only when `DDConfig.DEMO_MODE !== false`.
+- In production, set `DEMO_MODE: false` and use Supabase Auth metadata for `role` and `company_id`.
+
 ## Next Production Step
 
 Create Supabase Edge Functions for:

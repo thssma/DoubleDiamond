@@ -69,6 +69,7 @@ node tools/validate-rls-plan.js
 node tools/validate-backend-boundary.js
 node tools/validate-backend-foundation.js
 node tools/validate-edge-functions.js
+node tools/validate-auth-foundation.js
 node tools/validate-release.js
 ```
 
