@@ -30,6 +30,14 @@
     };
   }
 
+  async function backendWriteResponse(table, action, payload){
+    if(window.DDBackend && typeof window.DDBackend.requestBackendOperation === "function"){
+      const response = await window.DDBackend.requestBackendOperation(table, action, payload);
+      if(response) return response;
+    }
+    return backendPlaceholderResponse(table, action);
+  }
+
   function isConfigured(){
     return Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
   }
@@ -61,7 +69,7 @@
   async function apiInsert(table, data){
     if(!isConfigured()) throw new Error("API is not configured");
     const tableName = safeTable(table);
-    if(isBackendRequiredTable(tableName)) return backendPlaceholderResponse(tableName, "insert");
+    if(isBackendRequiredTable(tableName)) return await backendWriteResponse(tableName, "insert", { data });
     return await fetch(`${SUPABASE_URL}/rest/v1/${tableName}`, {
       method: "POST",
       headers: apiHeaders({"Prefer": "return=representation"}),
@@ -72,7 +80,7 @@
   async function apiPatch(table, id, data){
     if(!isConfigured()) throw new Error("API is not configured");
     const tableName = safeTable(table);
-    if(isBackendRequiredTable(tableName)) return backendPlaceholderResponse(tableName, "patch");
+    if(isBackendRequiredTable(tableName)) return await backendWriteResponse(tableName, "patch", { id, data });
     return await fetch(`${SUPABASE_URL}/rest/v1/${tableName}?id=eq.${encodeURIComponent(id)}`, {
       method: "PATCH",
       headers: apiHeaders({"Prefer": "return=representation"}),
@@ -83,7 +91,7 @@
   async function apiDelete(table, id){
     if(!isConfigured()) throw new Error("API is not configured");
     const tableName = safeTable(table);
-    if(isBackendRequiredTable(tableName)) return backendPlaceholderResponse(tableName, "delete");
+    if(isBackendRequiredTable(tableName)) return await backendWriteResponse(tableName, "delete", { id });
     return await fetch(`${SUPABASE_URL}/rest/v1/${tableName}?id=eq.${encodeURIComponent(id)}`, {
       method: "DELETE",
       headers: apiHeaders()
@@ -93,6 +101,7 @@
   window.DDApi = {
     isBackendRequiredTable,
     backendPlaceholderResponse,
+    backendWriteResponse,
     isConfigured,
     safeTable,
     apiHeaders,

@@ -11,6 +11,7 @@
     DEMO_PINS: {
       owner: demoPins.owner || "owner123",
       employee: demoPins.employee || "field123"
-    }
+    },
+    BACKEND_ENDPOINTS: runtime.BACKEND_ENDPOINTS || {}
   };
 })(window);
