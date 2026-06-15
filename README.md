@@ -22,13 +22,11 @@ Then open:
 http://127.0.0.1:4173/index.html?v=v1-commercial-final
 ```
 
-## Demo Access
+## Access
 
-- Client: use the public client login button.
-- Employee: staff access with PIN `field123`.
-- Owner: staff access with PIN `owner123`.
-
-These PINs are demo-only. Production authentication belongs in the security/backend block.
+- Production: use Supabase Auth with user metadata for `company_id` and `role`.
+- Local development: fallback access remains available only while `DDConfig.DEMO_MODE !== false`.
+- Go-live: follow `docs/SUPABASE_GO_LIVE_RUNBOOK.md` before deploy.
 
 ## Frontend Structure
 
@@ -72,6 +70,7 @@ node tools/validate-backend-foundation.js
 node tools/validate-edge-functions.js
 node tools/validate-auth-foundation.js
 node tools/validate-supabase-runbook.js
+node tools/validate-production-ux.js
 node tools/validate-release.js
 ```
 

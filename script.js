@@ -5539,14 +5539,34 @@ renderClientHome = function(){
     if(window.DDAuth) return window.DDAuth.getRole("client");
     return (ddGetSession()||{}).role || "client";
   }
+  function ddIsDemoMode(){
+    return window.DDAuth && typeof window.DDAuth.isDemoMode === "function" ? window.DDAuth.isDemoMode() : !window.DDConfig || window.DDConfig.DEMO_MODE !== false;
+  }
 
   function ddLoginClient(){
+    if(!ddIsDemoMode()) return ddLoginProduction();
     const name=(document.getElementById("ddClientName")||{}).value || "Client";
-    const email=(document.getElementById("ddClientEmail")||{}).value || "client@demo.com";
+    const email=(document.getElementById("ddClientEmail")||{}).value || "client@example.com";
     ddSetSession({role:"client", name:name.trim()||"Client", email, logged_at:new Date().toISOString()});
     ddBootAuthenticated("client");
   }
+  async function ddLoginProduction(){
+    const email=(document.getElementById("ddAuthEmail")||{}).value || "";
+    const password=(document.getElementById("ddAuthPassword")||{}).value || "";
+    if(!email || !password) return alert("Enter your email and password.");
+    if(!window.DDSupabaseAuth) return alert("Authentication provider is not available.");
+    try{
+      await window.DDSupabaseAuth.signInWithPassword(email, password);
+      const metadata = window.DDSupabaseAuth.userMetadata();
+      const role = metadata.role || "client";
+      ddSetSession({role, name: metadata.email || email, email: metadata.email || email, company_id: metadata.company_id || "", logged_at:new Date().toISOString(), provider:"supabase"});
+      ddBootAuthenticated(role);
+    }catch(error){
+      alert(error && error.message ? error.message : "Unable to sign in.");
+    }
+  }
   function ddLoginStaff(){
+    if(!ddIsDemoMode()) return alert("Staff access uses production authentication.");
     const role=(document.getElementById("ddStaffRole")||{}).value || "employee";
     const pin=(document.getElementById("ddStaffPin")||{}).value || "";
     const demoPins = (window.DDConfig && window.DDConfig.DEMO_PINS) || {};
@@ -5564,6 +5584,7 @@ renderClientHome = function(){
     if(box) box.classList.toggle("is-visible");
   }
   window.ddLoginClient=ddLoginClient;
+  window.ddLoginProduction=ddLoginProduction;
   window.ddLoginStaff=ddLoginStaff;
   window.ddLogout=ddLogout;
   window.ddRevealStaff=ddRevealStaff;
@@ -5575,32 +5596,45 @@ renderClientHome = function(){
     if(commercialLogin) commercialLogin.remove();
     let existing=document.getElementById("ddLoginShell");
     if(existing) existing.remove();
-    document.body.insertAdjacentHTML("beforeend", `
-      <main id="ddLoginShell" class="dd-login-shell">
-        <section class="dd-login-card">
-          <div class="dd-login-brand">💎</div>
-          <p class="dd-login-eyebrow">DoubleDiamond Client Portal</p>
-          <h1>Access your project</h1>
-          <p class="dd-login-subtitle">Track photos, reports, approvals and project updates.</p>
+    const productionLogin = !ddIsDemoMode();
+    const loginFields = productionLogin ? `
+          <label>Email</label>
+          <input id="ddAuthEmail" type="email" placeholder="you@company.com" autocomplete="email">
+          <label>Password</label>
+          <input id="ddAuthPassword" type="password" placeholder="Password" autocomplete="current-password">
+          <button class="dd-login-primary" onclick="ddLoginProduction()">Sign in</button>
+          <small class="dd-login-note">Access is managed by your organization.</small>
+    ` : `
           <label>Client name</label>
           <input id="ddClientName" placeholder="Client name" autocomplete="name">
           <label>Email</label>
           <input id="ddClientEmail" placeholder="client@email.com" autocomplete="email">
           <button class="dd-login-primary" onclick="ddLoginClient()">Enter Client Portal</button>
-          <small class="dd-login-note">Pilot access. Secure Supabase Auth can be connected in the next phase.</small>
-        </section>
-        <button class="dd-staff-trigger" onclick="ddRevealStaff()" title="Staff access">💎</button>
+          <small class="dd-login-note">Local development access.</small>
+    `;
+    const staffAccess = productionLogin ? "" : `
+        <button class="dd-staff-trigger" onclick="ddRevealStaff()" title="Staff access">DD</button>
         <section id="ddStaffBox" class="dd-staff-box">
           <h3>Staff Access</h3>
           <select id="ddStaffRole"><option value="employee">Employee</option><option value="owner">Owner</option></select>
           <input id="ddStaffPin" type="password" placeholder="Access PIN">
           <button onclick="ddLoginStaff()">Enter Internal App</button>
-          <small>Demo staff PINs are configured in DDConfig.</small>
+          <small>Development-only staff access.</small>
         </section>
+    `;
+    document.body.insertAdjacentHTML("beforeend", `
+      <main id="ddLoginShell" class="dd-login-shell">
+        <section class="dd-login-card">
+          <div class="dd-login-brand">DD</div>
+          <p class="dd-login-eyebrow">DoubleDiamond</p>
+          <h1>Sign in to your workspace</h1>
+          <p class="dd-login-subtitle">Secure access for clients, field teams and owners.</p>
+          ${loginFields}
+        </section>
+        ${staffAccess}
       </main>
     `);
   }
-
   function ddRoleAllowedPage(role, page){
     if(window.DDRoleUI && typeof window.DDRoleUI.isPageAllowed === "function"){
       return window.DDRoleUI.isPageAllowed(role, page);
@@ -6433,7 +6467,7 @@ setTimeout(ddClientLabelPatch,1000);
         <button type="submit">Login</button>
       </form>
       <button id="dd-forgot-password" class="dd-link-btn">Forgot password?</button>
-      <p class="dd-login-note">V1 commercial demo. Supabase Auth can replace local session in the next backend sprint.</p>
+      <p class="dd-login-note">Production access uses organization-managed authentication.</p>
     </div>`;
     document.body.appendChild(div);
     let r="client";
