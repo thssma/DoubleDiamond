@@ -12,6 +12,7 @@ This block keeps the current static frontend architecture, but adds guardrails f
 - Table names and record ids are validated/encoded in `DDApi` before Supabase REST calls.
 - MVP table access is tracked in `js/dd-data-contract.js` and summarized in `docs/DATA_ACCESS_MATRIX.md`.
 - The production RLS target is documented in `docs/RLS_IMPLEMENTATION_PLAN.md` and drafted in `supabase/BLOCK3_RLS_PLAN.sql`.
+- `DDApi` blocks browser writes to backend-only tables and returns an explicit simulated `202` response until Edge Functions/backend endpoints are connected.
 
 ## Production Backend Requirements
 
@@ -32,4 +33,5 @@ node tools/validate-mvp-scope.js
 node tools/validate-security-scope.js
 node tools/validate-data-contract.js
 node tools/validate-rls-plan.js
+node tools/validate-backend-boundary.js
 ```

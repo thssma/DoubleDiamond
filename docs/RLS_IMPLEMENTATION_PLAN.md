@@ -19,6 +19,8 @@ This is the production security target for the MVP data contract.
 7. Keep backend-only tables without browser write policies.
 8. Move integration queues, webhook writes, AI logs, and provider sends behind Edge Functions or backend API.
 
+Until those endpoints exist, `DDApi` returns an explicit simulated response for browser writes to backend-only tables instead of sending those writes to Supabase.
+
 ## Backend-Only Tables
 
 - `integration_credentials`
@@ -34,6 +36,7 @@ This is the production security target for the MVP data contract.
 
 ```powershell
 node tools/validate-rls-plan.js
+node tools/validate-backend-boundary.js
 ```
 
 The validator blocks anon write policies and ensures backend-only tables do not get browser write policies in the Block 3 RLS plan.

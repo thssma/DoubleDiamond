@@ -63,6 +63,7 @@ node tools/validate-mvp-scope.js
 node tools/validate-security-scope.js
 node tools/validate-data-contract.js
 node tools/validate-rls-plan.js
+node tools/validate-backend-boundary.js
 ```
 
 Manual browser smoke checks:
