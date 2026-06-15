@@ -40,13 +40,16 @@ These PINs are demo-only. Production authentication belongs in the security/back
 - `js/ui/`: UI behavior modules for role UX, text cleanup, and MVP navigation.
 - `docs/MVP_SCOPE.md`: role-based MVP scope for Product/UX work.
 - `docs/BLOCK2_QA_CHECKLIST.md`: QA checklist for the Product/UX block.
+- `docs/BLOCK3_SECURITY_DATA.md`: security/data guardrails and backend readiness scope.
+- `docs/DATA_ACCESS_MATRIX.md`: MVP table access map for frontend, RLS, and backend work.
+- `docs/RLS_IMPLEMENTATION_PLAN.md`: Supabase Auth/RLS rollout plan for production.
 - `docs/archive/`: historical phase notes retained for reference.
 
 ## Block Plan
 
 1. Base cleanup: reduce `script.js`, organize docs, centralize text/encoding cleanup, and extract critical screens. Status: merged.
-2. Product and UX: finalize MVP screens by role and remove prototype noise. Status: in progress.
-3. Security and backend: authentication, Supabase schema/RLS, and API hardening.
+2. Product and UX: finalize MVP screens by role and remove prototype noise. Status: merged.
+3. Security and backend: authentication, Supabase schema/RLS, and API hardening. Status: ready for review.
 4. QA and deploy: smoke tests, deploy target, service worker validation, and final docs.
 
 ## Validation
@@ -57,6 +60,10 @@ Before merging a branch:
 node --check script.js
 Get-ChildItem js -Recurse -Filter *.js | ForEach-Object { node --check $_.FullName }
 node tools/validate-mvp-scope.js
+node tools/validate-security-scope.js
+node tools/validate-data-contract.js
+node tools/validate-rls-plan.js
+node tools/validate-backend-boundary.js
 ```
 
 Manual browser smoke checks:

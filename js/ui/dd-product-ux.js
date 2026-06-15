@@ -52,6 +52,7 @@
   function getRole(){
     if(window.DDRoleUI && typeof window.DDRoleUI.getRole === "function") return window.DDRoleUI.getRole("client");
     if(window.DDAuth && typeof window.DDAuth.getRole === "function") return window.DDAuth.getRole("client");
+    if(window.DDStorage) return window.DDStorage.get("dd_role", "client");
     return localStorage.getItem("dd_role") || "client";
   }
 
