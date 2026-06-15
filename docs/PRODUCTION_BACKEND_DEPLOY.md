@@ -73,5 +73,8 @@ window.DD_RUNTIME_CONFIG = {
 
 ```powershell
 node tools/validate-edge-functions.js
+node tools/validate-supabase-runbook.js
 node tools/validate-release.js
 ```
+
+For the full Supabase sequence, use `docs/SUPABASE_GO_LIVE_RUNBOOK.md`.
