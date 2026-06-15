@@ -42,6 +42,7 @@ These PINs are demo-only. Production authentication belongs in the security/back
 - `docs/BLOCK2_QA_CHECKLIST.md`: QA checklist for the Product/UX block.
 - `docs/BLOCK3_SECURITY_DATA.md`: security/data guardrails and backend readiness scope.
 - `docs/DATA_ACCESS_MATRIX.md`: MVP table access map for frontend, RLS, and backend work.
+- `docs/RLS_IMPLEMENTATION_PLAN.md`: Supabase Auth/RLS rollout plan for production.
 - `docs/archive/`: historical phase notes retained for reference.
 
 ## Block Plan
@@ -61,6 +62,7 @@ Get-ChildItem js -Recurse -Filter *.js | ForEach-Object { node --check $_.FullNa
 node tools/validate-mvp-scope.js
 node tools/validate-security-scope.js
 node tools/validate-data-contract.js
+node tools/validate-rls-plan.js
 ```
 
 Manual browser smoke checks:

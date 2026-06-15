@@ -11,6 +11,7 @@ This block keeps the current static frontend architecture, but adds guardrails f
 - Browser persistence should go through `DDStorage` for new code.
 - Table names and record ids are validated/encoded in `DDApi` before Supabase REST calls.
 - MVP table access is tracked in `js/dd-data-contract.js` and summarized in `docs/DATA_ACCESS_MATRIX.md`.
+- The production RLS target is documented in `docs/RLS_IMPLEMENTATION_PLAN.md` and drafted in `supabase/BLOCK3_RLS_PLAN.sql`.
 
 ## Production Backend Requirements
 
@@ -30,4 +31,5 @@ Get-ChildItem js -Recurse -Filter *.js | ForEach-Object { node --check $_.FullNa
 node tools/validate-mvp-scope.js
 node tools/validate-security-scope.js
 node tools/validate-data-contract.js
+node tools/validate-rls-plan.js
 ```
