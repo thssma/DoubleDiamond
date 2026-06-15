@@ -36,3 +36,5 @@ Create Supabase Edge Functions for:
 - `automation_flow_runs`
 - `ai_command_center_logs`
 - integration credentials, execution queue, and webhooks
+
+The function scaffolds and deployment checklist are documented in `docs/PRODUCTION_BACKEND_DEPLOY.md`.

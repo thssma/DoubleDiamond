@@ -45,7 +45,8 @@ for(const file of listFiles("tools", ".js")){
   "tools/validate-data-contract.js",
   "tools/validate-rls-plan.js",
   "tools/validate-backend-boundary.js",
-  "tools/validate-backend-foundation.js"
+  "tools/validate-backend-foundation.js",
+  "tools/validate-edge-functions.js"
 ].forEach((file) => run(file, node, [file]));
 
 console.log("Release validation passed.");
