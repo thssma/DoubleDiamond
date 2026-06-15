@@ -44,6 +44,9 @@ These PINs are demo-only. Production authentication belongs in the security/back
 - `docs/DATA_ACCESS_MATRIX.md`: MVP table access map for frontend, RLS, and backend work.
 - `docs/RLS_IMPLEMENTATION_PLAN.md`: Supabase Auth/RLS rollout plan for production.
 - `docs/FINAL_RELEASE_CHECKLIST.md`: final QA, release validation, and production follow-up.
+- `docs/BACKEND_AUTH_FOUNDATION.md`: runtime backend endpoint wiring for the next production cycle.
+- `docs/PRODUCTION_BACKEND_DEPLOY.md`: Edge Function deployment and secrets checklist.
+- `docs/SUPABASE_GO_LIVE_RUNBOOK.md`: Supabase go-live checklist to run before production deploy.
 - `docs/archive/`: historical phase notes retained for reference.
 
 ## Block Plan
@@ -65,6 +68,10 @@ node tools/validate-security-scope.js
 node tools/validate-data-contract.js
 node tools/validate-rls-plan.js
 node tools/validate-backend-boundary.js
+node tools/validate-backend-foundation.js
+node tools/validate-edge-functions.js
+node tools/validate-auth-foundation.js
+node tools/validate-supabase-runbook.js
 node tools/validate-release.js
 ```
 

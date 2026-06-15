@@ -45,8 +45,9 @@ Required checks:
 
 ## Production Follow-Up
 
+- Follow `docs/SUPABASE_GO_LIVE_RUNBOOK.md`.
 - Apply Supabase Auth.
 - Review and apply `supabase/BLOCK3_RLS_PLAN.sql`.
-- Move backend-only queues/logs/integration writes to Edge Functions or backend API.
-- Replace demo PIN access with real authentication.
+- Deploy backend-only queues/logs/integration Edge Functions.
+- Replace demo PIN access with real authentication by setting `DEMO_MODE=false`.
 - Run final deploy smoke after Netlify production publish.

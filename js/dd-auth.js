@@ -57,9 +57,14 @@
   }
 
   function validateStaffPin(role, pin){
+    if(config.DEMO_MODE === false) return false;
     if(role === "owner") return pin === DEFAULT_OWNER_PIN;
     if(role === "employee") return pin === DEFAULT_EMPLOYEE_PIN;
     return false;
+  }
+
+  function isDemoMode(){
+    return config.DEMO_MODE !== false;
   }
 
   window.DDAuth = {
@@ -67,6 +72,7 @@
     ROLE_KEY,
     DEFAULT_OWNER_PIN,
     DEFAULT_EMPLOYEE_PIN,
+    isDemoMode,
     getSession,
     setSession,
     clearSession,
