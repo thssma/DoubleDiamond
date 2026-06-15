@@ -43,14 +43,15 @@ These PINs are demo-only. Production authentication belongs in the security/back
 - `docs/BLOCK3_SECURITY_DATA.md`: security/data guardrails and backend readiness scope.
 - `docs/DATA_ACCESS_MATRIX.md`: MVP table access map for frontend, RLS, and backend work.
 - `docs/RLS_IMPLEMENTATION_PLAN.md`: Supabase Auth/RLS rollout plan for production.
+- `docs/FINAL_RELEASE_CHECKLIST.md`: final QA, release validation, and production follow-up.
 - `docs/archive/`: historical phase notes retained for reference.
 
 ## Block Plan
 
 1. Base cleanup: reduce `script.js`, organize docs, centralize text/encoding cleanup, and extract critical screens. Status: merged.
 2. Product and UX: finalize MVP screens by role and remove prototype noise. Status: merged.
-3. Security and backend: authentication, Supabase schema/RLS, and API hardening. Status: ready for review.
-4. QA and deploy: smoke tests, deploy target, service worker validation, and final docs.
+3. Security and backend: authentication, Supabase schema/RLS, and API hardening. Status: merged.
+4. QA and deploy: smoke tests, deploy target, service worker validation, and final docs. Status: ready for review.
 
 ## Validation
 
@@ -64,6 +65,7 @@ node tools/validate-security-scope.js
 node tools/validate-data-contract.js
 node tools/validate-rls-plan.js
 node tools/validate-backend-boundary.js
+node tools/validate-release.js
 ```
 
 Manual browser smoke checks:
