@@ -42,6 +42,12 @@ as $$
   select app_private.jwt_role() in ('owner', 'employee');
 $$;
 
+grant usage on schema app_private to authenticated;
+grant execute on function app_private.jwt_company_id() to authenticated;
+grant execute on function app_private.jwt_role() to authenticated;
+grant execute on function app_private.is_owner() to authenticated;
+grant execute on function app_private.is_staff() to authenticated;
+
 -- Normalize company scoping columns required by production RLS.
 alter table projects add column if not exists company_id text;
 alter table project_timeline add column if not exists company_id text;
