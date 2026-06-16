@@ -22,6 +22,18 @@ Then open:
 http://127.0.0.1:4173/index.html?v=v1-commercial-final
 ```
 
+## Test Deploy
+
+The test deployment is published from `main` through GitHub Pages using `.github/workflows/test-deploy.yml`.
+
+Expected URL:
+
+```text
+https://thssma.github.io/DoubleDiamond/
+```
+
+The test runtime uses `js/dd-runtime-test.js`, disables demo PIN access, and points the frontend to the linked Supabase project and deployed Edge Functions.
+
 ## Access
 
 - Production: use Supabase Auth with user metadata for `company_id` and `role`.
